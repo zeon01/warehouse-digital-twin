@@ -1,0 +1,76 @@
+name: steady_state
+layout: small
+duration_s: 600.0
+fleet_size: 6
+planner: cbs
+record_video: true
+# Phase 1 acceptance: ≥60 orders distributed over a 10-min run so the
+# coordinator + planner + manipulation pipeline see real concurrency and
+# at least one CBS-resolvable conflict appears in events.log. The
+# shelf_xy positions correspond to the 4x3 shelf grid in
+# warehouse/layouts/small.yaml (rows at y=8,12,16,20; cols at x=4,7,10).
+orders:
+  - {id: o01, shelf_xy: [4.0, 8.0],   arrival_t: 0.0}
+  - {id: o02, shelf_xy: [7.0, 8.0],   arrival_t: 5.0}
+  - {id: o03, shelf_xy: [10.0, 8.0],  arrival_t: 10.0}
+  - {id: o04, shelf_xy: [4.0, 12.0],  arrival_t: 15.0}
+  - {id: o05, shelf_xy: [7.0, 12.0],  arrival_t: 20.0}
+  - {id: o06, shelf_xy: [10.0, 12.0], arrival_t: 25.0}
+  - {id: o07, shelf_xy: [4.0, 16.0],  arrival_t: 30.0}
+  - {id: o08, shelf_xy: [7.0, 16.0],  arrival_t: 35.0}
+  - {id: o09, shelf_xy: [10.0, 16.0], arrival_t: 40.0}
+  - {id: o10, shelf_xy: [4.0, 20.0],  arrival_t: 45.0}
+  - {id: o11, shelf_xy: [7.0, 20.0],  arrival_t: 50.0}
+  - {id: o12, shelf_xy: [10.0, 20.0], arrival_t: 55.0}
+  - {id: o13, shelf_xy: [4.0, 8.0],   arrival_t: 60.0}
+  - {id: o14, shelf_xy: [7.0, 8.0],   arrival_t: 65.0}
+  - {id: o15, shelf_xy: [10.0, 8.0],  arrival_t: 70.0}
+  - {id: o16, shelf_xy: [4.0, 12.0],  arrival_t: 75.0}
+  - {id: o17, shelf_xy: [7.0, 12.0],  arrival_t: 80.0}
+  - {id: o18, shelf_xy: [10.0, 12.0], arrival_t: 85.0}
+  - {id: o19, shelf_xy: [4.0, 16.0],  arrival_t: 90.0}
+  - {id: o20, shelf_xy: [7.0, 16.0],  arrival_t: 95.0}
+  - {id: o21, shelf_xy: [10.0, 16.0], arrival_t: 100.0}
+  - {id: o22, shelf_xy: [4.0, 20.0],  arrival_t: 105.0}
+  - {id: o23, shelf_xy: [7.0, 20.0],  arrival_t: 110.0}
+  - {id: o24, shelf_xy: [10.0, 20.0], arrival_t: 115.0}
+  - {id: o25, shelf_xy: [4.0, 8.0],   arrival_t: 130.0}
+  - {id: o26, shelf_xy: [7.0, 8.0],   arrival_t: 140.0}
+  - {id: o27, shelf_xy: [10.0, 8.0],  arrival_t: 150.0}
+  - {id: o28, shelf_xy: [4.0, 12.0],  arrival_t: 160.0}
+  - {id: o29, shelf_xy: [7.0, 12.0],  arrival_t: 170.0}
+  - {id: o30, shelf_xy: [10.0, 12.0], arrival_t: 180.0}
+  - {id: o31, shelf_xy: [4.0, 16.0],  arrival_t: 190.0}
+  - {id: o32, shelf_xy: [7.0, 16.0],  arrival_t: 200.0}
+  - {id: o33, shelf_xy: [10.0, 16.0], arrival_t: 210.0}
+  - {id: o34, shelf_xy: [4.0, 20.0],  arrival_t: 220.0}
+  - {id: o35, shelf_xy: [7.0, 20.0],  arrival_t: 230.0}
+  - {id: o36, shelf_xy: [10.0, 20.0], arrival_t: 240.0}
+  - {id: o37, shelf_xy: [4.0, 8.0],   arrival_t: 250.0}
+  - {id: o38, shelf_xy: [7.0, 8.0],   arrival_t: 260.0}
+  - {id: o39, shelf_xy: [10.0, 8.0],  arrival_t: 270.0}
+  - {id: o40, shelf_xy: [4.0, 12.0],  arrival_t: 280.0}
+  - {id: o41, shelf_xy: [7.0, 12.0],  arrival_t: 290.0}
+  - {id: o42, shelf_xy: [10.0, 12.0], arrival_t: 300.0}
+  - {id: o43, shelf_xy: [4.0, 16.0],  arrival_t: 310.0}
+  - {id: o44, shelf_xy: [7.0, 16.0],  arrival_t: 320.0}
+  - {id: o45, shelf_xy: [10.0, 16.0], arrival_t: 330.0}
+  - {id: o46, shelf_xy: [4.0, 20.0],  arrival_t: 340.0}
+  - {id: o47, shelf_xy: [7.0, 20.0],  arrival_t: 350.0}
+  - {id: o48, shelf_xy: [10.0, 20.0], arrival_t: 360.0}
+  - {id: o49, shelf_xy: [4.0, 8.0],   arrival_t: 370.0}
+  - {id: o50, shelf_xy: [7.0, 8.0],   arrival_t: 380.0}
+  - {id: o51, shelf_xy: [10.0, 8.0],  arrival_t: 390.0}
+  - {id: o52, shelf_xy: [4.0, 12.0],  arrival_t: 400.0}
+  - {id: o53, shelf_xy: [7.0, 12.0],  arrival_t: 410.0}
+  - {id: o54, shelf_xy: [10.0, 12.0], arrival_t: 420.0}
+  - {id: o55, shelf_xy: [4.0, 16.0],  arrival_t: 430.0}
+  - {id: o56, shelf_xy: [7.0, 16.0],  arrival_t: 440.0}
+  - {id: o57, shelf_xy: [10.0, 16.0], arrival_t: 450.0}
+  - {id: o58, shelf_xy: [4.0, 20.0],  arrival_t: 460.0}
+  - {id: o59, shelf_xy: [7.0, 20.0],  arrival_t: 470.0}
+  - {id: o60, shelf_xy: [10.0, 20.0], arrival_t: 480.0}
+  - {id: o61, shelf_xy: [4.0, 8.0],   arrival_t: 490.0}
+  - {id: o62, shelf_xy: [7.0, 8.0],   arrival_t: 500.0}
+  - {id: o63, shelf_xy: [10.0, 8.0],  arrival_t: 510.0}
+  - {id: o64, shelf_xy: [4.0, 12.0],  arrival_t: 520.0}

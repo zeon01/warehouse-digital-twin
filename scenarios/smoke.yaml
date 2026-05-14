@@ -1,0 +1,8 @@
+name: smoke
+layout: small
+duration_s: 120.0
+fleet_size: 2
+planner: greedy
+record_video: false
+orders:
+  - {id: o1, shelf_xy: [4.0, 8.0], arrival_t: 0.0}
