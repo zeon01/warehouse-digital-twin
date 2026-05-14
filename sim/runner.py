@@ -49,25 +49,52 @@ def make_simulation_app(headless: bool = True):
 def published_topics(timeout_s: float = 5.0) -> list[str]:
     """Poll `ros2 topic list` until non-empty or timeout, return the list.
 
-    Sources `/opt/ros/humble/setup.bash` and the local ROS2 environment
-    that Isaac Sim's bridge publishes into. Polls because the bridge can
-    take a moment after `world.step(render=True)` calls to actually flush
-    topic registrations.
+    Inherits the parent process env (which must already have ROS2 sourced —
+    `ROS_DISTRO`, `AMENT_PREFIX_PATH`, `LD_LIBRARY_PATH`, and ideally
+    `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` to avoid FastDDS conflicts with
+    Isaac Sim's bundled DDS). DO NOT use `bash -lc` — login shells reset
+    env vars and silently break DDS routing, so the topic list looks empty
+    even when the bridge is publishing.
     """
+    import os
     import subprocess
     import time
 
+    # Resolve the ros2 binary via PATH (the parent shell sourced ROS2)
+    ros2 = "/opt/ros/humble/bin/ros2"
+    if not os.path.exists(ros2):
+        return []
+
+    # Strip Isaac Sim's Python 3.11 paths out of PYTHONPATH but KEEP the
+    # ROS2 entry. The ros2 CLI runs under system /usr/bin/python3 (3.10);
+    # if PYTHONPATH includes /isaac-sim/kit/python/lib/python3.11/*, the
+    # first `import re` crashes with "SRE module mismatch". If we clear
+    # PYTHONPATH entirely, ros2cli can't find its own package metadata
+    # and fails with "No package metadata was found for ros2cli".
+    pp_parts = os.environ.get("PYTHONPATH", "").split(":")
+    pp_clean = ":".join(p for p in pp_parts if p and "/isaac-sim/" not in p)
+    clean_env = {k: v for k, v in os.environ.items() if k != "PYTHONHOME"}
+    clean_env["PYTHONPATH"] = pp_clean
+
     end = time.time() + timeout_s
     last: list[str] = []
+    out = None
     while time.time() < end:
         out = subprocess.run(
-            ["bash", "-lc", "source /opt/ros/humble/setup.bash && ros2 topic list"],
+            [ros2, "topic", "list"],
             capture_output=True,
             text=True,
             check=False,
+            env=clean_env,
         )
         last = [t for t in out.stdout.splitlines() if t.strip()]
         if last:
             return last
         time.sleep(0.5)
+    if out is not None:
+        from pathlib import Path
+
+        Path("/tmp/topics_debug.txt").write_text(
+            f"returncode={out.returncode}\nstdout={out.stdout!r}\nstderr={out.stderr!r}\n"
+        )
     return last
