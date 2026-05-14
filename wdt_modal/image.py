@@ -62,6 +62,10 @@ image = (
         "networkx>=3.2",
         "opencv-python-headless>=4.9",
         "pyyaml>=6.0",
+        # usd-core gives us pxr (Usd, UsdGeom, UsdLux, Gf) in Modal's Python directly,
+        # so USD authoring (warehouse scene builder) doesn't need to subprocess into
+        # /isaac-sim/python.sh — which can't import pxr standalone anyway.
+        "usd-core>=24.0",
     )
     .env(
         {
@@ -79,4 +83,6 @@ image = (
     # `from wdt_modal.image import image` and similar. copy=False (default) means
     # this is added at container startup, not baked into the image — fast iteration.
     .add_local_python_source("wdt_modal")
+    # Mount the full warehouse/ directory (not just .py — we need layouts/*.yaml too).
+    .add_local_dir("warehouse", "/root/warehouse", copy=False)
 )

@@ -129,3 +129,34 @@ def _add_amr_spawn_markers(stage, layout: LayoutConfig) -> list[tuple[float, flo
 def build_from_yaml(layout_path: str | Path, out_usd: str | Path) -> str:
     """Convenience: load layout YAML and build the scene in one call."""
     return build_scene(load_layout(layout_path), out_usd)
+
+
+def _main(argv: list[str] | None = None) -> int:
+    """CLI: `python -m warehouse.generators.build_scene <layout> [out_usd]`.
+
+    Resolves <layout> to warehouse/layouts/<layout>.yaml. If out_usd is
+    omitted, writes to outputs/scenes/<layout>.usd alongside the repo.
+    """
+    import sys
+
+    args = list(sys.argv[1:] if argv is None else argv)
+    if not args or args[0] in {"-h", "--help"}:
+        print("usage: python -m warehouse.generators.build_scene <layout-name> [out_usd]")
+        return 2
+
+    layout_name = args[0]
+    layout_path = Path(__file__).resolve().parents[1] / "layouts" / f"{layout_name}.yaml"
+    if not layout_path.exists():
+        print(f"error: layout file not found: {layout_path}")
+        return 1
+
+    out_usd = Path(args[1]) if len(args) > 1 else Path("outputs/scenes") / f"{layout_name}.usd"
+    out_usd.parent.mkdir(parents=True, exist_ok=True)
+
+    path = build_from_yaml(layout_path, out_usd)
+    print(f"wrote {path}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main())
