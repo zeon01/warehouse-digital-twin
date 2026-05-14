@@ -19,6 +19,7 @@ from geometry_msgs.msg import PoseStamped
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 from rclpy.node import Node
+from tf2_ros import Buffer, TransformListener
 
 # Make the coordinator package importable regardless of which path the
 # ROS2 entry point launches from. /work/ is where we untar ros2_ws on
@@ -50,6 +51,12 @@ class FleetCoordinator(Node):
         self.create_subscription(PoseStamped, "/orders/enqueue", self._on_order, 10)
         self.create_timer(1.0, self._tick)
 
+        # TF listener for live AMR poses (frame `<ns>/base_link` in `map`).
+        # The Carter ROS USD's transform_tree_odometry OmniGraph publishes
+        # the AMR pose under its namespace; we look it up each tick.
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
+
         self.get_logger().info(f"fleet_coordinator up — managing {len(amr_ids)} AMRs: {amr_ids}")
 
     def _on_order(self, msg: PoseStamped) -> None:
@@ -60,10 +67,18 @@ class FleetCoordinator(Node):
             f"enqueued order {oid} at ({msg.pose.position.x:.2f}, {msg.pose.position.y:.2f})"
         )
 
+    def _refresh_poses(self) -> None:
+        """Look up each AMR's pose in the `map` frame via TF."""
+        for a in self.amr_ids:
+            try:
+                tf = self._tf_buffer.lookup_transform("map", f"{a}/base_link", rclpy.time.Time())
+            except Exception:
+                # TF not yet available for this AMR — keep the last known pose.
+                continue
+            self._poses[a] = (tf.transform.translation.x, tf.transform.translation.y)
+
     def _tick(self) -> None:
-        # NOTE: pose updates come from the TF listener (Task 33). Until then
-        # _poses stays at (0,0) for every AMR which is fine for exercising
-        # the assignment + deadlock paths but not for real navigation.
+        self._refresh_poses()
         t = self.get_clock().now().nanoseconds * 1e-9
         self._deadlock.tick(t, self._poses)
         if self._deadlock.deadlocked():
