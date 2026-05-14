@@ -14,14 +14,19 @@ from sim.spawn import spawn_nova_carter
 
 
 def _namespace_subtree(prim_path: str, namespace: str) -> int:
-    """Set inputs:nodeNamespace on every OG node under prim_path. Returns count set.
+    """Namespace all ROS2 publishers/subscribers under prim_path. Returns count set.
 
-    The Nova_Carter_ROS USD wires up ~30 ROS2 publisher / subscriber OG nodes
-    (one each for tf, odom, imu, lidar, several stereo cameras, etc.). Each
-    of these nodes has an `inputs:nodeNamespace` token attribute that, if
-    set, gets prepended to the topic name. Setting them in bulk via stage
-    traversal handles all publishers and subscribers without us needing to
-    know each node's path explicitly.
+    Nova_Carter_ROS uses TWO namespacing patterns and we need to patch both:
+
+    1. Direct `inputs:nodeNamespace` on publisher OG nodes (e.g. the per-IMU
+       ROS2PublishImu nodes). Setting this directly prepends to the topic.
+
+    2. Indirect via a "namespace" or "node_namespace" constant OG node whose
+       `inputs:value` is connected as an input to other publishers (drives
+       /cmd_vel, /chassis/odom, /front_3d_lidar/lidar_points, stereo camera
+       publishers, etc.). The constant's pre-baked value is either '' / 'None'
+       (no namespace) or a partial like 'front_fisheye_camera/left'; we
+       prepend our namespace so multi-instance topics don't collide.
     """
     import omni.usd
 
@@ -32,10 +37,24 @@ def _namespace_subtree(prim_path: str, namespace: str) -> int:
         path = prim.GetPath().pathString
         if not (path == prim_path or path.startswith(prefix)):
             continue
-        attr = prim.GetAttribute("inputs:nodeNamespace")
-        if attr.IsValid():
-            attr.Set(namespace)
+
+        # Pattern 1: direct nodeNamespace on a publisher node
+        ns_attr = prim.GetAttribute("inputs:nodeNamespace")
+        if ns_attr.IsValid():
+            ns_attr.Set(namespace)
             count += 1
+
+        # Pattern 2: namespace / node_namespace constant OG node feeding others
+        if path.endswith("/namespace") or path.endswith("/node_namespace"):
+            val_attr = prim.GetAttribute("inputs:value")
+            if val_attr.IsValid():
+                current = str(val_attr.Get() or "").strip()
+                if current in ("", "None"):
+                    new = namespace
+                else:
+                    new = f"{namespace}/{current}"
+                val_attr.Set(new)
+                count += 1
     return count
 
 

@@ -1,0 +1,110 @@
+"""Combined smoke: 6 Carters + 1 Franka + overhead/cell cameras.
+
+Verifies the full Phase 1 scene composes without crashes and the AMR
+fleet's ROS2 topics still flow when a manipulator and additional camera
+prims are added to the world.
+
+Invoked on a vast.ai instance via:
+    source /opt/ros/humble/setup.bash
+    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    /isaac-sim/python.sh wdt_vast/combined_smoke.py
+
+Outputs to:
+- /tmp/combined_progress.txt — phase markers
+- /tmp/combined_topics.json  — topic counts and per-namespace breakdown
+"""
+
+import json
+import sys
+import traceback
+from datetime import datetime, timezone
+from pathlib import Path
+
+PROGRESS = Path("/tmp/combined_progress.txt")
+TOPICS_OUT = Path("/tmp/combined_topics.json")
+ERROR_OUT = Path("/tmp/combined_error.txt")
+
+PROGRESS.write_text("")
+
+
+def mark(phase: str) -> None:
+    with PROGRESS.open("a") as fh:
+        fh.write(f"{datetime.now(timezone.utc).isoformat()}  {phase}\n")
+
+
+try:
+    mark("script_start")
+    sys.path.insert(0, "/tmp")
+    from sim.multi_robot import spawn_amr_fleet
+    from sim.runner import (
+        add_cell_camera,
+        add_overhead_camera,
+        make_simulation_app,
+        published_topics,
+    )
+    from sim.spawn import spawn_franka
+    from warehouse.layout import load_layout
+
+    mark("imports_ok")
+
+    sim = make_simulation_app(headless=True)
+    mark("simapp_booted")
+
+    from isaacsim.core.api import World  # noqa: E402
+
+    world = World()
+    world.scene.add_default_ground_plane()
+
+    layout = load_layout("/tmp/warehouse/layouts/small.yaml")
+
+    gx, gy = layout.amrs.spawn.grid
+    ox, oy = layout.amrs.spawn.origin_xy
+    spacing = layout.amrs.spawn.spacing_m
+    poses = [(ox + c * spacing, oy + r * spacing) for r in range(gy) for c in range(gx)][
+        : layout.amrs.count
+    ]
+    spawn_amr_fleet(world, poses)
+    mark(f"amr_fleet_spawned_n={len(poses)}")
+
+    px, py = layout.pick_cell.position_xy
+    spawn_franka(world, "/World/pick_arm", "pick_arm", position_xyz=(px, py, 1.0))
+    mark("franka_spawned")
+
+    add_overhead_camera("/World")
+    add_cell_camera("/World")
+    mark("cameras_added")
+
+    world.reset()
+    mark("world_reset")
+
+    for _ in range(180):
+        world.step(render=True)
+    mark("stepped_180_frames")
+
+    topics = published_topics(timeout_s=15.0)
+    by_namespace: dict[str, list[str]] = {}
+    for t in topics:
+        parts = t.lstrip("/").split("/", 1)
+        if parts[0].startswith("amr_"):
+            by_namespace.setdefault(parts[0], []).append(t)
+
+    TOPICS_OUT.write_text(
+        json.dumps(
+            {
+                "all": topics,
+                "n_topics": len(topics),
+                "by_namespace": by_namespace,
+                "namespaces_seen": sorted(by_namespace.keys()),
+                "non_amr_topics": [t for t in topics if not t.lstrip("/").startswith("amr_")],
+            },
+            indent=2,
+        )
+    )
+    mark(f"topics_count={len(topics)}_namespaces={len(by_namespace)}")
+
+    sim.close()
+    mark("sim_closed")
+except Exception as e:
+    ERROR_OUT.write_text(f"{type(e).__name__}: {e}\n\n{traceback.format_exc()}")
+    mark(f"EXCEPTION:{type(e).__name__}")
+    raise

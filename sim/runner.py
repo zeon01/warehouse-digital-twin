@@ -78,7 +78,6 @@ def published_topics(timeout_s: float = 5.0) -> list[str]:
 
     end = time.time() + timeout_s
     last: list[str] = []
-    out = None
     while time.time() < end:
         out = subprocess.run(
             [ros2, "topic", "list"],
@@ -91,10 +90,18 @@ def published_topics(timeout_s: float = 5.0) -> list[str]:
         if last:
             return last
         time.sleep(0.5)
-    if out is not None:
-        from pathlib import Path
-
-        Path("/tmp/topics_debug.txt").write_text(
-            f"returncode={out.returncode}\nstdout={out.stdout!r}\nstderr={out.stderr!r}\n"
-        )
     return last
+
+
+def add_overhead_camera(parent_path: str = "/World", position=(10, 15, 25), look_at=(10, 15, 0)):
+    """Add a top-down camera framing a ~20x30m warehouse footprint. Returns the prim path."""
+    import omni.replicator.core as rep
+
+    return rep.create.camera(position=position, look_at=look_at, parent=parent_path)
+
+
+def add_cell_camera(parent_path: str = "/World", position=(16, 15, 1.5), look_at=(16, 15, 0.5)):
+    """Add a camera framed on the pick cell at eye level. Returns the prim path."""
+    import omni.replicator.core as rep
+
+    return rep.create.camera(position=position, look_at=look_at, parent=parent_path)
