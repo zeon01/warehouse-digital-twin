@@ -45,3 +45,6 @@ models/anygrasp/
 # OS
 Thumbs.db
 ehthumbs.db
+
+# Superpowers brainstorm sessions
+.superpowers/
