@@ -1,0 +1,35 @@
+[project]
+name = "warehouse-digital-twin"
+version = "0.0.1"
+description = "Warehouse digital twin on Isaac Sim + ROS2 + Nav2 + MoveIt2 with a pre-trained manipulation cell."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "modal>=0.64",
+    "pydantic>=2.5",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "networkx>=3.2",
+    "opencv-python>=4.9",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.3",
+    "pre-commit>=3.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-ra --strict-markers --cov-report=term-missing"
