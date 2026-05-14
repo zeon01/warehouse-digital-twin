@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>warehouse_bringup</name>
+  <version>0.0.1</version>
+  <description>Launch + config for the warehouse digital twin (Nav2 per AMR, MoveIt2, bridge).</description>
+  <maintainer email="zeon01@users.noreply.github.com">Saad Sharif Ahmed</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>moveit</exec_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>
