@@ -1,8 +1,11 @@
 # Warehouse Digital Twin
 
+[![Unit Tests](https://github.com/zeon01/warehouse-digital-twin/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/zeon01/warehouse-digital-twin/actions/workflows/unit-tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An open-source warehouse digital twin built on NVIDIA Isaac Sim, combining ROS2 + Nav2 multi-agent navigation with a pre-trained manipulation cell (FoundationPose + AnyGrasp + MoveIt2).
 
-> **Status:** under active development. See [the design spec](docs/superpowers/specs/2026-05-14-warehouse-digital-twin-design.md) for the full plan.
+> **Status:** Phase 1 in active development. Milestones tracked in [the Phase 1 plan](docs/superpowers/plans/2026-05-14-warehouse-digital-twin-phase-1.md).
 
 ## What this is
 
@@ -24,4 +27,4 @@ A reference implementation of the digital-twin validation pipeline that companie
 
 ## License
 
-TBD — likely MIT or Apache 2.0.
+MIT — see [LICENSE](LICENSE).
