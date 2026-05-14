@@ -67,8 +67,63 @@ def build_scene(layout: LayoutConfig, out_usd: str | Path) -> str:
     light = UsdLux.DistantLight.Define(stage, "/World/SunLight")
     light.CreateIntensityAttr(3000.0)
 
+    _add_shelves(stage, layout)
+    _add_pick_cell(stage, layout)
+    _add_amr_spawn_markers(stage, layout)
+
     stage.GetRootLayer().Save()
     return str(out_usd)
+
+
+def _add_shelves(stage, layout: LayoutConfig) -> None:
+    """Grid of shelf cubes per layout.shelves config."""
+    from pxr import Gf, UsdGeom
+
+    ox, oy = layout.shelves.origin_xy
+    sx, sy = layout.shelves.spacing_xy
+    for row in range(layout.shelves.rows):
+        for col in range(layout.shelves.cols):
+            cx = ox + col * sx
+            cy = oy + row * sy
+            prim = UsdGeom.Cube.Define(stage, f"/World/Shelves/Shelf_{row}_{col}")
+            prim.CreateSizeAttr(1.0)
+            UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(cx, cy, 1.0))
+            UsdGeom.Xformable(prim).AddScaleOp().Set(Gf.Vec3d(1.0, 0.6, 2.0))
+
+
+def _add_pick_cell(stage, layout: LayoutConfig) -> None:
+    """Block placeholder for the manipulator's pick cell base."""
+    from pxr import Gf, UsdGeom
+
+    px, py = layout.pick_cell.position_xy
+    base = UsdGeom.Cube.Define(stage, "/World/PickCell/Base")
+    base.CreateSizeAttr(1.0)
+    UsdGeom.Xformable(base).AddTranslateOp().Set(Gf.Vec3d(px, py, 0.5))
+    UsdGeom.Xformable(base).AddScaleOp().Set(Gf.Vec3d(1.5, 1.5, 1.0))
+
+
+def _add_amr_spawn_markers(stage, layout: LayoutConfig) -> list[tuple[float, float]]:
+    """Small flat markers at each AMR spawn pose; returns the pose list."""
+    from pxr import Gf, UsdGeom
+
+    gx, gy = layout.amrs.spawn.grid
+    ox, oy = layout.amrs.spawn.origin_xy
+    spacing = layout.amrs.spawn.spacing_m
+    poses: list[tuple[float, float]] = []
+    idx = 0
+    for r in range(gy):
+        for c in range(gx):
+            if idx >= layout.amrs.count:
+                break
+            x = ox + c * spacing
+            y = oy + r * spacing
+            poses.append((x, y))
+            m = UsdGeom.Cube.Define(stage, f"/World/SpawnMarkers/AMR_{idx}")
+            m.CreateSizeAttr(1.0)
+            UsdGeom.Xformable(m).AddTranslateOp().Set(Gf.Vec3d(x, y, 0.05))
+            UsdGeom.Xformable(m).AddScaleOp().Set(Gf.Vec3d(0.3, 0.3, 0.1))
+            idx += 1
+    return poses
 
 
 def build_from_yaml(layout_path: str | Path, out_usd: str | Path) -> str:
