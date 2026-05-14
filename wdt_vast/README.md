@@ -30,6 +30,17 @@ All rendering tasks live here instead, on rented vast.ai instances.
    scp -P <ssh-port> 'root@<ssh-host>:/tmp/out_dir/*' outputs/<task-name>/
    ```
 
+3a. **For ROS2-using scripts:** ROS2 Humble must be installed on the instance
+   (`apt install ros-humble-ros-base`, one-time) AND sourced before python.sh:
+
+   ```bash
+   ssh ... 'source /opt/ros/humble/setup.bash && /isaac-sim/python.sh ...'
+   ```
+
+   The bridge extension `isaacsim.ros2.bridge` probes `ROS_DISTRO` at startup
+   and refuses to initialize without it. The legacy `omni.isaac.ros2_bridge`
+   alias is silently ignored in 5.0 — use the new name.
+
 4. **Stop after each session** to drop billing to storage-only (~$0.025/hr):
 
    ```bash

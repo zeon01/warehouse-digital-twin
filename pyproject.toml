@@ -41,5 +41,5 @@ addopts = "-ra --strict-markers --cov-report=term-missing"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["wdt_modal*", "wdt_vast*", "warehouse*", "coordinator*", "manipulation*", "observability*", "scenarios*"]
+include = ["wdt_modal*", "wdt_vast*", "warehouse*", "sim*", "coordinator*", "manipulation*", "observability*", "scenarios*"]
 exclude = ["tests*", "docs*", ".venv*"]
