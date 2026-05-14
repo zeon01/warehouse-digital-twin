@@ -7,6 +7,10 @@ where pxr is real.
 
 USD authoring does NOT need rendering / Vulkan — only the pxr bindings —
 so this can run on Modal even though full Isaac Sim render is broken there.
+
+Each prim type gets a colored UsdPreviewSurface material so a rendered
+overhead view is interpretable: grey floor, white walls, blue shelves,
+red pick cell, green AMR spawn markers.
 """
 
 from __future__ import annotations
@@ -14,6 +18,36 @@ from __future__ import annotations
 from pathlib import Path
 
 from warehouse.layout import LayoutConfig, load_layout
+
+# Material colors per prim type — chosen for high contrast in renders.
+_COLORS = {
+    "floor": (0.4, 0.4, 0.4),
+    "wall": (0.85, 0.85, 0.85),
+    "shelf": (0.2, 0.4, 0.8),
+    "pick_cell": (0.85, 0.2, 0.2),
+    "spawn_marker": (0.2, 0.8, 0.3),
+}
+
+
+def _make_material(stage, name: str, color: tuple[float, float, float], roughness: float = 0.6):
+    """Define a UsdPreviewSurface material and return it for binding."""
+    from pxr import Gf, Sdf, UsdShade
+
+    mat_path = f"/World/Materials/{name}"
+    material = UsdShade.Material.Define(stage, mat_path)
+    shader = UsdShade.Shader.Define(stage, f"{mat_path}/Shader")
+    shader.CreateIdAttr("UsdPreviewSurface")
+    shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*color))
+    shader.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(roughness)
+    shader.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.0)
+    material.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
+    return material
+
+
+def _bind(prim, material) -> None:
+    from pxr import UsdShade
+
+    UsdShade.MaterialBindingAPI.Apply(prim.GetPrim()).Bind(material)
 
 
 def build_scene(layout: LayoutConfig, out_usd: str | Path) -> str:
@@ -25,6 +59,13 @@ def build_scene(layout: LayoutConfig, out_usd: str | Path) -> str:
     UsdGeom.SetStageMetersPerUnit(stage, 1.0)
 
     UsdGeom.Xform.Define(stage, "/World")
+    UsdGeom.Scope.Define(stage, "/World/Materials")
+
+    mat_floor = _make_material(stage, "Floor", _COLORS["floor"], roughness=0.8)
+    mat_wall = _make_material(stage, "Wall", _COLORS["wall"], roughness=0.7)
+    mat_shelf = _make_material(stage, "Shelf", _COLORS["shelf"], roughness=0.5)
+    mat_pick = _make_material(stage, "PickCell", _COLORS["pick_cell"], roughness=0.4)
+    mat_spawn = _make_material(stage, "Spawn", _COLORS["spawn_marker"], roughness=0.6)
 
     # Floor — a thin cube centered on the warehouse footprint, sunk slightly into z<0
     floor = UsdGeom.Cube.Define(stage, "/World/Floor")
@@ -35,6 +76,7 @@ def build_scene(layout: LayoutConfig, out_usd: str | Path) -> str:
     UsdGeom.Xformable(floor).AddScaleOp().Set(
         Gf.Vec3d(layout.warehouse.width_m, layout.warehouse.depth_m, 0.1)
     )
+    _bind(floor, mat_floor)
 
     # Walls — four thin cubes along the perimeter
     wall_h = 3.0
@@ -62,20 +104,27 @@ def build_scene(layout: LayoutConfig, out_usd: str | Path) -> str:
         prim.CreateSizeAttr(1.0)
         UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(cx, cy, wall_h / 2))
         UsdGeom.Xformable(prim).AddScaleOp().Set(Gf.Vec3d(sx, sy, wall_h))
+        _bind(prim, mat_wall)
 
-    # Distant light — sun-like, no specific direction set here
-    light = UsdLux.DistantLight.Define(stage, "/World/SunLight")
-    light.CreateIntensityAttr(3000.0)
+    # Lighting — distant "sun" + dome for ambient fill. The previous render had
+    # a single 3000-intensity DistantLight which produced a huge white hot spot;
+    # this two-light setup gives even ambient illumination plus directional shadow.
+    sun = UsdLux.DistantLight.Define(stage, "/World/SunLight")
+    sun.CreateIntensityAttr(800.0)
+    UsdGeom.Xformable(sun).AddRotateXYZOp().Set(Gf.Vec3f(-45.0, 0.0, 30.0))
 
-    _add_shelves(stage, layout)
-    _add_pick_cell(stage, layout)
-    _add_amr_spawn_markers(stage, layout)
+    dome = UsdLux.DomeLight.Define(stage, "/World/DomeLight")
+    dome.CreateIntensityAttr(500.0)
+
+    _add_shelves(stage, layout, mat_shelf)
+    _add_pick_cell(stage, layout, mat_pick)
+    _add_amr_spawn_markers(stage, layout, mat_spawn)
 
     stage.GetRootLayer().Save()
     return str(out_usd)
 
 
-def _add_shelves(stage, layout: LayoutConfig) -> None:
+def _add_shelves(stage, layout: LayoutConfig, material) -> None:
     """Grid of shelf cubes per layout.shelves config."""
     from pxr import Gf, UsdGeom
 
@@ -89,9 +138,10 @@ def _add_shelves(stage, layout: LayoutConfig) -> None:
             prim.CreateSizeAttr(1.0)
             UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(cx, cy, 1.0))
             UsdGeom.Xformable(prim).AddScaleOp().Set(Gf.Vec3d(1.0, 0.6, 2.0))
+            _bind(prim, material)
 
 
-def _add_pick_cell(stage, layout: LayoutConfig) -> None:
+def _add_pick_cell(stage, layout: LayoutConfig, material) -> None:
     """Block placeholder for the manipulator's pick cell base."""
     from pxr import Gf, UsdGeom
 
@@ -100,10 +150,15 @@ def _add_pick_cell(stage, layout: LayoutConfig) -> None:
     base.CreateSizeAttr(1.0)
     UsdGeom.Xformable(base).AddTranslateOp().Set(Gf.Vec3d(px, py, 0.5))
     UsdGeom.Xformable(base).AddScaleOp().Set(Gf.Vec3d(1.5, 1.5, 1.0))
+    _bind(base, material)
 
 
-def _add_amr_spawn_markers(stage, layout: LayoutConfig) -> list[tuple[float, float]]:
-    """Small flat markers at each AMR spawn pose; returns the pose list."""
+def _add_amr_spawn_markers(stage, layout: LayoutConfig, material) -> list[tuple[float, float]]:
+    """Marker cubes at each AMR spawn pose; returns the pose list.
+
+    Markers are sized 0.5x0.5x0.5m (was 0.3x0.3x0.1) so they're visible in an
+    overhead render, not invisible specks.
+    """
     from pxr import Gf, UsdGeom
 
     gx, gy = layout.amrs.spawn.grid
@@ -120,8 +175,9 @@ def _add_amr_spawn_markers(stage, layout: LayoutConfig) -> list[tuple[float, flo
             poses.append((x, y))
             m = UsdGeom.Cube.Define(stage, f"/World/SpawnMarkers/AMR_{idx}")
             m.CreateSizeAttr(1.0)
-            UsdGeom.Xformable(m).AddTranslateOp().Set(Gf.Vec3d(x, y, 0.05))
-            UsdGeom.Xformable(m).AddScaleOp().Set(Gf.Vec3d(0.3, 0.3, 0.1))
+            UsdGeom.Xformable(m).AddTranslateOp().Set(Gf.Vec3d(x, y, 0.25))
+            UsdGeom.Xformable(m).AddScaleOp().Set(Gf.Vec3d(0.5, 0.5, 0.5))
+            _bind(m, material)
             idx += 1
     return poses
 
