@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "warehouse-digital-twin"
 version = "0.0.1"
@@ -10,7 +14,7 @@ dependencies = [
     "numpy>=1.26",
     "scipy>=1.11",
     "networkx>=3.2",
-    "opencv-python>=4.9",
+    "opencv-python-headless>=4.9",
     "pyyaml>=6.0",
 ]
 
@@ -33,3 +37,8 @@ select = ["E", "F", "I", "B", "UP"]
 testpaths = ["tests"]
 python_files = "test_*.py"
 addopts = "-ra --strict-markers --cov-report=term-missing"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wdt_modal*", "scenes*", "coordinator*", "manipulation*", "observability*", "scenarios*"]
+exclude = ["tests*", "docs*", ".venv*"]
