@@ -120,6 +120,31 @@ try:
     )
     mark(f"coordinator_launched_pid={coordinator_proc.pid}")
 
+    # Manipulation pipeline — instantiated in-process per Task 43 plan.
+    # **Phase 1 gap:** the actual FoundationPose + AnyGrasp + MoveIt2
+    # packages aren't installed on the vast.ai instance (model weights
+    # ~GB each, MoveIt2 needs its own ROS deps). The pipeline's
+    # `_lazy_load()` raises ImportError on first call, so we wrap the
+    # instantiation in a try and disable the pipeline if the deps are
+    # missing — keeps run_scenario alive end-to-end. Phase 2 will land
+    # the model installs + a real per-order trigger from the
+    # coordinator's "near pick cell" signal.
+    manip = None
+    try:
+        from manipulation.grasping import GraspGenerator
+        from manipulation.motion_planning import ArmPlanner
+        from manipulation.pipeline import ManipulationPipeline
+        from manipulation.pose_estimation import PoseEstimator
+
+        manip = ManipulationPipeline(
+            pose_estimator=PoseEstimator(model_dir="/vol/models/foundationpose"),
+            grasp_generator=GraspGenerator(model_dir="/vol/models/anygrasp"),
+            arm=ArmPlanner(planning_group="panda_arm"),
+        )
+        mark("manip_pipeline_constructed")
+    except Exception as e:
+        mark(f"manip_pipeline_skipped:{type(e).__name__}")
+
     world.reset()
     mark("world_reset")
 
