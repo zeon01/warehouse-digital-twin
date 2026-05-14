@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Modal
+.modal/
+
+# ROS2 colcon
+build/
+install/
+log/
+*.bag
+
+# Sim outputs (per-run, not portfolio assets)
+runs/
+outputs/
+*.usd~
+*.usda~
+
+# ML model weights (downloaded at runtime, cached on Modal volume)
+models/foundationpose/
+models/anygrasp/
+*.pth
+*.onnx
+*.safetensors
+
+# OS
+Thumbs.db
+ehthumbs.db
