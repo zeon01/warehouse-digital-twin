@@ -7,7 +7,10 @@ import modal
 ISAAC_SIM_IMAGE = "nvcr.io/nvidia/isaac-sim:5.0.0"
 
 image = (
-    modal.Image.from_registry(ISAAC_SIM_IMAGE, add_python="3.10")
+    # add_python="3.11" matches the Python that Isaac Sim 5.0 ships its Kit C
+    # extensions for (carb._carb.cpython-311-*.so etc.). A 3.10 interpreter cannot
+    # load those, so SimulationApp() would always fail.
+    modal.Image.from_registry(ISAAC_SIM_IMAGE, add_python="3.11")
     # Clear the base image's ENTRYPOINT — Isaac Sim's default entrypoint auto-launches
     # Omniverse Kit (loading 100+ extensions), which takes >15min and blows out Modal's
     # startup_timeout. Our function code will explicitly invoke SimulationApp() when it
