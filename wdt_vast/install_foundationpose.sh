@@ -1,67 +1,81 @@
 #!/usr/bin/env bash
-# Pull FoundationPose wheels + weights from Modal volume to vast.ai, then
-# install into the Isaac Sim Python environment.
+# Install FoundationPose from source on a vast.ai instance.
 #
-# Usage (on vast.ai):
-#     bash wdt_vast/install_foundationpose.sh
+# Pulls weights from the Modal volume populated by
+# wdt_modal/stage_foundationpose_weights.py, builds the mycpp pybind11
+# extension, and pip-installs the package into Isaac Sim's python.sh
+# environment.
 #
 # Prereqs (one-time per instance):
-#     pip install --user modal
-#     modal token new       # interactive — paste from modal.com/settings/tokens
+#   pip install --user modal       # gives modal CLI on PATH
+#   modal token new                # interactive token paste
 #
-# Output:
-#     /opt/foundationpose/wheels/        — extracted pip wheels
-#     /opt/foundationpose/checkpoints/   — model weights (~2 GB)
-#     /opt/foundationpose/src/           — pinned FoundationPose source
-#     foundationpose installed in Isaac Sim's python.sh environment
+# Usage:
+#   bash wdt_vast/install_foundationpose.sh
+#
+# Idempotent — re-runs skip clone and weight pulls if already present.
 
 set -euo pipefail
 
-FP_COMMIT=4517f47b5e7e4a7e0d3b9e5d8f8c9e7b8a9d8c5e
-FP_COMMIT_SHORT=${FP_COMMIT:0:8}
-WHEELS_TGZ_NAME="foundationpose-wheels-${FP_COMMIT_SHORT}.tar.gz"
+FP_COMMIT=a1b694b83e633c2cb6115b9063d940a687759392
+PREFIX=/opt/foundationpose
+SRC="$PREFIX/src"
+WEIGHTS="$SRC/weights"
+ISAAC_PY=/isaac-sim/python.sh
 
-INSTALL_PREFIX=/opt/foundationpose
-WHEELS_DIR="$INSTALL_PREFIX/wheels"
-CHECKPOINTS_DIR="$INSTALL_PREFIX/checkpoints"
-SRC_DIR="$INSTALL_PREFIX/src"
+REFINER_RUN=2023-10-28-18-33-37
+SCORER_RUN=2024-01-11-20-02-45
 
-mkdir -p "$WHEELS_DIR" "$CHECKPOINTS_DIR"
+echo "==> apt deps for mycpp build"
+apt-get update -y
+apt-get install -y --no-install-recommends \
+  cmake ninja-build build-essential \
+  libeigen3-dev libboost-all-dev \
+  python3-pybind11
 
-WHEELS_TGZ=/tmp/$WHEELS_TGZ_NAME
-if [ ! -f "$WHEELS_TGZ" ]; then
-  echo "==> pulling wheels tarball from Modal"
-  modal volume get foundationpose-models "$WHEELS_TGZ_NAME" "$WHEELS_TGZ"
+echo "==> cloning + pinning FoundationPose ($FP_COMMIT)"
+mkdir -p "$PREFIX"
+if [ ! -d "$SRC/.git" ]; then
+  git clone https://github.com/NVlabs/FoundationPose "$SRC"
 fi
-echo "==> extracting wheels"
-tar -xzf "$WHEELS_TGZ" -C "$WHEELS_DIR"
+git -C "$SRC" fetch --depth 1 origin "$FP_COMMIT"
+git -C "$SRC" checkout "$FP_COMMIT"
 
-if [ ! -f "$CHECKPOINTS_DIR/model_best.pth" ]; then
-  echo "==> pulling checkpoints from Modal (~2 GB, may take ~5-10 min)"
-  modal volume get foundationpose-models checkpoints "$CHECKPOINTS_DIR/"
-fi
+echo "==> building mycpp (pybind11)"
+cd "$SRC/mycpp"
+rm -rf build && mkdir build && cd build
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DPython3_ROOT_DIR="$($ISAAC_PY -c 'import sys; print(sys.prefix)')"
+cmake --build . -j"$(nproc)"
 
-echo "==> cloning + pinning FoundationPose source"
-if [ ! -d "$SRC_DIR" ]; then
-  git clone https://github.com/NVlabs/FoundationPose "$SRC_DIR"
-fi
-git -C "$SRC_DIR" fetch --depth 1 origin "$FP_COMMIT"
-git -C "$SRC_DIR" checkout "$FP_COMMIT"
+echo "==> pip-installing PyTorch (cu124) + nvdiffrast + FoundationPose deps"
+$ISAAC_PY -m pip install --upgrade pip
+$ISAAC_PY -m pip install \
+  torch==2.1.0 torchvision==0.16.0 \
+  --index-url https://download.pytorch.org/whl/cu124
+$ISAAC_PY -m pip install nvdiffrast
+$ISAAC_PY -m pip install -r "$SRC/requirements.txt"
+$ISAAC_PY -m pip install -e "$SRC"
+$ISAAC_PY -m pip install trimesh  # used by manipulation.pose_estimation
 
-echo "==> pip-installing wheels + source into Isaac Sim's python.sh"
-/isaac-sim/python.sh -m pip install "$WHEELS_DIR"/*.whl
-/isaac-sim/python.sh -m pip install -e "$SRC_DIR"
+echo "==> staging weights from Modal volume foundationpose-models"
+mkdir -p "$WEIGHTS"
+for run in "$REFINER_RUN" "$SCORER_RUN"; do
+  if [ ! -f "$WEIGHTS/$run/model_best.pth" ]; then
+    echo "    pulling $run"
+    modal volume get foundationpose-models "$run" "$WEIGHTS/$run"
+  else
+    echo "    [skip] $run already present"
+  fi
+done
 
 echo "==> verifying import"
-/isaac-sim/python.sh -c "import foundationpose; print('foundationpose at', foundationpose.__file__)"
+$ISAAC_PY -c "
+import sys
+sys.path.insert(0, '$SRC')
+from estimater import FoundationPose, ScorePredictor, PoseRefinePredictor
+print('FoundationPose import OK')
+"
 
-echo "==> done. FoundationPose installed at $INSTALL_PREFIX"
-
-# ----------------------------------------------------------------------
-# FALLBACK (uncomment if Modal-built wheels fail to load due to PyTorch
-# ABI mismatch). Builds the CUDA extensions directly on vast.ai using
-# the runtime PyTorch + CUDA. Slow (~25 min) but uses the exact stack.
-# ----------------------------------------------------------------------
-# echo "==> fallback: building CUDA extensions on vast.ai"
-# cd "$SRC_DIR/bundled/nvdiffrast" && /isaac-sim/python.sh -m pip install -e .
-# cd "$SRC_DIR/mycpp/mycuda" && /isaac-sim/python.sh -m pip install -e .
+echo "==> done. FoundationPose installed at $PREFIX"
