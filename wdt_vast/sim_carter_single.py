@@ -53,13 +53,25 @@ try:
     world.reset()
     mark("world_reset")
 
-    # Step at ~30 Hz. Render off — the orchestrator doesn't need visuals,
-    # just physics + ROS2 publishers.
+    # Start the simulation timeline. Nova Carter's OmniGraph publishers
+    # (LIDAR, IMU, cameras) use OnPlaybackTick triggers which only fire
+    # when the timeline is playing — `world.step()` alone advances
+    # physics but doesn't start the timeline. Without play(), the
+    # /amr_0/front_3d_lidar/lidar_points topic exists but no messages
+    # flow (confirmed by M1 smoke debug 2026-05-15).
+    world.play()
+    mark("world_playing")
+
+    # Step at ~30 Hz. Render ON — the Nova Carter ROS USD's LIDAR
+    # PointCloud publisher only fires when render is enabled (verified
+    # by the M1 smoke debug: with render=False the topic stayed silent,
+    # AMCL never published map->odom, and Nav2 rejected goals because
+    # the map frame didn't exist). Slower but necessary.
     dt = 1.0 / 30.0
     n_steps = int(duration_s / dt)
     mark(f"stepping_{n_steps}_frames_for_{duration_s}_s")
     for i in range(n_steps):
-        world.step(render=False)
+        world.step(render=True)
         if i % 300 == 0:  # every 10 sim seconds
             mark(f"step_{i}")
 

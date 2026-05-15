@@ -36,10 +36,13 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 GOAL_XY = (8.0, 8.0)
 NS = "amr_0"
-SIM_DURATION_S = 180  # keep sim alive for the whole smoke
+SIM_DURATION_S = 600  # keep sim alive for the whole smoke + nav
 SIM_BOOT_S = 45
-NAV2_ACTIVATE_S = 25
-GOAL_TIMEOUT_S = 120
+# AMCL needs to receive several scans before it publishes map->odom;
+# 25 s wasn't enough on the first attempt (goal rejected because map
+# frame didn't exist yet). Give the TF chain a full minute.
+NAV2_ACTIVATE_S = 60
+GOAL_TIMEOUT_S = 180
 
 
 def _popen(cmd: list[str], log_name: str) -> subprocess.Popen:
