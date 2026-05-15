@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 # Install FoundationPose from source on a vast.ai instance.
 #
-# Pulls weights from the Modal volume populated by
-# wdt_modal/stage_foundationpose_weights.py, builds the mycpp pybind11
-# extension, and pip-installs the package into Isaac Sim's python.sh
-# environment.
+# Target Python is configurable via the FP_TARGET_PY env var. The default
+# is /usr/bin/python3 (system Python 3.10) because pick_cell_orchestrator
+# needs both rclpy (ROS2 Humble — only py3.10 binding) and FoundationPose
+# in one process. Override to /isaac-sim/python.sh for a Phase 3 setup
+# that runs FP from Isaac Sim's bundled Python.
 #
 # Prereqs (one-time per instance):
-#   pip install --user modal       # gives modal CLI on PATH
+#   pip install --user modal       # gives modal CLI on PATH (optional —
+#                                    you can scp wheels/weights instead)
 #   modal token new                # interactive token paste
 #
 # Usage:
 #   bash wdt_vast/install_foundationpose.sh
+#   FP_TARGET_PY=/isaac-sim/python.sh bash wdt_vast/install_foundationpose.sh
 #
-# Idempotent — re-runs skip clone and weight pulls if already present.
+# Idempotent — re-runs skip clone, weight pulls, and torch install if
+# already present.
 
 set -euo pipefail
 
@@ -21,10 +25,26 @@ FP_COMMIT=a1b694b83e633c2cb6115b9063d940a687759392
 PREFIX=/opt/foundationpose
 SRC="$PREFIX/src"
 WEIGHTS="$SRC/weights"
-ISAAC_PY=/isaac-sim/python.sh
+TARGET_PY="${FP_TARGET_PY:-/usr/bin/python3}"
 
 REFINER_RUN=2023-10-28-18-33-37
 SCORER_RUN=2024-01-11-20-02-45
+
+# Where the cp310 pytorch3d wheel lives (cp311 lives in wheels/).
+TARGET_MAJOR_MINOR=$("$TARGET_PY" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+if [ "$TARGET_MAJOR_MINOR" = "3.10" ]; then
+  PT3D_VOL_SUBDIR=wheels-py310
+  PT3D_LOCAL_SUBDIR=wheels-py310
+elif [ "$TARGET_MAJOR_MINOR" = "3.11" ]; then
+  PT3D_VOL_SUBDIR=wheels
+  PT3D_LOCAL_SUBDIR=wheels
+else
+  echo "ERROR: target python is $TARGET_MAJOR_MINOR but only 3.10/3.11 are supported"
+  exit 1
+fi
+
+echo "==> target python: $TARGET_PY ($TARGET_MAJOR_MINOR)"
+echo "==> using pytorch3d wheels from /weights/$PT3D_VOL_SUBDIR"
 
 echo "==> apt deps for mycpp build + CUDA toolkit for nvdiffrast"
 apt-get update -y
@@ -43,9 +63,6 @@ if [ ! -f /etc/apt/sources.list.d/cuda-ubuntu2204-x86_64.list ]; then
   dpkg -i /tmp/cuda-keyring.deb
   apt-get update -y
 fi
-# cuda-toolkit-12-4 pulls ~3 GB — full nvcc + headers + libs. The
-# minimal `cuda-nvcc-12-4 cuda-cudart-dev-12-4` set is smaller but
-# breaks on missing thrust headers, so we take the full toolkit.
 apt-get install -y --no-install-recommends cuda-toolkit-12-4
 export PATH="/usr/local/cuda-12.4/bin:$PATH"
 export CUDA_HOME=/usr/local/cuda-12.4
@@ -53,9 +70,6 @@ export CUDA_HOME=/usr/local/cuda-12.4
 echo "==> cloning + pinning FoundationPose ($FP_COMMIT)"
 mkdir -p "$PREFIX"
 if [ ! -d "$SRC/.git" ]; then
-  # If weights or other content were pre-staged (e.g. via scp from a
-  # Modal-volume pull on a machine that has the modal CLI), move them
-  # aside so `git clone` sees an empty dir, then restore after clone.
   if [ -d "$SRC" ] && [ -n "$(ls -A "$SRC" 2>/dev/null)" ]; then
     mv "$SRC" "${SRC}.staged"
   fi
@@ -68,72 +82,59 @@ fi
 git -C "$SRC" fetch --depth 1 origin "$FP_COMMIT"
 git -C "$SRC" checkout "$FP_COMMIT"
 
-echo "==> building mycpp (pybind11)"
+echo "==> building mycpp (pybind11) for $TARGET_PY"
 cd "$SRC/mycpp"
 rm -rf build && mkdir build && cd build
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
-  -DPython3_ROOT_DIR="$($ISAAC_PY -c 'import sys; print(sys.prefix)')"
+  -DPython3_ROOT_DIR="$($TARGET_PY -c 'import sys; print(sys.prefix)')"
 cmake --build . -j"$(nproc)"
 
 echo "==> pip-installing PyTorch (cu124) + nvdiffrast + FoundationPose deps"
-# PyTorch's cu124 index starts at 2.4.0 — earlier versions only shipped
-# cu118/cu121 wheels. FoundationPose's upstream doesn't pin a major
-# version, so we take the earliest cu124-compatible pair. Isaac Sim's
-# bundled torch (2.7.0+cu128) gets shadowed by this install; the boot
-# smoke verified Isaac Sim still starts on 2.4.0+cu124.
-$ISAAC_PY -m pip install --upgrade pip
-if ! $ISAAC_PY -c "import torch; assert torch.__version__.startswith('2.4')" 2>/dev/null; then
-  $ISAAC_PY -m pip install \
+$TARGET_PY -m pip install --upgrade pip
+if ! $TARGET_PY -c "import torch; assert torch.__version__.startswith('2.4')" 2>/dev/null; then
+  $TARGET_PY -m pip install \
     torch==2.4.0 torchvision==0.19.0 \
     --index-url https://download.pytorch.org/whl/cu124
 fi
 
-# nvdiffrast isn't on PyPI — install from upstream git. The package's
-# setup.py imports torch to compile CUDA extensions, so we must use
-# --no-build-isolation so the build sees our installed torch. (Pre-
-# install build deps that --no-build-isolation skips.)
-$ISAAC_PY -m pip install setuptools wheel ninja
-$ISAAC_PY -m pip install --no-build-isolation \
+# nvdiffrast — git clone, --no-build-isolation, pre-installed build deps.
+$TARGET_PY -m pip install setuptools wheel ninja
+$TARGET_PY -m pip install --no-build-isolation \
   git+https://github.com/NVlabs/nvdiffrast.git
 
-# pytorch3d isn't on PyPI for our PyTorch 2.4 + cu124 + py3.11 combo.
-# Pull the pre-built wheel from the foundationpose-models Modal volume
-# (built by wdt_modal/build_pytorch3d_wheel.py).
-PT3D_WHEEL_DIR=/opt/foundationpose/wheels
+# pytorch3d wheel pulled from Modal volume (or pre-staged via scp).
+PT3D_WHEEL_DIR="$PREFIX/$PT3D_LOCAL_SUBDIR"
 mkdir -p "$PT3D_WHEEL_DIR"
 if ! ls "$PT3D_WHEEL_DIR"/pytorch3d-*.whl >/dev/null 2>&1; then
   if command -v modal >/dev/null 2>&1; then
-    modal volume get foundationpose-models wheels "$PT3D_WHEEL_DIR/.."
+    modal volume get foundationpose-models "$PT3D_VOL_SUBDIR" "$PT3D_WHEEL_DIR/.."
   else
     echo "    ERROR: pytorch3d wheel missing at $PT3D_WHEEL_DIR/ and modal CLI not installed."
     echo "    On a host with modal auth:"
-    echo "        modal volume get foundationpose-models wheels /tmp/fp_wheels"
-    echo "        scp /tmp/fp_wheels/pytorch3d-*.whl THIS_HOST:$PT3D_WHEEL_DIR/"
+    echo "        modal volume get foundationpose-models $PT3D_VOL_SUBDIR /tmp/fp_$PT3D_VOL_SUBDIR"
+    echo "        scp /tmp/fp_$PT3D_VOL_SUBDIR/pytorch3d-*.whl THIS_HOST:$PT3D_WHEEL_DIR/"
     exit 1
   fi
 fi
-$ISAAC_PY -m pip install "$PT3D_WHEEL_DIR"/pytorch3d-*.whl
+$TARGET_PY -m pip install "$PT3D_WHEEL_DIR"/pytorch3d-*.whl
 
-$ISAAC_PY -m pip install -r "$SRC/requirements.txt"
+$TARGET_PY -m pip install -r "$SRC/requirements.txt"
 
-# FoundationPose's repo isn't a pip-installable package (no setup.py,
-# no pyproject.toml) — upstream expects you to add the source dir to
-# PYTHONPATH and import modules directly (e.g. `from estimater import
-# FoundationPose`). Drop a .pth file into Isaac Sim's site-packages so
-# the dir is on sys.path automatically.
+# FP isn't pip-installable; drop a .pth file in $TARGET_PY's site-packages.
 SITE_PACKAGES=$(
-  $ISAAC_PY -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"
+  $TARGET_PY -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"
 )
 echo "$SRC" > "$SITE_PACKAGES/foundationpose.pth"
 echo "    wrote $SITE_PACKAGES/foundationpose.pth -> $SRC"
 
-$ISAAC_PY -m pip install trimesh  # used by manipulation.pose_estimation
+$TARGET_PY -m pip install trimesh
 
-# FP's requirements.txt pulled numpy 2.x which breaks Isaac Sim deps
-# (numba, nvidia-srl-usd, osqp all pin numpy<2.0 or scipy<1.12).
-# Pin both back to versions Isaac Sim ships with.
-$ISAAC_PY -m pip install --force-reinstall \
+# FP's requirements pulled numpy 2.x. Pin back to Isaac-Sim-compatible
+# versions. (Only matters for the py3.11 target — py3.10 system python
+# is independent of Isaac Sim's bundled deps, but pinning here keeps
+# both targets consistent.)
+$TARGET_PY -m pip install --force-reinstall \
   "numpy>=1.21.5,<2.0" "scipy<1.12" "lxml<5.0"
 
 echo "==> staging weights from Modal volume foundationpose-models"
@@ -147,18 +148,14 @@ for run in "$REFINER_RUN" "$SCORER_RUN"; do
   else
     echo "    ERROR: $WEIGHTS/$run missing and modal CLI not installed."
     echo "    Either install modal+auth on this host, or pre-stage weights via:"
-    echo "        # on a host with modal auth:"
     echo "        modal volume get foundationpose-models $run /tmp/$run"
     echo "        scp -r /tmp/$run THIS_HOST:$WEIGHTS/$run"
     exit 1
   fi
 done
 
-echo "==> verifying import"
-# The .pth file from earlier should already have $SRC on sys.path, but
-# fallback to an explicit insert in case Isaac Sim's python setup ignores
-# the .pth (some embedded interpreters do).
-$ISAAC_PY -c "
+echo "==> verifying import via $TARGET_PY"
+$TARGET_PY -c "
 import sys
 sys.path.insert(0, '$SRC')
 from estimater import FoundationPose
@@ -167,4 +164,4 @@ from learning.training.predict_pose_refine import PoseRefinePredictor
 print('FoundationPose import OK')
 "
 
-echo "==> done. FoundationPose installed at $PREFIX"
+echo "==> done. FoundationPose installed at $PREFIX for $TARGET_PY"
