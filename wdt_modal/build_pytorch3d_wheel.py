@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import modal
 
-PT3D_REF = "v0.7.8"  # stable release tag, PyTorch 2.4 compatible
+PT3D_REF = "v0.7.9"  # stable release tag, PyTorch 2.4 compatible
 
 image = (
     modal.Image.from_registry(
