@@ -26,12 +26,29 @@ ISAAC_PY=/isaac-sim/python.sh
 REFINER_RUN=2023-10-28-18-33-37
 SCORER_RUN=2024-01-11-20-02-45
 
-echo "==> apt deps for mycpp build"
+echo "==> apt deps for mycpp build + CUDA toolkit for nvdiffrast"
 apt-get update -y
 apt-get install -y --no-install-recommends \
   cmake ninja-build build-essential \
   libeigen3-dev libboost-all-dev \
-  python3-pybind11
+  python3-pybind11 \
+  wget gnupg
+
+# NVIDIA's apt repo for CUDA toolkit 12.4 (matches the cu124 PyTorch
+# wheel ABI). Isaac Sim's image ships runtime libs but no nvcc, which
+# nvdiffrast's setup.py needs to compile its CUDA kernels.
+if [ ! -f /etc/apt/sources.list.d/cuda-ubuntu2204-x86_64.list ]; then
+  wget -qO /tmp/cuda-keyring.deb \
+    https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+  dpkg -i /tmp/cuda-keyring.deb
+  apt-get update -y
+fi
+# cuda-toolkit-12-4 pulls ~3 GB — full nvcc + headers + libs. The
+# minimal `cuda-nvcc-12-4 cuda-cudart-dev-12-4` set is smaller but
+# breaks on missing thrust headers, so we take the full toolkit.
+apt-get install -y --no-install-recommends cuda-toolkit-12-4
+export PATH="/usr/local/cuda-12.4/bin:$PATH"
+export CUDA_HOME=/usr/local/cuda-12.4
 
 echo "==> cloning + pinning FoundationPose ($FP_COMMIT)"
 mkdir -p "$PREFIX"
