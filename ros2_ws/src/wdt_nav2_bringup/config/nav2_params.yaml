@@ -56,6 +56,10 @@ controller_server:
       acc_lim_x: 1.5
       acc_lim_theta: 2.0
       sim_time: 1.7
+      # DWB requires an explicit critics list — the per-critic .scale
+      # params below are ignored without it (the plan's params didn't
+      # declare this and controller_server failed to configure).
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
       BaseObstacle.scale: 0.02
       PathAlign.scale: 32.0
       GoalAlign.scale: 24.0
