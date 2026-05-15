@@ -3,7 +3,9 @@ repos:
     rev: v4.6.0
     hooks:
       - id: trailing-whitespace
+        exclude: '\.(pgm|png|jpg|jpeg|mp4|usd|usda)$'
       - id: end-of-file-fixer
+        exclude: '\.(pgm|png|jpg|jpeg|mp4|usd|usda)$'
       - id: check-yaml
       - id: check-added-large-files
         args: ['--maxkb=2000']
