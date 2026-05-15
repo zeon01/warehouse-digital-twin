@@ -2,23 +2,25 @@
 <!--
   Nova Carter URDF for Nav2 footprint + TF chain.
 
-  Isaac Sim ships Nova Carter with its own physics + sensors. This URDF
-  exists only so ROS2-side consumers (Nav2's costmaps, RViz, MoveIt2
-  scene monitor) have a consistent footprint and frame tree:
+  Isaac Sim's Nova Carter USD publishes /tf with `odom → base_link`,
+  so this URDF makes `base_link` the root and chains the static
+  per-sensor frames off it:
 
-    base_footprint  →  base_link  →  laser_frame
-
-  All three frames are also published by the sim-side OmniGraph (Task 6)
-  so robot_state_publisher and the sim agree on TF.
+    odom (from sim) → base_link → laser_frame
 
   The chassis collision/visual is approximated as a 0.6 × 0.4 × 0.5 m
   box. The actual Carter geometry is more complex; Nav2's costmap only
   needs an inflation-radius-friendly footprint, so the box is sufficient.
+
+  Note: Phase 1 had a `base_footprint` root with `base_footprint →
+  base_link` fixed joint, intended to follow the typical Nav2 mobile
+  convention. But Isaac Sim publishes the dynamic transform with
+  `child_frame_id: base_link`, not `base_footprint`, breaking the TF
+  chain (M1 smoke debug 2026-05-15). Drop base_footprint and use
+  base_link as both the URDF root and AMCL's `base_frame_id`.
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="nova_carter">
   <xacro:arg name="robot_namespace" default=""/>
-
-  <link name="base_footprint"/>
 
   <link name="base_link">
     <visual>
@@ -30,11 +32,6 @@
       <origin xyz="0 0 0.25"/>
     </collision>
   </link>
-  <joint name="base_footprint_to_base_link" type="fixed">
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
-    <origin xyz="0 0 0"/>
-  </joint>
 
   <link name="laser_frame"/>
   <joint name="base_link_to_laser" type="fixed">

@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.2
     alpha4: 0.2
     alpha5: 0.2
-    base_frame_id: base_footprint
+    base_frame_id: base_link  # matches Isaac Sim Nova Carter's /tf child_frame_id
     odom_frame_id: odom
     global_frame_id: map
     laser_model_type: likelihood_field
@@ -25,7 +25,7 @@ bt_navigator:
   ros__parameters:
     use_sim_time: true
     global_frame: map
-    robot_base_frame: base_link
+    robot_base_frame: base_link  # matches Isaac Sim Nova Carter
     odom_topic: odom
     bt_loop_duration: 10
     default_server_timeout: 20
