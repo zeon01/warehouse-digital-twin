@@ -36,7 +36,17 @@ apt-get install -y --no-install-recommends \
 echo "==> cloning + pinning FoundationPose ($FP_COMMIT)"
 mkdir -p "$PREFIX"
 if [ ! -d "$SRC/.git" ]; then
+  # If weights or other content were pre-staged (e.g. via scp from a
+  # Modal-volume pull on a machine that has the modal CLI), move them
+  # aside so `git clone` sees an empty dir, then restore after clone.
+  if [ -d "$SRC" ] && [ -n "$(ls -A "$SRC" 2>/dev/null)" ]; then
+    mv "$SRC" "${SRC}.staged"
+  fi
   git clone https://github.com/NVlabs/FoundationPose "$SRC"
+  if [ -d "${SRC}.staged" ]; then
+    cp -r "${SRC}.staged"/. "$SRC/"
+    rm -rf "${SRC}.staged"
+  fi
 fi
 git -C "$SRC" fetch --depth 1 origin "$FP_COMMIT"
 git -C "$SRC" checkout "$FP_COMMIT"
@@ -62,11 +72,18 @@ $ISAAC_PY -m pip install trimesh  # used by manipulation.pose_estimation
 echo "==> staging weights from Modal volume foundationpose-models"
 mkdir -p "$WEIGHTS"
 for run in "$REFINER_RUN" "$SCORER_RUN"; do
-  if [ ! -f "$WEIGHTS/$run/model_best.pth" ]; then
-    echo "    pulling $run"
+  if [ -f "$WEIGHTS/$run/model_best.pth" ]; then
+    echo "    [skip] $run already present"
+  elif command -v modal >/dev/null 2>&1; then
+    echo "    pulling $run via modal CLI"
     modal volume get foundationpose-models "$run" "$WEIGHTS/$run"
   else
-    echo "    [skip] $run already present"
+    echo "    ERROR: $WEIGHTS/$run missing and modal CLI not installed."
+    echo "    Either install modal+auth on this host, or pre-stage weights via:"
+    echo "        # on a host with modal auth:"
+    echo "        modal volume get foundationpose-models $run /tmp/$run"
+    echo "        scp -r /tmp/$run THIS_HOST:$WEIGHTS/$run"
+    exit 1
   fi
 done
 
