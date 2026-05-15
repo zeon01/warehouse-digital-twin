@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+  Nova Carter URDF for Nav2 footprint + TF chain.
+
+  Isaac Sim ships Nova Carter with its own physics + sensors. This URDF
+  exists only so ROS2-side consumers (Nav2's costmaps, RViz, MoveIt2
+  scene monitor) have a consistent footprint and frame tree:
+
+    base_footprint  →  base_link  →  laser_frame
+
+  All three frames are also published by the sim-side OmniGraph (Task 6)
+  so robot_state_publisher and the sim agree on TF.
+
+  The chassis collision/visual is approximated as a 0.6 × 0.4 × 0.5 m
+  box. The actual Carter geometry is more complex; Nav2's costmap only
+  needs an inflation-radius-friendly footprint, so the box is sufficient.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="nova_carter">
+  <xacro:arg name="robot_namespace" default=""/>
+
+  <link name="base_footprint"/>
+
+  <link name="base_link">
+    <visual>
+      <geometry><box size="0.6 0.4 0.5"/></geometry>
+      <origin xyz="0 0 0.25"/>
+    </visual>
+    <collision>
+      <geometry><box size="0.6 0.4 0.5"/></geometry>
+      <origin xyz="0 0 0.25"/>
+    </collision>
+  </link>
+  <joint name="base_footprint_to_base_link" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <link name="laser_frame"/>
+  <joint name="base_link_to_laser" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser_frame"/>
+    <origin xyz="0 0 0.55"/>
+  </joint>
+</robot>
