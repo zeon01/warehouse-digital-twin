@@ -38,6 +38,9 @@ image = (
         "build-essential",
         "ninja-build",
         "cmake",
+        # pytorch3d's setup.py shells out to `which clang++` and fails
+        # if it's missing, even though gcc is the default compiler.
+        "clang",
     )
     .pip_install(
         "torch==2.4.0",
