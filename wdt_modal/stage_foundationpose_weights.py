@@ -1,127 +1,107 @@
-"""Build FoundationPose CUDA wheels on Modal, store in a volume.
+"""Cache FoundationPose model weights on a Modal volume.
 
-The runtime target is vast.ai (driver 570 / CUDA 12.4). We build inside
-a Modal container that matches: nvidia/cuda:12.4.0-devel-ubuntu22.04
-with PyTorch 2.1.0+cu124 and Python 3.10.
+The upstream weights live in two public Google Drive folders:
 
-Output (on the `foundationpose-models` Modal volume):
-    foundationpose-wheels-<commit-short>.tar.gz
-        tarball of built wheels for nvdiffrast + mycuda CUDA extensions
-    checkpoints/
-        unpacked model weights from the NVIDIA-hosted checkpoint bundle
+    refiner: 2023-10-28-18-33-37/  (model_best.pth + config.yml)
+    scorer:  2024-01-11-20-02-45/  (model_best.pth + config.yml)
+
+vast.ai instances can't easily auth against Google Drive, so we mirror
+the folders to a Modal volume named ``foundationpose-models`` once.
+``wdt_vast/install_foundationpose.sh`` then pulls them via
+``modal volume get``.
 
 Run:
-    # Build wheels (~15-25 min, watch for tzdata/PPA gotchas)
-    modal run wdt_modal/build_foundationpose_wheels.py
+    modal run wdt_modal/stage_foundationpose_weights.py
+    # ~5-10 minutes for ~2 GB total, depending on Drive throttling.
 
-    # Stage weights (~5-10 min, one-time)
-    modal run wdt_modal/build_foundationpose_wheels.py::stage_weights
+If gdown fails (rate-limited, ACL changes, ToS update), fall back to
+manual upload:
+    # On local Mac, after manually downloading the two folders:
+    modal volume put foundationpose-models 2023-10-28-18-33-37 weights/2023-10-28-18-33-37
+    modal volume put foundationpose-models 2024-01-11-20-02-45 weights/2024-01-11-20-02-45
 
-See manipulation/FOUNDATIONPOSE.md for the full integration story.
+The Modal Volume layout we maintain is:
+    /weights/
+        2023-10-28-18-33-37/
+            model_best.pth
+            config.yml
+        2024-01-11-20-02-45/
+            model_best.pth
+            config.yml
 """
 
 from __future__ import annotations
 
 import modal
 
-# Pinned commit — verify against upstream HEAD before running.
-# See manipulation/FOUNDATIONPOSE.md.
-FP_COMMIT = "4517f47b5e7e4a7e0d3b9e5d8f8c9e7b8a9d8c5e"
-FP_COMMIT_SHORT = FP_COMMIT[:8]
+# Public Drive folder linked from FoundationPose's README — contains both
+# the refiner and scorer subfolders.
+WEIGHTS_DRIVE_FOLDER = "1DFezOAD0oD1BblsXVxqDsl8fj0qzB82i"
+REFINER_RUN_NAME = "2023-10-28-18-33-37"
+SCORER_RUN_NAME = "2024-01-11-20-02-45"
 
-image = (
-    modal.Image.from_registry(
-        "nvidia/cuda:12.4.0-devel-ubuntu22.04",
-        add_python="3.10",
-    )
-    .env({"DEBIAN_FRONTEND": "noninteractive", "TZ": "Etc/UTC"})
-    .apt_install(
-        "git",
-        "build-essential",
-        "ninja-build",
-        "cmake",
-        "libgl1",
-        "libglib2.0-0",
-    )
-    .pip_install(
-        "torch==2.1.0",
-        "torchvision==0.16.0",
-        "ninja",
-        "setuptools",
-        "wheel",
-        index_url="https://download.pytorch.org/whl/cu124",
-    )
-    .run_commands(
-        "git clone https://github.com/NVlabs/FoundationPose /workspace/fp && "
-        f"cd /workspace/fp && git checkout {FP_COMMIT}",
-    )
-)
+image = modal.Image.debian_slim(python_version="3.11").apt_install("curl").pip_install("gdown>=5.1")
 
-app = modal.App("wdt-foundationpose-wheel-builder")
+app = modal.App("wdt-foundationpose-weights")
 vol = modal.Volume.from_name("foundationpose-models", create_if_missing=True)
 
 
-@app.function(image=image, gpu="L4", volumes={"/weights": vol}, timeout=3600)
-def build_wheels():
-    """Compile nvdiffrast + mycuda CUDA extensions into pip wheels."""
-    import shutil  # noqa: F401 — kept for parity with the install script's tarball
-    import subprocess
-    from pathlib import Path
-
-    fp = Path("/workspace/fp")
-    out = Path("/weights/wheels")
-    out.mkdir(parents=True, exist_ok=True)
-
-    # nvdiffrast bundled inside FoundationPose
-    subprocess.run(
-        ["pip", "wheel", "-w", str(out), "./bundled/nvdiffrast"],
-        cwd=fp,
-        check=True,
-    )
-    # mycuda extension (custom CUDA ops for ICP refinement)
-    subprocess.run(
-        ["pip", "wheel", "-w", str(out), "./mycpp/mycuda"],
-        cwd=fp,
-        check=True,
-    )
-
-    tarball = Path(f"/weights/foundationpose-wheels-{FP_COMMIT_SHORT}.tar.gz")
-    subprocess.run(
-        ["tar", "-czf", str(tarball), "-C", str(out), "."],
-        check=True,
-    )
-    print(f"wheels built and tarred to {tarball}")
-    print(f"contents: {list(out.iterdir())}")
-
-
 @app.function(image=image, volumes={"/weights": vol}, timeout=3600)
-def stage_weights():
-    """Download + extract the FoundationPose model checkpoints.
+def stage_weights() -> None:
+    """Mirror both weight subfolders from Google Drive to /weights/.
 
-    Skips if /weights/checkpoints/model_best.pth already exists, so
-    re-running this function is cheap.
+    Skips folders whose ``model_best.pth`` already exists so re-runs are
+    cheap. If gdown returns no files, falls back to the manual-upload
+    instructions in this module's docstring.
     """
     import subprocess
     from pathlib import Path
 
-    out = Path("/weights/checkpoints")
-    if (out / "model_best.pth").exists():
-        print("weights already present, skipping")
+    out_root = Path("/weights")
+    out_root.mkdir(parents=True, exist_ok=True)
+
+    needs_download = []
+    for run_name in (REFINER_RUN_NAME, SCORER_RUN_NAME):
+        target = out_root / run_name
+        if (target / "model_best.pth").exists():
+            print(f"[skip] {target} already has model_best.pth")
+        else:
+            needs_download.append(run_name)
+
+    if not needs_download:
+        print("==> all weights present, nothing to download")
         return
-    out.mkdir(parents=True, exist_ok=True)
-    # TODO: replace with the official NVIDIA-hosted FoundationPose
-    # checkpoints URL from the upstream README. The current URL is a
-    # placeholder — the upstream uses Google Drive which doesn't curl
-    # cleanly. Options for the real fix: (a) a Hugging Face mirror,
-    # (b) a Modal-hosted gdrive-rsync, (c) manual upload via
-    # `modal volume put`.
-    url = "https://example.invalid/2024-03-08-foundationpose-checkpoints.tar.gz"
-    subprocess.run(["curl", "-L", url, "-o", "/weights/cp.tar.gz"], check=True)
-    subprocess.run(["tar", "-xzf", "/weights/cp.tar.gz", "-C", str(out)], check=True)
-    print(f"checkpoints extracted to {out}")
+
+    print(f"[gdown] downloading parent Drive folder for {needs_download}")
+    # gdown --folder walks the entire Drive folder; we pull once and
+    # cherry-pick the run subfolders we need.
+    subprocess.run(
+        [
+            "gdown",
+            "--folder",
+            f"https://drive.google.com/drive/folders/{WEIGHTS_DRIVE_FOLDER}",
+            "-O",
+            "/tmp/fp_drive",
+        ],
+        check=True,
+    )
+
+    for run_name in needs_download:
+        src = Path("/tmp/fp_drive") / run_name
+        if not src.exists():
+            raise RuntimeError(
+                f"gdown didn't produce {src}; check Drive folder layout "
+                f"or fall back to manual `modal volume put` per the module docstring"
+            )
+        target = out_root / run_name
+        target.mkdir(parents=True, exist_ok=True)
+        for f in src.iterdir():
+            subprocess.run(["cp", str(f), str(target / f.name)], check=True)
+        print(f"[ok] {target} populated")
+
+    print("==> staging complete")
 
 
 @app.local_entrypoint()
-def main():
-    """Default `modal run` entrypoint — builds the wheels."""
-    build_wheels.remote()
+def main() -> None:
+    stage_weights.remote()

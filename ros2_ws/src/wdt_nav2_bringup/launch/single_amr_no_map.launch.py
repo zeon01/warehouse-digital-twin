@@ -4,6 +4,11 @@ Use this when the caller (e.g., multi_amr.launch.py) provides a shared
 map_server at the top level. The lifecycle_manager here only manages
 the per-namespace nodes (amcl, planner_server, etc.) — NOT map_server,
 which is managed at the parent scope.
+
+Also bridges Nova Carter's PointCloud2 LIDAR (which Isaac Sim's
+``Nova_Carter_ROS.usd`` publishes on ``<ns>/front_3d_lidar/lidar_points``)
+to the LaserScan topic Nav2's AMCL + costmap expect on ``<ns>/scan``,
+via the ``pointcloud_to_laserscan`` ROS2 package.
 """
 
 from launch import LaunchDescription
@@ -28,10 +33,40 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            DeclareLaunchArgument("robot_namespace", default_value="robot_0"),
+            DeclareLaunchArgument("robot_namespace", default_value="amr_0"),
             GroupAction(
                 [
                     PushRosNamespace(ns),
+                    # PointCloud2 -> LaserScan bridge for AMCL + costmap.
+                    # The Nova Carter USD publishes its 3D LIDAR on
+                    # /<ns>/front_3d_lidar/lidar_points; we project to a
+                    # 2D scan in front of the robot (height window
+                    # 0.1-1.5 m) and remap to /<ns>/scan.
+                    Node(
+                        package="pointcloud_to_laserscan",
+                        executable="pointcloud_to_laserscan_node",
+                        name="pointcloud_to_laserscan",
+                        remappings=[
+                            ("cloud_in", "front_3d_lidar/lidar_points"),
+                            ("scan", "scan"),
+                        ],
+                        parameters=[
+                            {
+                                "use_sim_time": True,
+                                "target_frame": "base_link",
+                                "min_height": 0.1,
+                                "max_height": 1.5,
+                                "angle_min": -3.14159,
+                                "angle_max": 3.14159,
+                                "angle_increment": 0.0087,  # ~0.5°
+                                "scan_time": 0.1,
+                                "range_min": 0.2,
+                                "range_max": 30.0,
+                                "use_inf": True,
+                            }
+                        ],
+                        output="screen",
+                    ),
                     Node(
                         package="nav2_amcl",
                         executable="amcl",

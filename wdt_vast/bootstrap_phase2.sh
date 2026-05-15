@@ -41,6 +41,7 @@ APT_PKGS=(
   ros-humble-franka-description
   ros-humble-cv-bridge
   ros-humble-vision-opencv
+  ros-humble-pointcloud-to-laserscan
 )
 
 echo "==> apt-get update"

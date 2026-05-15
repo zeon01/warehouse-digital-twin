@@ -58,7 +58,7 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution([pkg, "launch", "single_amr_no_map.launch.py"])
                 ),
-                launch_arguments={"robot_namespace": f"robot_{i}"}.items(),
+                launch_arguments={"robot_namespace": f"amr_{i}"}.items(),
             )
         )
 

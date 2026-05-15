@@ -21,7 +21,7 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            DeclareLaunchArgument("robot_namespace", default_value="robot_0"),
+            DeclareLaunchArgument("robot_namespace", default_value="amr_0"),
             Node(
                 package="nav2_map_server",
                 executable="map_server",
