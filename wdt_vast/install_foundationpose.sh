@@ -97,6 +97,24 @@ $ISAAC_PY -m pip install setuptools wheel ninja
 $ISAAC_PY -m pip install --no-build-isolation \
   git+https://github.com/NVlabs/nvdiffrast.git
 
+# pytorch3d isn't on PyPI for our PyTorch 2.4 + cu124 + py3.11 combo.
+# Pull the pre-built wheel from the foundationpose-models Modal volume
+# (built by wdt_modal/build_pytorch3d_wheel.py).
+PT3D_WHEEL_DIR=/opt/foundationpose/wheels
+mkdir -p "$PT3D_WHEEL_DIR"
+if ! ls "$PT3D_WHEEL_DIR"/pytorch3d-*.whl >/dev/null 2>&1; then
+  if command -v modal >/dev/null 2>&1; then
+    modal volume get foundationpose-models wheels "$PT3D_WHEEL_DIR/.."
+  else
+    echo "    ERROR: pytorch3d wheel missing at $PT3D_WHEEL_DIR/ and modal CLI not installed."
+    echo "    On a host with modal auth:"
+    echo "        modal volume get foundationpose-models wheels /tmp/fp_wheels"
+    echo "        scp /tmp/fp_wheels/pytorch3d-*.whl THIS_HOST:$PT3D_WHEEL_DIR/"
+    exit 1
+  fi
+fi
+$ISAAC_PY -m pip install "$PT3D_WHEEL_DIR"/pytorch3d-*.whl
+
 $ISAAC_PY -m pip install -r "$SRC/requirements.txt"
 
 # FoundationPose's repo isn't a pip-installable package (no setup.py,
