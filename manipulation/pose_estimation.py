@@ -49,6 +49,16 @@ class PoseEstimator:
     def _lazy_load(self) -> None:
         if self._scorer is not None:
             return
+        # FoundationPose isn't pip-installable — wdt_vast/install_foundationpose.sh
+        # drops a .pth file pointing at /opt/foundationpose/src, but some
+        # embedded interpreters skip .pth processing. Belt-and-suspenders:
+        # ensure the src dir is on sys.path here too.
+        import sys
+
+        fp_src = "/opt/foundationpose/src"
+        if fp_src not in sys.path:
+            sys.path.insert(0, fp_src)
+
         import nvdiffrast.torch as dr  # type: ignore[import]
         from learning.training.predict_pose_refine import (  # type: ignore[import]
             PoseRefinePredictor,

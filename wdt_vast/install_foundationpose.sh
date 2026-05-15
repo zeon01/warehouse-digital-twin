@@ -98,8 +98,25 @@ $ISAAC_PY -m pip install --no-build-isolation \
   git+https://github.com/NVlabs/nvdiffrast.git
 
 $ISAAC_PY -m pip install -r "$SRC/requirements.txt"
-$ISAAC_PY -m pip install -e "$SRC"
+
+# FoundationPose's repo isn't a pip-installable package (no setup.py,
+# no pyproject.toml) — upstream expects you to add the source dir to
+# PYTHONPATH and import modules directly (e.g. `from estimater import
+# FoundationPose`). Drop a .pth file into Isaac Sim's site-packages so
+# the dir is on sys.path automatically.
+SITE_PACKAGES=$(
+  $ISAAC_PY -c "import sysconfig; print(sysconfig.get_paths()['purelib'])"
+)
+echo "$SRC" > "$SITE_PACKAGES/foundationpose.pth"
+echo "    wrote $SITE_PACKAGES/foundationpose.pth -> $SRC"
+
 $ISAAC_PY -m pip install trimesh  # used by manipulation.pose_estimation
+
+# FP's requirements.txt pulled numpy 2.x which breaks Isaac Sim deps
+# (numba, nvidia-srl-usd, osqp all pin numpy<2.0 or scipy<1.12).
+# Pin both back to versions Isaac Sim ships with.
+$ISAAC_PY -m pip install --force-reinstall \
+  "numpy>=1.21.5,<2.0" "scipy<1.12" "lxml<5.0"
 
 echo "==> staging weights from Modal volume foundationpose-models"
 mkdir -p "$WEIGHTS"
@@ -120,10 +137,15 @@ for run in "$REFINER_RUN" "$SCORER_RUN"; do
 done
 
 echo "==> verifying import"
+# The .pth file from earlier should already have $SRC on sys.path, but
+# fallback to an explicit insert in case Isaac Sim's python setup ignores
+# the .pth (some embedded interpreters do).
 $ISAAC_PY -c "
 import sys
 sys.path.insert(0, '$SRC')
-from estimater import FoundationPose, ScorePredictor, PoseRefinePredictor
+from estimater import FoundationPose
+from learning.training.predict_score import ScorePredictor
+from learning.training.predict_pose_refine import PoseRefinePredictor
 print('FoundationPose import OK')
 "
 
