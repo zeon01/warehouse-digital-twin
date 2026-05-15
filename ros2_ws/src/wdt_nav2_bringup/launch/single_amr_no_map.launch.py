@@ -9,6 +9,12 @@ Also bridges Nova Carter's PointCloud2 LIDAR (which Isaac Sim's
 ``Nova_Carter_ROS.usd`` publishes on ``<ns>/front_3d_lidar/lidar_points``)
 to the LaserScan topic Nav2's AMCL + costmap expect on ``<ns>/scan``,
 via the ``pointcloud_to_laserscan`` ROS2 package.
+
+Params are loaded via ``RewrittenYaml(root_key=namespace, ...)`` —
+without that the nested keys (e.g. ``FollowPath.critics``) silently
+don't reach the namespaced node because ROS2's param-loader can't
+match ``controller_server:`` against a node at ``/<ns>/controller_server``
+when both PushRosNamespace and nested-yaml keys are in play.
 """
 
 from launch import LaunchDescription
@@ -16,12 +22,24 @@ from launch.actions import DeclareLaunchArgument, GroupAction
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node, PushRosNamespace
 from launch_ros.substitutions import FindPackageShare
+from nav2_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
     pkg = FindPackageShare("wdt_nav2_bringup")
     params_file = PathJoinSubstitution([pkg, "config", "nav2_params.yaml"])
     ns = LaunchConfiguration("robot_namespace")
+
+    # Substitute the namespace into the params YAML at launch time so
+    # the YAML's top-level keys (`amcl:`, `controller_server:`, …) get
+    # prefixed with `<ns>/`. Mirrors nav2_bringup's nav2_multirobot_launch
+    # pattern.
+    configured_params = RewrittenYaml(
+        source_file=params_file,
+        root_key=ns,
+        param_rewrites={},
+        convert_types=True,
+    )
 
     lifecycle_nodes = [
         "amcl",
@@ -38,10 +56,6 @@ def generate_launch_description():
                 [
                     PushRosNamespace(ns),
                     # PointCloud2 -> LaserScan bridge for AMCL + costmap.
-                    # The Nova Carter USD publishes its 3D LIDAR on
-                    # /<ns>/front_3d_lidar/lidar_points; we project to a
-                    # 2D scan in front of the robot (height window
-                    # 0.1-1.5 m) and remap to /<ns>/scan.
                     Node(
                         package="pointcloud_to_laserscan",
                         executable="pointcloud_to_laserscan_node",
@@ -71,35 +85,35 @@ def generate_launch_description():
                         package="nav2_amcl",
                         executable="amcl",
                         name="amcl",
-                        parameters=[params_file],
+                        parameters=[configured_params],
                         output="screen",
                     ),
                     Node(
                         package="nav2_planner",
                         executable="planner_server",
                         name="planner_server",
-                        parameters=[params_file],
+                        parameters=[configured_params],
                         output="screen",
                     ),
                     Node(
                         package="nav2_controller",
                         executable="controller_server",
                         name="controller_server",
-                        parameters=[params_file],
+                        parameters=[configured_params],
                         output="screen",
                     ),
                     Node(
                         package="nav2_bt_navigator",
                         executable="bt_navigator",
                         name="bt_navigator",
-                        parameters=[params_file],
+                        parameters=[configured_params],
                         output="screen",
                     ),
                     Node(
                         package="nav2_behaviors",
                         executable="behavior_server",
                         name="behavior_server",
-                        parameters=[params_file],
+                        parameters=[configured_params],
                         output="screen",
                     ),
                     Node(
