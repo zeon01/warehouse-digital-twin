@@ -33,3 +33,30 @@ def test_top_down_grasp_returns_one_candidate():
     assert len(cands) == 1
     assert cands[0].score == 1.0
     assert cands[0].width == 0.08
+
+
+def test_top_down_grasp_from_pose_propose_uses_pose():
+    from manipulation.grasping import TopDownGrasp, TopDownGraspFromPose
+    from manipulation.pose_estimation import PoseResult
+
+    pose = PoseResult(
+        translation=np.array([1.0, 2.0, 3.0]),
+        rotation=np.eye(3),
+        score=1.0,
+    )
+    inner = TopDownGrasp(standoff_m=0.1)
+    gen = TopDownGraspFromPose(inner=inner, pose=pose)
+
+    cands = gen.propose(depth=np.zeros((10, 10), dtype=np.float32), camera_K=np.eye(3))
+    assert len(cands) == 1
+    np.testing.assert_allclose(cands[0].translation, [1.0, 2.0, 3.1])
+
+
+def test_top_down_grasp_bare_propose_raises():
+    import pytest
+
+    from manipulation.grasping import TopDownGrasp
+
+    gen = TopDownGrasp()
+    with pytest.raises(NotImplementedError):
+        gen.propose(depth=np.zeros((1, 1), dtype=np.float32), camera_K=np.eye(3))
