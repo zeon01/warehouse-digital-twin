@@ -62,12 +62,20 @@ cmake --build . -j"$(nproc)"
 echo "==> pip-installing PyTorch (cu124) + nvdiffrast + FoundationPose deps"
 # PyTorch's cu124 index starts at 2.4.0 — earlier versions only shipped
 # cu118/cu121 wheels. FoundationPose's upstream doesn't pin a major
-# version, so we take the earliest cu124-compatible pair.
+# version, so we take the earliest cu124-compatible pair. Isaac Sim's
+# bundled torch (2.7.0+cu128) gets shadowed by this install; the boot
+# smoke verified Isaac Sim still starts on 2.4.0+cu124.
 $ISAAC_PY -m pip install --upgrade pip
-$ISAAC_PY -m pip install \
-  torch==2.4.0 torchvision==0.19.0 \
-  --index-url https://download.pytorch.org/whl/cu124
-$ISAAC_PY -m pip install nvdiffrast
+if ! $ISAAC_PY -c "import torch; assert torch.__version__.startswith('2.4')" 2>/dev/null; then
+  $ISAAC_PY -m pip install \
+    torch==2.4.0 torchvision==0.19.0 \
+    --index-url https://download.pytorch.org/whl/cu124
+fi
+
+# nvdiffrast isn't on PyPI — install from upstream git. The package
+# builds CUDA kernels lazily on first import against the runtime torch.
+$ISAAC_PY -m pip install git+https://github.com/NVlabs/nvdiffrast.git
+
 $ISAAC_PY -m pip install -r "$SRC/requirements.txt"
 $ISAAC_PY -m pip install -e "$SRC"
 $ISAAC_PY -m pip install trimesh  # used by manipulation.pose_estimation
