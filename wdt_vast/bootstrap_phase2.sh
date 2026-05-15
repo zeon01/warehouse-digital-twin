@@ -35,13 +35,12 @@ fi
 # Franka description ships the canonical Panda URDF + meshes.
 # cv_bridge converts sensor_msgs/Image <-> numpy/cv2 inside the orchestrator.
 APT_PKGS=(
-  ros-humble-moveit
-  ros-humble-moveit-py
-  ros-humble-moveit-resources-panda-moveit-config
-  ros-humble-franka-description
+  ros-humble-moveit                                  # incl. moveit_ros_move_group, moveit_py
+  ros-humble-moveit-resources-panda-moveit-config    # SRDF + kinematics + ompl_planning
+  ros-humble-franka-description                      # URDF + meshes
   ros-humble-cv-bridge
   ros-humble-vision-opencv
-  ros-humble-pointcloud-to-laserscan
+  ros-humble-pointcloud-to-laserscan                 # PC2 -> LaserScan for AMCL
 )
 
 echo "==> apt-get update"
@@ -51,9 +50,14 @@ echo "==> apt-get install: ${APT_PKGS[*]}"
 apt-get install -y "${APT_PKGS[@]}"
 
 echo "==> verifying ROS2 package visibility"
+# ROS2 Humble's setup.bash references AMENT_TRACE_SETUP_FILES without
+# defaulting it, which trips set -u in strict-mode scripts. Drop strict
+# mode for the source then re-enable.
+set +u
 source /opt/ros/humble/setup.bash
+set -u
 for pkg in moveit_ros_move_group moveit_resources_panda_moveit_config \
-           franka_description cv_bridge; do
+           franka_description cv_bridge pointcloud_to_laserscan; do
   if ! ros2 pkg prefix "$pkg" >/dev/null 2>&1; then
     echo "ERROR: ros2 cannot find $pkg after apt install — check apt log"
     exit 1
