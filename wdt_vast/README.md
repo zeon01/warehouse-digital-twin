@@ -102,6 +102,38 @@ All rendering tasks live here instead, on rented vast.ai instances.
 - Disk: 80GB
 - Bootstrapped: ROS2 Humble + Nav2 + cyclonedds + libbrotli1 downgrade + colcon-built ros2_ws at /work/ros2_ws
 
+## Phase 2 bootstrap (do this once per instance after Phase 1 setup)
+
+Phase 2 adds MoveIt2 + Franka description + cv_bridge for the
+manipulation pipeline, plus a from-source FoundationPose install for
+6-DoF pose estimation.
+
+```bash
+# 1. Apt-install MoveIt2 + Franka + cv_bridge (~3 min)
+scp wdt_vast/bootstrap_phase2.sh root@<instance>:/tmp/
+ssh root@<instance> 'bash /tmp/bootstrap_phase2.sh'
+
+# 2. Install FoundationPose from source at pinned commit (~5-10 min)
+#    Pulls weights from Modal volume via gdown — see manipulation/FOUNDATIONPOSE.md
+scp wdt_vast/install_foundationpose.sh root@<instance>:/tmp/
+ssh root@<instance> 'bash /tmp/install_foundationpose.sh'
+
+# 3. Re-build the ROS2 workspace with Phase 2 packages
+#    (wdt_carter_description, wdt_nav2_bringup, wdt_franka_description,
+#     wdt_manipulation_bringup)
+tar czf /tmp/ros2_ws.tar.gz ros2_ws/
+scp /tmp/ros2_ws.tar.gz root@<instance>:/tmp/
+ssh root@<instance> '
+  rm -rf /work && mkdir /work && cd /work && tar xzf /tmp/ros2_ws.tar.gz
+  source /opt/ros/humble/setup.bash
+  cd /work/ros2_ws && colcon build --symlink-install
+'
+```
+
+After all three steps the instance is ready for the Phase 2 smokes (M5
+end-to-end pick, M6 1-order closed loop, M7 64-order steady_state) and
+the M8 ablation run.
+
 ## Why a subprocess wrapper isn't needed here
 
 Unlike Modal, we don't need to layer `python.sh` over our own Python — when
