@@ -34,6 +34,7 @@ Outputs to <out_dir>:
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
@@ -42,8 +43,51 @@ import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
-scenario_path = sys.argv[1] if len(sys.argv) > 1 else "/tmp/scenarios/smoke.yaml"
-out_dir = Path(sys.argv[2] if len(sys.argv) > 2 else "/tmp/run_out")
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """CLI for run_scenario.
+
+    Phase 2 adds --allocator, --path-planner, --seed to drive the
+    planner-ablation grid via ``wdt_vast/run_ablation.py``. The first
+    two positionals (scenario, out_dir) stay for Phase 1 compatibility.
+    """
+    parser = argparse.ArgumentParser(prog="run_scenario")
+    parser.add_argument(
+        "scenario",
+        nargs="?",
+        default="/tmp/scenarios/smoke.yaml",
+        help="path to scenario YAML",
+    )
+    parser.add_argument(
+        "out_dir",
+        nargs="?",
+        default="/tmp/run_out",
+        help="output directory",
+    )
+    parser.add_argument(
+        "--allocator",
+        choices=["greedy", "hungarian"],
+        default="hungarian",
+        help="task allocator (Phase 2 ablation axis 1)",
+    )
+    parser.add_argument(
+        "--path-planner",
+        choices=["greedy", "cbs"],
+        default="cbs",
+        help="multi-agent path planner (Phase 2 ablation axis 2)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="RNG seed for order-arrival jitter (Phase 2)",
+    )
+    return parser.parse_args(argv)
+
+
+_args = _parse_args()
+scenario_path = _args.scenario
+out_dir = Path(_args.out_dir)
 out_dir.mkdir(parents=True, exist_ok=True)
 
 PROGRESS = out_dir / "progress.txt"
@@ -67,7 +111,18 @@ try:
 
     scenario = load_scenario(scenario_path)
     layout = load_layout(f"/tmp/warehouse/layouts/{scenario.layout}.yaml")
-    mark(f"scenario_loaded_{scenario.name}_orders={len(scenario.orders)}")
+
+    # Phase 2 ablation: jitter order arrivals so each seed produces a
+    # different stochastic schedule. The deterministic baseline (Phase 1)
+    # is recovered by passing --seed 42 with jitter_s=0; we keep
+    # jitter_s=5 by default so the seeds matter.
+    from scenarios.schema import apply_seed_jitter
+
+    scenario.orders = apply_seed_jitter(scenario.orders, _args.seed, jitter_s=5.0)
+    mark(
+        f"scenario_loaded_{scenario.name}_orders={len(scenario.orders)}"
+        f"_alloc={_args.allocator}_planner={_args.path_planner}_seed={_args.seed}"
+    )
 
     recorder = MetricsRecorder(out_dir=out_dir)
 
@@ -100,9 +155,12 @@ try:
     spawn_franka(world, "/World/pick_arm", "pick_arm", position_xyz=(px, py, 1.0))
     mark("franka_spawned")
 
-    # Launch the FleetCoordinator as a subprocess (Task 43 wiring).
-    # ros2_ws must already be built on the instance — see wdt_vast/README.md.
+    # Launch the FleetCoordinator as a subprocess. Phase 2 passes the
+    # allocator + path_planner + pick_cell_xy as ROS2 parameters so the
+    # ablation can flip strategies without rebuilding ros2_ws. The seed
+    # was already applied to scenario.orders above.
     amr_ids = [f"amr_{i}" for i in range(scenario.fleet_size)]
+    pick_xy = list(layout.pick_cell.position_xy)
     ros_env = os.environ.copy()
     ros_env["ROS_DOMAIN_ID"] = "42"
     coordinator_proc = subprocess.Popen(
@@ -111,8 +169,11 @@ try:
             "-lc",
             "source /opt/ros/humble/setup.bash && "
             "source /work/ros2_ws/install/setup.bash && "
-            f"ros2 run fleet_coordinator fleet_coordinator_node "
-            f"--ros-args -p amr_ids:='{amr_ids}'",
+            "ros2 run fleet_coordinator fleet_coordinator_node "
+            f"--ros-args -p amr_ids:='{amr_ids}' "
+            f"-p pick_cell_xy:='{pick_xy}' "
+            f"-p allocator:={_args.allocator} "
+            f"-p path_planner:={_args.path_planner}",
         ],
         env=ros_env,
         stdout=subprocess.PIPE,
