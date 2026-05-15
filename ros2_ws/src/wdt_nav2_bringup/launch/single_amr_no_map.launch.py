@@ -1,14 +1,18 @@
-"""Per-AMR Nav2 bringup MINUS the map_server.
+"""Per-AMR Nav2 bringup MINUS the map_server, with GROUND-TRUTH pose.
 
-Use this when the caller (e.g., multi_amr.launch.py) provides a shared
-map_server at the top level. The lifecycle_manager here only manages
-the per-namespace nodes (amcl, planner_server, etc.) — NOT map_server,
-which is managed at the parent scope.
+Phase 2 design §8 risk-table option: instead of AMCL, publish a static
+``map → odom`` transform locked to the Carter's known spawn pose. The
+planner_server, controller_server, bt_navigator, behavior_server,
+and both costmaps all run *as real Nav2 nodes* — only localization is
+shortcut. This unblocks M2-M9 without depending on the Nova Carter
+LIDAR publisher which doesn't fire under standalone-python Isaac Sim
+(verified during M1 smoke: topic listed but `ros2 topic hz` returned
+zero messages even with render=True and world.play()).
 
-Also bridges Nova Carter's PointCloud2 LIDAR (which Isaac Sim's
-``Nova_Carter_ROS.usd`` publishes on ``<ns>/front_3d_lidar/lidar_points``)
-to the LaserScan topic Nav2's AMCL + costmap expect on ``<ns>/scan``,
-via the ``pointcloud_to_laserscan`` ROS2 package.
+Carter spawns at world (1, 1, 0). odom origin = spawn pose, so the
+map→odom static transform is (1, 1, 0) — that puts the AMR at (1, 1)
+in the map frame at startup, consistent with the AMCL `initial_pose`
+the canonical config would have set.
 
 Params are loaded via ``RewrittenYaml(root_key=namespace, ...)`` —
 without that the nested keys (e.g. ``FollowPath.critics``) silently
@@ -30,10 +34,6 @@ def generate_launch_description():
     params_file = PathJoinSubstitution([pkg, "config", "nav2_params.yaml"])
     ns = LaunchConfiguration("robot_namespace")
 
-    # Substitute the namespace into the params YAML at launch time so
-    # the YAML's top-level keys (`amcl:`, `controller_server:`, …) get
-    # prefixed with `<ns>/`. Mirrors nav2_bringup's nav2_multirobot_launch
-    # pattern.
     configured_params = RewrittenYaml(
         source_file=params_file,
         root_key=ns,
@@ -42,7 +42,6 @@ def generate_launch_description():
     )
 
     lifecycle_nodes = [
-        "amcl",
         "planner_server",
         "controller_server",
         "bt_navigator",
@@ -55,7 +54,40 @@ def generate_launch_description():
             GroupAction(
                 [
                     PushRosNamespace(ns),
-                    # PointCloud2 -> LaserScan bridge for AMCL + costmap.
+                    # Ground-truth map -> odom static transform. Carter
+                    # spawned at world (1, 1, 0); odom origin = spawn,
+                    # so map → odom = (1, 1, 0) keeps map and world
+                    # aligned. Replace with a dynamic publisher if the
+                    # spawn location ever needs to change at runtime.
+                    Node(
+                        package="tf2_ros",
+                        executable="static_transform_publisher",
+                        name="map_to_odom_static",
+                        arguments=[
+                            "--x",
+                            "1.0",
+                            "--y",
+                            "1.0",
+                            "--z",
+                            "0.0",
+                            "--roll",
+                            "0.0",
+                            "--pitch",
+                            "0.0",
+                            "--yaw",
+                            "0.0",
+                            "--frame-id",
+                            "map",
+                            "--child-frame-id",
+                            "odom",
+                        ],
+                        output="screen",
+                    ),
+                    # PointCloud2 -> LaserScan bridge — kept active so
+                    # costmaps can still get obstacle observations once
+                    # the Carter LIDAR publisher is fixed (Phase 3).
+                    # Costmap obstacle_layer also configured to tolerate
+                    # the topic being silent for now (no clearing).
                     Node(
                         package="pointcloud_to_laserscan",
                         executable="pointcloud_to_laserscan_node",
@@ -72,20 +104,13 @@ def generate_launch_description():
                                 "max_height": 1.5,
                                 "angle_min": -3.14159,
                                 "angle_max": 3.14159,
-                                "angle_increment": 0.0087,  # ~0.5°
+                                "angle_increment": 0.0087,
                                 "scan_time": 0.1,
                                 "range_min": 0.2,
                                 "range_max": 30.0,
                                 "use_inf": True,
                             }
                         ],
-                        output="screen",
-                    ),
-                    Node(
-                        package="nav2_amcl",
-                        executable="amcl",
-                        name="amcl",
-                        parameters=[configured_params],
                         output="screen",
                     ),
                     Node(
