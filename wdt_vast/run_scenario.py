@@ -222,13 +222,36 @@ try:
     next_order_idx = 0
     sorted_orders = sorted(scenario.orders, key=lambda o: o.arrival_t)
 
+    # Phase 2: publish each order on /orders/enqueue when its arrival_t hits.
+    # Phase 1 only recorded them to disk; the coordinator never saw them
+    # because nothing was publishing to the topic it subscribes to.
+    import rclpy  # noqa: E402
+    from geometry_msgs.msg import PoseStamped  # noqa: E402
+
+    if not rclpy.ok():
+        rclpy.init()
+    order_node = rclpy.create_node("run_scenario_order_publisher")
+    order_pub = order_node.create_publisher(PoseStamped, "/orders/enqueue", 10)
+    mark("order_publisher_up")
+
     while t < scenario.duration_s:
         while next_order_idx < len(sorted_orders) and sorted_orders[next_order_idx].arrival_t <= t:
             o = sorted_orders[next_order_idx]
             recorder.on_order_enqueued(order_id=o.id, at=t)
+            msg = PoseStamped()
+            msg.header.frame_id = o.id  # coordinator reads this as the order id
+            msg.header.stamp = order_node.get_clock().now().to_msg()
+            msg.pose.position.x = float(o.shelf_xy[0])
+            msg.pose.position.y = float(o.shelf_xy[1])
+            msg.pose.orientation.w = 1.0
+            order_pub.publish(msg)
             next_order_idx += 1
+        rclpy.spin_once(order_node, timeout_sec=0.0)
         world.step(render=scenario.record_video)
         t += dt
+
+    order_node.destroy_node()
+    rclpy.shutdown()
 
     mark(f"loop_done_orders_enqueued={next_order_idx}")
     recorder.flush()
