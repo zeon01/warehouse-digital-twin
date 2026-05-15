@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  MoveIt2 move_group + (later) pick_cell_orchestrator bringup.
+
+  Phase 2 wires the apt-installed moveit_resources_panda_moveit_config
+  package into move_group. Task 27 (M5) converts this package to
+  ament_python and adds the pick_cell_orchestrator node entry point.
+-->
+<package format="3">
+  <name>wdt_manipulation_bringup</name>
+  <version>0.2.0</version>
+  <description>MoveIt2 move_group + pick_cell_orchestrator bringup.</description>
+  <maintainer email="zeon01@users.noreply.github.com">Saad Sharif Ahmed</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>moveit_ros_move_group</exec_depend>
+  <exec_depend>moveit_resources_panda_moveit_config</exec_depend>
+  <exec_depend>wdt_franka_description</exec_depend>
+
+  <export><build_type>ament_cmake</build_type></export>
+</package>

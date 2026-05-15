@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+  Thin wrapper for the Franka Panda description.
+
+  Phase 2 uses apt-installed franka_description (URDF + meshes) and
+  moveit_resources_panda_moveit_config (SRDF + kinematics + joint
+  limits + OMPL config) rather than vendoring those files into the
+  repo. This package exists only as a stable include point for the
+  Isaac Sim spawn + Phase 2's move_group launch (in
+  wdt_manipulation_bringup).
+
+  If either apt package becomes unavailable on a target ROS2 distro,
+  vendor the URDF/SRDF into this package's urdf/ and srdf/ dirs and
+  point downstream launches here instead.
+-->
+<package format="3">
+  <name>wdt_franka_description</name>
+  <version>0.2.0</version>
+  <description>Thin wrapper for Franka Panda URDF + MoveIt2 config from apt.</description>
+  <maintainer email="zeon01@users.noreply.github.com">Saad Sharif Ahmed</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>franka_description</exec_depend>
+  <exec_depend>moveit_resources_panda_moveit_config</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <export><build_type>ament_cmake</build_type></export>
+</package>
