@@ -17,6 +17,9 @@ dependencies = [
     "opencv-python-headless>=4.9",
     "pyyaml>=6.0",
     "usd-core>=24.0",
+    # Phase 2 ablation aggregation + plots
+    "pandas>=2.2",
+    "matplotlib>=3.8",
 ]
 
 [project.optional-dependencies]
