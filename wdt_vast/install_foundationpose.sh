@@ -72,9 +72,13 @@ if ! $ISAAC_PY -c "import torch; assert torch.__version__.startswith('2.4')" 2>/
     --index-url https://download.pytorch.org/whl/cu124
 fi
 
-# nvdiffrast isn't on PyPI — install from upstream git. The package
-# builds CUDA kernels lazily on first import against the runtime torch.
-$ISAAC_PY -m pip install git+https://github.com/NVlabs/nvdiffrast.git
+# nvdiffrast isn't on PyPI — install from upstream git. The package's
+# setup.py imports torch to compile CUDA extensions, so we must use
+# --no-build-isolation so the build sees our installed torch. (Pre-
+# install build deps that --no-build-isolation skips.)
+$ISAAC_PY -m pip install setuptools wheel ninja
+$ISAAC_PY -m pip install --no-build-isolation \
+  git+https://github.com/NVlabs/nvdiffrast.git
 
 $ISAAC_PY -m pip install -r "$SRC/requirements.txt"
 $ISAAC_PY -m pip install -e "$SRC"
