@@ -188,29 +188,82 @@ def build_from_yaml(layout_path: str | Path, out_usd: str | Path) -> str:
 
 
 def _main(argv: list[str] | None = None) -> int:
-    """CLI: `python -m warehouse.generators.build_scene <layout> [out_usd]`.
+    """CLI: ``python -m warehouse.generators.build_scene <layout> [flags]``.
 
-    Resolves <layout> to warehouse/layouts/<layout>.yaml. If out_usd is
-    omitted, writes to outputs/scenes/<layout>.usd alongside the repo.
+    Resolves ``<layout>`` to ``warehouse/layouts/<layout>.yaml``. By
+    default writes the USD to ``outputs/scenes/<layout>.usd``. Phase 2
+    adds ``--out-map-dir`` to additionally emit a Nav2-compatible PGM +
+    YAML occupancy grid from the same layout, and ``--skip-usd`` for
+    environments without ``pxr`` (local Mac unit tests).
     """
+    import argparse
     import sys
 
-    args = list(sys.argv[1:] if argv is None else argv)
-    if not args or args[0] in {"-h", "--help"}:
-        print("usage: python -m warehouse.generators.build_scene <layout-name> [out_usd]")
-        return 2
+    parser = argparse.ArgumentParser(prog="build_scene")
+    parser.add_argument("layout_name")
+    parser.add_argument(
+        "out_usd_pos",
+        nargs="?",
+        default=None,
+        help="legacy positional out_usd path (Phase 1 compat)",
+    )
+    parser.add_argument(
+        "--out-usd",
+        default=None,
+        help="output USD path; default outputs/scenes/<layout>.usd",
+    )
+    parser.add_argument(
+        "--out-map-dir",
+        default=None,
+        help="if set, also write <layout>.pgm + <layout>.yaml here",
+    )
+    parser.add_argument(
+        "--skip-usd",
+        action="store_true",
+        help="skip USD authoring (no pxr required); use with --out-map-dir",
+    )
+    args = parser.parse_args(argv if argv is not None else sys.argv[1:])
 
-    layout_name = args[0]
-    layout_path = Path(__file__).resolve().parents[1] / "layouts" / f"{layout_name}.yaml"
+    layout_path = Path(__file__).resolve().parents[1] / "layouts" / f"{args.layout_name}.yaml"
     if not layout_path.exists():
         print(f"error: layout file not found: {layout_path}")
         return 1
 
-    out_usd = Path(args[1]) if len(args) > 1 else Path("outputs/scenes") / f"{layout_name}.usd"
-    out_usd.parent.mkdir(parents=True, exist_ok=True)
+    layout = load_layout(layout_path)
 
-    path = build_from_yaml(layout_path, out_usd)
-    print(f"wrote {path}")
+    if not args.skip_usd:
+        out_usd = Path(args.out_usd or args.out_usd_pos or f"outputs/scenes/{args.layout_name}.usd")
+        out_usd.parent.mkdir(parents=True, exist_ok=True)
+        path = build_scene(layout, out_usd)
+        print(f"wrote {path}")
+
+    if args.out_map_dir:
+        from warehouse.generators.map_export import (
+            rasterize_obstacles,
+            write_map_yaml,
+            write_pgm,
+        )
+
+        out_map_dir = Path(args.out_map_dir)
+        out_map_dir.mkdir(parents=True, exist_ok=True)
+        grid = rasterize_obstacles(
+            world_w_m=layout.warehouse.width_m,
+            world_h_m=layout.warehouse.depth_m,
+            resolution_m_per_px=0.05,
+            obstacles=layout.to_obstacle_boxes(),
+        )
+        pgm_path = out_map_dir / f"{args.layout_name}.pgm"
+        yaml_path = out_map_dir / f"{args.layout_name}.yaml"
+        write_pgm(grid, pgm_path)
+        write_map_yaml(
+            pgm_filename=pgm_path.name,
+            resolution_m_per_px=0.05,
+            origin_xy_yaw=(0.0, 0.0, 0.0),
+            path=yaml_path,
+        )
+        print(f"wrote {pgm_path}")
+        print(f"wrote {yaml_path}")
+
     return 0
 
 
