@@ -52,6 +52,7 @@ apt-get install -y --no-install-recommends \
   cmake ninja-build build-essential \
   libeigen3-dev libboost-all-dev \
   python3-pybind11 \
+  python3-pip python3-dev \
   wget gnupg
 
 # NVIDIA's apt repo for CUDA toolkit 12.4 (matches the cu124 PyTorch
@@ -98,10 +99,24 @@ if ! $TARGET_PY -c "import torch; assert torch.__version__.startswith('2.4')" 2>
     --index-url https://download.pytorch.org/whl/cu124
 fi
 
-# nvdiffrast — git clone, --no-build-isolation, pre-installed build deps.
-$TARGET_PY -m pip install setuptools wheel ninja
-$TARGET_PY -m pip install --no-build-isolation \
-  git+https://github.com/NVlabs/nvdiffrast.git
+# nvdiffrast — clone locally then pip install from path. With
+# --no-build-isolation pip uses the OUTSIDE setuptools; Ubuntu 22.04
+# ships setuptools 59.6 which ignores the [project] table in
+# pyproject.toml and silently produces an "UNKNOWN-0.0.0" package
+# (no metadata, no installable files). nvdiffrast's pyproject.toml
+# requires setuptools>=64 — upgrade BEFORE the install.
+$TARGET_PY -m pip install --upgrade "setuptools>=68" wheel ninja
+$TARGET_PY -m pip uninstall -y UNKNOWN 2>/dev/null || true
+if [ ! -d "$PREFIX/nvdiffrast" ]; then
+  git clone --depth 1 https://github.com/NVlabs/nvdiffrast.git "$PREFIX/nvdiffrast"
+fi
+$TARGET_PY -m pip install --no-build-isolation "$PREFIX/nvdiffrast"
+# Verify nvdiffrast actually installed (UNKNOWN trap caught us twice)
+$TARGET_PY -m pip show nvdiffrast >/dev/null || {
+  echo "ERROR: nvdiffrast did not install correctly (still showing UNKNOWN?)"
+  $TARGET_PY -m pip list 2>&1 | grep -iE "nvdiff|UNKNOWN"
+  exit 1
+}
 
 # pytorch3d wheel pulled from Modal volume (or pre-staged via scp).
 PT3D_WHEEL_DIR="$PREFIX/$PT3D_LOCAL_SUBDIR"
@@ -118,6 +133,13 @@ if ! ls "$PT3D_WHEEL_DIR"/pytorch3d-*.whl >/dev/null 2>&1; then
   fi
 fi
 $TARGET_PY -m pip install "$PT3D_WHEEL_DIR"/pytorch3d-*.whl
+
+# Ubuntu 22.04's system Python has blinker 1.4 installed via apt+distutils
+# (no metadata manifest). FP's requirements.txt transitively wants a
+# newer blinker (Flask 3.x dep) and pip refuses to uninstall the
+# distutils-managed one. --ignore-installed forces pip to install
+# alongside, which is fine.
+$TARGET_PY -m pip install --ignore-installed --no-deps "blinker>=1.6"
 
 $TARGET_PY -m pip install -r "$SRC/requirements.txt"
 
