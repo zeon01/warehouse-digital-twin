@@ -12,10 +12,13 @@
 | Component | Where | Status |
 |-----------|-------|--------|
 | Procedural warehouse builder (USD + materials + lighting) | `warehouse/` | ✅ Working — `python -m warehouse.generators.build_scene small` |
-| Isaac Sim 5.0 + ROS2 bridge orchestration | `sim/`, `wdt_vast/` | ✅ Working — 6 AMRs + Franka + 60 namespaced ROS2 topics |
-| Fleet coordinator (Hungarian + CBS + deadlock) | `coordinator/`, `ros2_ws/src/fleet_coordinator/` | ✅ Tested in isolation; ROS2 node colcon-built |
-| Manipulation pipeline (FoundationPose + AnyGrasp + MoveIt2) | `manipulation/` | ⚠️ Wrappers + interfaces; model installs are Phase 2 |
-| Nav2 per-AMR config + launch | `ros2_ws/src/warehouse_bringup/` | ⚠️ Config done; full Nav2 wiring is Phase 2 (Task 26 uses direct `cmd_vel` instead) |
+| Isaac Sim 5.0 + ROS2 bridge orchestration | `sim/`, `wdt_vast/` | ✅ Working — 6 AMRs + Franka + table + cube + camera + lighting + full TF tree |
+| Fleet coordinator (Hungarian + CBS + deadlock) | `coordinator/`, `ros2_ws/src/fleet_coordinator/` | ✅ End-to-end order routing in `run_scenario.py` — enqueues, assigns, tracks AMR arrival |
+| AMR navigation (pure-pursuit fallback) | `nav_drivers/`, `ros2_ws/src/wdt_pure_pursuit/` | ✅ **Phase 2 M1+M2** — single AMR drives 6m to goal in 121s; 6/6 SUCCEEDED concurrently |
+| Nav2 full stack | `ros2_ws/src/wdt_nav2_bringup/` | ⚠️ Parked — DWB silent because Carter LIDAR doesn't fire under standalone-python; pure-pursuit is the production path for Phase 2 |
+| MoveIt2 motion planning | `manipulation/motion_planning.py`, `ros2_ws/src/wdt_manipulation_bringup/` | ✅ **Phase 2 M3** — `plan_to_pose` succeeds in ~156ms (plan_only mode) |
+| FoundationPose 6-DoF pose estimation | `manipulation/pose_estimation.py` | ✅ **Phase 2 M4** — standalone smoke green (252 candidates registered against synthetic cube) |
+| End-to-end pick chain (FP + grasp + MoveIt + coordinator) | `ros2_ws/src/wdt_manipulation_bringup/wdt_manipulation_bringup/pick_cell_orchestrator.py` | 🚧 **Phase 2 M5** — redesign plan ready ([spec](docs/superpowers/specs/2026-05-16-pick-chain-redesign-design.md) · [plan](docs/superpowers/plans/2026-05-16-pick-chain-redesign.md)) |
 | Metrics + video recorder | `metrics/` | ✅ Working — pytest-covered, MP4 assembler via ffmpeg |
 | Scenario runner (end-to-end) | `wdt_vast/run_scenario.py`, `scenarios/` | ✅ Composes end-to-end; 64-order steady-state verified |
 
@@ -34,6 +37,44 @@
 |---|---|---|
 | ![iso](docs/images/scene_iso.png) | ![amrs](docs/images/scene_amrs.png) | ![overhead](docs/images/scene_overhead.png) |
 
+## Phase 2 progress
+
+Phase 2 closes the integration gaps from Phase 1 so a `cmd_vel`-driven demo becomes a real **AMR drives to shelf → AMR drives to pick cell → MoveIt2 plans grasp → FoundationPose registers cube** chain.
+
+### M1 — Single-AMR navigation ✅
+
+- Pure-pursuit driver replaces Nav2/DWB (which is silent on Carter LIDAR under standalone-python Isaac Sim)
+- Carter drives 6m from `(1, 1)` to `(4.83, 4.82)` in 44.2s; `NavigateToPose` goal SUCCEEDED at tolerance 0.248m
+- Action interface matches Nav2's — drop-in for `fleet_coordinator`
+
+### M2 — Multi-AMR pure-pursuit fleet ✅
+
+- 6 concurrent Carters driven from spawn poses to +3m diagonal goals
+- 6/6 SUCCEEDED at distance 0.247–0.249m, elapsed 145.9–146.1s wall
+- Confirmed sim/wall ratio ~10× slower than realtime with 6 AMRs at full RTX render on a single 3090
+
+### M3 — MoveIt2 plan-to-pose ✅
+
+- `wdt_manipulation_bringup/move_group.launch.py` brings up MoveIt2 via the apt-installed `moveit_resources_panda_moveit_config`
+- OMPL/RRTConnect plans from `ready` pose to `ready + 0.3 rad` on `panda_joint1` in 0.02s (`plan_only=True`)
+- Required: explicit `MoveItConfigsBuilder` params, self-published `/joint_states` (Panda zero-pose self-collides between `panda_link5` and `panda_link7`)
+
+### M4 — FoundationPose standalone smoke ✅
+
+- 8cm cube CAD + synthetic 480×640 RGB-D → `PoseEstimator.estimate()` runs the full chain
+- 252 pose candidates clustered + refined via scorer (`2024-01-11-...`) + refiner (`2023-10-28-...`) weights
+- Installed to system Python 3.10 (Isaac Sim's bundled 3.11 doesn't ship `rclpy`); CUDA 12.4 + nvdiffrast + pytorch3d-0.7.9
+- ~12s per inference on RTX 3090
+
+### M5 — End-to-end pick chain 🚧
+
+- Real scene assembled: 0.6×0.6×0.7m table + 8cm cube + Isaac Sim Camera + distant + dome lighting + full TF tree (`world → cell_cam_optical`, `world → panda_link0`)
+- Verified visually via the [snapshot tool](wdt_vast/snapshot_cell_cam.py) — cube clearly visible in RGB, depth shows correct geometry
+- 11 iterations (v11–v21) chased layered rclpy / FoundationPose / MoveIt issues — full root-cause trail in [`docs/gotchas.md`](docs/gotchas.md) (34 documented gotchas)
+- Identified root causes: **rclpy executor deadlock** in subscription callback + **FP mask too wide** (registered against table not cube) + **OrientationConstraint too tight** for top-down grasps near workspace edge
+- Redesign: worker-thread orchestrator + pluggable `PoseSource` ([spec](docs/superpowers/specs/2026-05-16-pick-chain-redesign-design.md) · [10-task plan](docs/superpowers/plans/2026-05-16-pick-chain-redesign.md))
+- M5 acceptance ships on `pose_source=gt` (simulator ground-truth pose); `pose_source=fp` is the M6 stretch — same orchestrator code, flag flipped
+
 ## Architecture
 
 ```mermaid
@@ -41,7 +82,7 @@ graph TB
     subgraph Local["Local Mac (dev)"]
         SceneGen["warehouse.generators<br/>USD builder · usd-core"]
         Coord["coordinator/<br/>Hungarian · CBS · deadlock"]
-        Manip["manipulation/<br/>FoundationPose · AnyGrasp · MoveIt2 wrappers"]
+        Manip["manipulation/<br/>FoundationPose · TopDownGrasp · MoveIt2 (plan_only)"]
         Metrics["metrics/<br/>recorder + ffmpeg"]
     end
 
@@ -89,19 +130,16 @@ pytest tests/unit/
 
 The Isaac Sim rendering + ROS2 integration runs need a vast.ai (or equivalent) RTX instance with driver ≥570; setup instructions are in [`wdt_vast/README.md`](wdt_vast/README.md).
 
-## What's next (Phase 2)
+## What's next
 
-The current scenario runner composes the full pipeline structurally — `orders_total=64, orders_completed=0` is the documented Phase 1 state. To turn that 0 into real pick numbers, Phase 2 will:
-
-1. **Wire Nav2 properly** — map server + AMCL + lifecycle activation, replacing the current `cmd_vel`-only motion. The plumbing is there; needs a map and a few launch tweaks.
-2. **Install FoundationPose + AnyGrasp + MoveIt2** model weights (~GB each) on the instance and trigger the manipulation pipeline when an AMR with an order reaches the pick cell.
-3. **Capture the demo video** — add a `BasicWriter` to the overhead camera inside `run_scenario`, run the steady-state with `record_video: true`, stitch via `metrics.video.assemble_mp4`.
-
-Phase 3 (stretch): custom-trained perception model with a sim-to-real ablation.
+- **Finish M5** — execute the [pick-chain redesign plan](docs/superpowers/plans/2026-05-16-pick-chain-redesign.md) (10 TDD tasks: PoseSource protocol → PickWorker thread → orchestrator rewrite → `/world/cube_pose` publisher → fast no-sim harness → E2E smoke). Ship `orders_completed=1` on `hungarian_cbs` and tag `v0.2.0`.
+- **3-config × 5-seed ablation** — run the full planner × allocator grid (`greedy_greedy`, `hungarian_greedy`, `hungarian_cbs`) on the 64-order steady_state scenario; mean ± std + p-values in `docs/results-phase-2.md`.
+- **Capture the demo video** — `BasicWriter` on the overhead camera inside `run_scenario`; steady-state with `record_video: true`; stitch via `metrics.video.assemble_mp4`.
+- **Phase 3 (stretch)** — wire Carter's onboard RGB-D for live FoundationPose (drop the simulator camera feed), scale to 20+ AMRs, custom-trained perception with sim-to-real ablation.
 
 ## Stack
 
-NVIDIA Isaac Sim 5.0 · ROS2 Humble · CycloneDDS · Nav2 · MoveIt2 · FoundationPose · AnyGrasp · usd-core · pydantic · pytest · ruff · Modal · vast.ai
+NVIDIA Isaac Sim 5.0 · ROS2 Humble · CycloneDDS · MoveIt2 · OMPL RRTConnect · FoundationPose · pure-pursuit nav · tf2 · usd-core · pydantic · pytest · ruff · Modal · vast.ai
 
 ## License
 
