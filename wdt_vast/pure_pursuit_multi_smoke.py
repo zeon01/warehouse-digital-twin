@@ -51,14 +51,21 @@ SPAWN_POSES: list[tuple[float, float]] = [
 ]
 NUM_AMRS = len(SPAWN_POSES)
 
-# Each AMR drives diagonally +6, +6 from its spawn. All goals are well
-# inside the 20x30 m warehouse and far enough that motion is non-trivial.
-GOAL_OFFSET: tuple[float, float] = (6.0, 6.0)
+# Each AMR drives diagonally +3, +3 from its spawn (~4.2 m). All goals
+# stay well inside the 20x30 m warehouse and far enough that motion is
+# non-trivial. 6 m offset was tried first but at 6 Carters rendering on
+# one GPU the sim is too slow to cover that within a reasonable smoke
+# budget — 3 m keeps each AMR's drive under ~3 min wall.
+GOAL_OFFSET: tuple[float, float] = (3.0, 3.0)
 
-SIM_DURATION_S = 600
+SIM_DURATION_S = 900
 SIM_BOOT_S = 45
 PP_ACTIVATE_S = 12  # slightly longer than single-AMR — 6 drivers all spinning up
-GOAL_TIMEOUT_S = 90
+# Wall-clock budget per goal. With 6 Carters rendering at full RTX
+# rates, the sim runs ~10-20x slower than real-time on RTX 3090; a
+# 6m diagonal at 0.5 m/s sim-time = ~12 s SIM-time = ~120-240 s WALL.
+# Budget 480 s per goal to leave margin for the slowest AMR.
+GOAL_TIMEOUT_S = 480
 
 
 def _popen(cmd: list[str], log_path: Path, env: dict | None = None) -> subprocess.Popen:
@@ -102,12 +109,16 @@ def main() -> int:
     print(f"sim pid={sim.pid}, sleeping {SIM_BOOT_S}s for Kit boot + fleet namespacing")
     time.sleep(SIM_BOOT_S)
 
+    # Pass goal_timeout_s through to per-AMR pp_driver — multi-AMR sim
+    # runs ~10x slower than realtime so the 60-s default would abort
+    # before any AMR can complete a 6 m drive.
     pp = _popen(
         [
             "ros2",
             "launch",
             "wdt_pure_pursuit",
             "multi_amr.launch.py",
+            f"goal_timeout_s:={GOAL_TIMEOUT_S}",
         ],
         OUT / "pp.log",
     )

@@ -58,7 +58,7 @@ try:
     for candidate in ("/work", "/tmp"):
         if candidate not in sys.path:
             sys.path.insert(0, candidate)
-    from sim.multi_robot import _namespace_subtree, spawn_amr_fleet
+    from sim.multi_robot import spawn_amr_fleet
     from sim.runner import make_simulation_app
 
     mark("imports_ok")
@@ -72,20 +72,14 @@ try:
     mark("world_created")
 
     poses = _SPAWN_POSES[:num_amrs]
+    # spawn_amr_fleet already calls _namespace_subtree internally per AMR
+    # (see sim/multi_robot.py). Calling it AGAIN here would double-prefix
+    # the pattern-2 OG namespace constants (`amr_0` → `amr_0/amr_0`),
+    # routing topics to a path nobody subscribes to. The single-AMR case
+    # (sim_carter_single.py) DOES need to call _namespace_subtree manually
+    # because spawn_nova_carter is bare; the fleet helper bakes it in.
     spawn_amr_fleet(world, poses)
-    mark(f"fleet_spawned_n={len(poses)}")
-
-    # spawn_amr_fleet DOESN'T call _namespace_subtree (it's a flat helper
-    # that just instantiates Carters). Apply per-AMR namespacing here so
-    # diff_drive OG subscribes to /amr_i/cmd_vel and TF publishes to
-    # /amr_i/tf. Without this, all 6 Carters share /cmd_vel and only
-    # one (the first to subscribe) gets the commands. Bit me with
-    # sim_carter_single.py 2026-05-16 — same fix.
-    ns_counts = []
-    for i in range(len(poses)):
-        n = _namespace_subtree(f"/World/amr_{i}", f"amr_{i}")
-        ns_counts.append(n)
-    mark(f"fleet_namespaced n_per_amr={ns_counts}")
+    mark(f"fleet_spawned_and_namespaced_n={len(poses)}")
 
     world.reset()
     mark("world_reset")
