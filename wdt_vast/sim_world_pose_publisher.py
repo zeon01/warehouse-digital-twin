@@ -1,123 +1,99 @@
-"""Publish the pick cube's worldspace pose on /world/cube_pose at 10 Hz.
+"""Publish a static /world/cube_pose at a configurable rate.
 
-Runs inside the Isaac Sim kit process (python 3.11) since it needs USD
-stage access. The orchestrator subscribes to this topic when running in
-``pose_source=gt`` mode, completely bypassing FoundationPose for the M5
-acceptance loop.
+Originally designed to run inside Isaac Sim's kit python (3.11) and read
+the cube's USD prim transform live. That design hit gotcha #18 (kit
+python lacks Humble's cpython-310 rclpy). Refactored to a system-python
+(3.10) static publisher: run_scenario.py passes the cube's spawn coords
+as CLI args. M5 smoke uses ``plan_only=True`` so MoveIt never executes
+the grasp — slight physics drift on a resting DynamicCuboid is harmless.
 
 Invocation (from run_scenario.py):
-    /isaac-sim/python.sh wdt_vast/sim_world_pose_publisher.py \\
-        --cube-prim-path /World/pick_cube
+    /usr/bin/python3 wdt_vast/sim_world_pose_publisher.py \\
+        --x 16.40 --y 15.0 --z 0.75 --frame-id world
+
+GroundTruthPoseSource on the orchestrator subscribes to /world/cube_pose
+and feeds the latest position into the PickWorker without any
+FoundationPose call.
 """
 
 from __future__ import annotations
 
 import argparse
-import math
 import sys
 
 import rclpy
 from geometry_msgs.msg import PoseStamped
 from rclpy.node import Node
 
-PUBLISH_RATE_HZ = 10.0
 
-
-def _quaternion_from_matrix(m) -> tuple[float, float, float, float]:
-    """3x3 rotation matrix (USD Gf.Matrix3d or numpy) → (qx, qy, qz, qw)."""
-
-    # Tolerate both pxr.Gf.Matrix3d and numpy.ndarray
-    def _r(i, j):
-        try:
-            return float(m[i][j])
-        except TypeError:
-            return float(m[i, j])
-
-    tr = _r(0, 0) + _r(1, 1) + _r(2, 2)
-    if tr > 0:
-        s = math.sqrt(tr + 1.0) * 2
-        qw = 0.25 * s
-        qx = (_r(2, 1) - _r(1, 2)) / s
-        qy = (_r(0, 2) - _r(2, 0)) / s
-        qz = (_r(1, 0) - _r(0, 1)) / s
-    else:
-        # Branchy fallback — pick the largest diagonal.
-        if _r(0, 0) > _r(1, 1) and _r(0, 0) > _r(2, 2):
-            s = math.sqrt(1.0 + _r(0, 0) - _r(1, 1) - _r(2, 2)) * 2
-            qw = (_r(2, 1) - _r(1, 2)) / s
-            qx = 0.25 * s
-            qy = (_r(0, 1) + _r(1, 0)) / s
-            qz = (_r(0, 2) + _r(2, 0)) / s
-        elif _r(1, 1) > _r(2, 2):
-            s = math.sqrt(1.0 + _r(1, 1) - _r(0, 0) - _r(2, 2)) * 2
-            qw = (_r(0, 2) - _r(2, 0)) / s
-            qx = (_r(0, 1) + _r(1, 0)) / s
-            qy = 0.25 * s
-            qz = (_r(1, 2) + _r(2, 1)) / s
-        else:
-            s = math.sqrt(1.0 + _r(2, 2) - _r(0, 0) - _r(1, 1)) * 2
-            qw = (_r(1, 0) - _r(0, 1)) / s
-            qx = (_r(0, 2) + _r(2, 0)) / s
-            qy = (_r(1, 2) + _r(2, 1)) / s
-            qz = 0.25 * s
-    return (qx, qy, qz, qw)
-
-
-class WorldCubePosePublisher(Node):
-    def __init__(self, cube_prim_path: str) -> None:
+class StaticWorldCubePosePublisher(Node):
+    def __init__(  # noqa: PLR0913
+        self,
+        x: float,
+        y: float,
+        z: float,
+        qx: float,
+        qy: float,
+        qz: float,
+        qw: float,
+        frame_id: str,
+        rate_hz: float,
+    ) -> None:
         super().__init__("sim_world_cube_pose")
-        self._cube_prim_path = cube_prim_path
+        self._x = x
+        self._y = y
+        self._z = z
+        self._qx = qx
+        self._qy = qy
+        self._qz = qz
+        self._qw = qw
+        self._frame_id = frame_id
         self._pub = self.create_publisher(PoseStamped, "/world/cube_pose", 10)
-        self._timer = self.create_timer(1.0 / PUBLISH_RATE_HZ, self._tick)
+        self._timer = self.create_timer(1.0 / rate_hz, self._tick)
         self.get_logger().info(
-            f"sim_world_cube_pose publishing /world/cube_pose from {cube_prim_path} "
-            f"at {PUBLISH_RATE_HZ:.1f} Hz"
+            f"sim_world_cube_pose publishing /world/cube_pose at "
+            f"({x:.3f}, {y:.3f}, {z:.3f}) frame={frame_id} rate={rate_hz:.1f} Hz"
         )
 
     def _tick(self) -> None:
-        import omni.usd
-        from pxr import UsdGeom
-
-        stage = omni.usd.get_context().get_stage()
-        if stage is None:
-            return
-        prim = stage.GetPrimAtPath(self._cube_prim_path)
-        if not prim or not prim.IsValid():
-            return
-        xform = UsdGeom.Xformable(prim)
-        # ComputeLocalToWorldTransform returns the prim's world transform
-        # as a Gf.Matrix4d. Default time = 0 is fine; the cube isn't
-        # animated in the smoke (FixedCuboid; DynamicCuboid may drift
-        # slightly under physics but world pose is still current).
-        world_xform = xform.ComputeLocalToWorldTransform(0.0)
-        translation = world_xform.ExtractTranslation()
-        rotation = world_xform.ExtractRotationMatrix()
-
         msg = PoseStamped()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = "world"
-        msg.pose.position.x = float(translation[0])
-        msg.pose.position.y = float(translation[1])
-        msg.pose.position.z = float(translation[2])
-        qx, qy, qz, qw = _quaternion_from_matrix(rotation)
-        msg.pose.orientation.x = qx
-        msg.pose.orientation.y = qy
-        msg.pose.orientation.z = qz
-        msg.pose.orientation.w = qw
+        msg.header.frame_id = self._frame_id
+        msg.pose.position.x = self._x
+        msg.pose.position.y = self._y
+        msg.pose.position.z = self._z
+        msg.pose.orientation.x = self._qx
+        msg.pose.orientation.y = self._qy
+        msg.pose.orientation.z = self._qz
+        msg.pose.orientation.w = self._qw
         self._pub.publish(msg)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(prog="sim_world_pose_publisher")
-    parser.add_argument(
-        "--cube-prim-path",
-        default="/World/pick_cube",
-        help="USD prim path of the cube whose world pose is published.",
-    )
+    parser.add_argument("--x", type=float, default=16.40)
+    parser.add_argument("--y", type=float, default=15.00)
+    parser.add_argument("--z", type=float, default=0.75)
+    parser.add_argument("--qx", type=float, default=0.0)
+    parser.add_argument("--qy", type=float, default=0.0)
+    parser.add_argument("--qz", type=float, default=0.0)
+    parser.add_argument("--qw", type=float, default=1.0)
+    parser.add_argument("--frame-id", default="world")
+    parser.add_argument("--rate", type=float, default=10.0)
     args = parser.parse_args()
 
     rclpy.init()
-    node = WorldCubePosePublisher(cube_prim_path=args.cube_prim_path)
+    node = StaticWorldCubePosePublisher(
+        x=args.x,
+        y=args.y,
+        z=args.z,
+        qx=args.qx,
+        qy=args.qy,
+        qz=args.qz,
+        qw=args.qw,
+        frame_id=args.frame_id,
+        rate_hz=args.rate,
+    )
     try:
         rclpy.spin(node)
     finally:

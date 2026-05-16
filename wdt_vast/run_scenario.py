@@ -407,14 +407,18 @@ try:
     )
     mark(f"franka_ready_joint_states_launched_pid={js_proc.pid}")
 
-    # 3d. /world/cube_pose publisher — runs inside the kit-python so it can
-    # read the cube's USD prim transform. Only needed for gt-mode pose
-    # source, but launching unconditionally is fine: the orchestrator only
-    # subscribes when pose_source=gt and the topic is cheap.
+    # 3d. /world/cube_pose static publisher. The orchestrator's
+    # GroundTruthPoseSource subscribes to this topic. Kit python (3.11)
+    # can't import rclpy (gotcha #18) so we publish from /usr/bin/python3
+    # (3.10) with the cube's spawn coords passed as args. plan_only=True
+    # in MoveIt makes any physics drift on the resting DynamicCuboid
+    # harmless. Only consumed when pose_source=gt; topic is cheap when
+    # pose_source=fp.
     cube_pose_proc = _ros2_popen(
         "world_cube_pose",
-        "/isaac-sim/python.sh /work/wdt_vast/sim_world_pose_publisher.py "
-        "--cube-prim-path /World/pick_cube",
+        "/usr/bin/python3 /work/wdt_vast/sim_world_pose_publisher.py "
+        f"--x {cube_center[0]} --y {cube_center[1]} --z {cube_center[2]} "
+        f"--frame-id world",
     )
     mark(f"world_cube_pose_launched_pid={cube_pose_proc.pid}")
 
