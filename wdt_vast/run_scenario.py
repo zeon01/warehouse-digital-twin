@@ -82,6 +82,14 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=42,
         help="RNG seed for order-arrival jitter (Phase 2)",
     )
+    parser.add_argument(
+        "--pose-source",
+        choices=("fp", "gt"),
+        default="gt",
+        help="Pose source for the pick orchestrator. gt = ground truth "
+        "from /world/cube_pose (M5 acceptance default); fp = live "
+        "FoundationPose (M6 stretch).",
+    )
     return parser.parse_args(argv)
 
 
@@ -240,6 +248,7 @@ try:
         "wdt_manipulation_bringup/lib/wdt_manipulation_bringup/pick_cell_orchestrator",
         "wdt_vast/synthetic_cell_camera.py",  # legacy v7-v12; harmless if absent
         "wdt_vast/franka_ready_joint_states.py",
+        "wdt_vast/sim_world_pose_publisher.py",
         "tf2_ros/static_transform_publisher.*cell_cam_optical",
         "moveit_ros_move_group/move_group",
     ):
@@ -398,14 +407,27 @@ try:
     )
     mark(f"franka_ready_joint_states_launched_pid={js_proc.pid}")
 
+    # 3d. /world/cube_pose publisher — runs inside the kit-python so it can
+    # read the cube's USD prim transform. Only needed for gt-mode pose
+    # source, but launching unconditionally is fine: the orchestrator only
+    # subscribes when pose_source=gt and the topic is cheap.
+    cube_pose_proc = _ros2_popen(
+        "world_cube_pose",
+        "/isaac-sim/python.sh /work/wdt_vast/sim_world_pose_publisher.py "
+        "--cube-prim-path /World/pick_cube",
+    )
+    mark(f"world_cube_pose_launched_pid={cube_pose_proc.pid}")
+
     # 4. Pick cell orchestrator — subscribes to /cell/cam/* + /cell/start_pick,
     #    runs FP + TopDownGrasp + ArmPlanner (plan_only), publishes
     #    /cell/pick_result. Override cad_path to the synthetic box we
-    #    just wrote.
+    #    just wrote. --pose-source picks fp (live FoundationPose) or gt
+    #    (subscribe to /world/cube_pose).
     orch_proc = _ros2_popen(
         "pick_orch",
         "ros2 run wdt_manipulation_bringup pick_cell_orchestrator "
-        f"--ros-args -p cad_path:={m5_cad}",
+        f"--ros-args -p cad_path:={m5_cad} "
+        f"-p pose_source:={_args.pose_source}",
     )
     mark(f"pick_orchestrator_launched_pid={orch_proc.pid}")
 
