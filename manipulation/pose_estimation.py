@@ -109,8 +109,15 @@ class PoseEstimator:
         # target object, so we let FoundationPose register against the
         # entire frame rather than a tight bbox.
         mask = np.ones(depth.shape[:2], dtype=bool)
+        # trimesh loads mesh.vertices as float64 by default and FP's
+        # internal pose math runs in double. Cast K to float64 to match
+        # — without this FP's `K @ pts` raises
+        # "RuntimeError: expected mat1 and mat2 to have the same
+        # dtype, but got: float != double" (verified 2026-05-16 on
+        # Quebec 36866311 with a 480x640 K from the smoke).
+        K64 = np.asarray(camera_K, dtype=np.float64)
         pose = self._impl.register(
-            K=camera_K,
+            K=K64,
             rgb=rgb,
             depth=depth,
             ob_mask=mask,
