@@ -81,7 +81,11 @@ class PickCellOrchestrator(Node):
 
         self._pose_estimator = PoseEstimator()
         self._top_down = TopDownGrasp(standoff_m=0.05)
-        self._arm = ArmPlanner(planning_group="panda_arm")
+        # Pass self as parent_node so ArmPlanner reuses this node's
+        # rclpy context + executor for the MoveGroup action client.
+        # Without parent_node, ArmPlanner would create its own Node and
+        # double-init rclpy.
+        self._arm = ArmPlanner(parent_node=self, planning_group="panda_arm")
         self.get_logger().info("pick_cell_orchestrator ready")
 
     def _on_rgb(self, msg: Image) -> None:

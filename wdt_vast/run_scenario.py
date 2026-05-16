@@ -155,56 +155,111 @@ try:
     spawn_franka(world, "/World/pick_arm", "pick_arm", position_xyz=(px, py, 1.0))
     mark("franka_spawned")
 
-    # Launch the FleetCoordinator as a subprocess. Phase 2 passes the
-    # allocator + path_planner + pick_cell_xy as ROS2 parameters so the
-    # ablation can flip strategies without rebuilding ros2_ws. The seed
-    # was already applied to scenario.orders above.
+    # M5 acceptance: orders_completed=1 means the full chain runs:
+    #   order -> coordinator -> AMR nav -> at_cell -> /cell/start_pick
+    #     -> orchestrator -> FP+grasp+MoveIt plan -> /cell/pick_result
+    # That requires four ROS2 stacks alive in parallel with the sim:
+    #   1. wdt_pure_pursuit multi_amr — NavigateToPose servers per AMR.
+    #   2. wdt_manipulation_bringup move_group — MoveIt2 OMPL planner.
+    #   3. wdt_vast/synthetic_cell_camera — fake /cell/cam/{rgb,depth,info}
+    #      until Isaac Sim Camera plumbing is wired (M5b / Phase 3).
+    #   4. wdt_manipulation_bringup pick_cell_orchestrator — pose + grasp
+    #      + MoveIt plan from camera frames + a CAD path.
+    #   5. fleet_coordinator — top-level state machine.
+    # Per gotcha #18/#19 (memory), Carter's diff_drive OG only listens
+    # on /amr_i/cmd_vel once `_namespace_subtree` has been called — that
+    # is handled by spawn_amr_fleet (don't double-call from here).
+
     amr_ids = [f"amr_{i}" for i in range(scenario.fleet_size)]
     pick_xy = list(layout.pick_cell.position_xy)
     ros_env = os.environ.copy()
     ros_env["ROS_DOMAIN_ID"] = "42"
-    coordinator_proc = subprocess.Popen(
-        [
-            "bash",
-            "-lc",
-            "source /opt/ros/humble/setup.bash && "
-            "source /work/ros2_ws/install/setup.bash && "
-            "ros2 run fleet_coordinator fleet_coordinator_node "
-            f"--ros-args -p amr_ids:='{amr_ids}' "
-            f"-p pick_cell_xy:='{pick_xy}' "
-            f"-p allocator:={_args.allocator} "
-            f"-p path_planner:={_args.path_planner}",
-        ],
-        env=ros_env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+
+    def _ros2_popen(name: str, cmd_str: str) -> subprocess.Popen:
+        """Background-launch a ros2 command with sourcing baked in.
+
+        setsid + redirect-from-/dev/null per gotcha #23 so the child
+        survives even when the parent shell goes away during long sim
+        loops.
+        """
+        log = out_dir / f"{name}.log"
+        return subprocess.Popen(
+            [
+                "bash",
+                "-lc",
+                "set +u && "
+                "source /opt/ros/humble/setup.bash && "
+                "source /work/ros2_ws/install/setup.bash && "
+                "set -u && " + cmd_str,
+            ],
+            env=ros_env,
+            stdout=open(log, "w"),
+            stderr=subprocess.STDOUT,
+            stdin=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+
+    # Generate the synthetic CAD that synthetic_cell_camera's depth bump
+    # matches — 8 cm cube. Orchestrator's cad_path param points here.
+    import trimesh  # noqa: E402
+
+    m5_cad = "/tmp/m5_smoke_box.obj"
+    trimesh.creation.box(extents=(0.08, 0.08, 0.08)).export(m5_cad)
+    mark(f"m5_cad_written={m5_cad}")
+
+    # 1. Pure-pursuit fleet — NavigateToPose action servers per AMR.
+    pp_proc = _ros2_popen(
+        "pure_pursuit",
+        "ros2 launch wdt_pure_pursuit multi_amr.launch.py",
+    )
+    mark(f"pure_pursuit_launched_pid={pp_proc.pid}")
+
+    # 2. MoveIt2 move_group — OMPL planner.
+    move_group_proc = _ros2_popen(
+        "move_group",
+        "ros2 launch wdt_manipulation_bringup move_group.launch.py",
+    )
+    mark(f"move_group_launched_pid={move_group_proc.pid}")
+
+    # 3. Synthetic cell camera — until Isaac Sim Camera + ROS2CameraHelper
+    #    is wired in (M5b / Phase 3).
+    cam_proc = _ros2_popen(
+        "synth_cell_cam",
+        "/usr/bin/python3 /work/wdt_vast/synthetic_cell_camera.py",
+    )
+    mark(f"synth_cell_cam_launched_pid={cam_proc.pid}")
+
+    # 4. Pick cell orchestrator — subscribes to /cell/cam/* + /cell/start_pick,
+    #    runs FP + TopDownGrasp + ArmPlanner (plan_only), publishes
+    #    /cell/pick_result. Override cad_path to the synthetic box we
+    #    just wrote.
+    orch_proc = _ros2_popen(
+        "pick_orch",
+        "ros2 run wdt_manipulation_bringup pick_cell_orchestrator "
+        f"--ros-args -p cad_path:={m5_cad}",
+    )
+    mark(f"pick_orchestrator_launched_pid={orch_proc.pid}")
+
+    # 5. Fleet coordinator — top-level state machine.
+    coordinator_proc = _ros2_popen(
+        "coordinator",
+        "ros2 run fleet_coordinator fleet_coordinator_node "
+        f"--ros-args -p amr_ids:='{amr_ids}' "
+        f"-p pick_cell_xy:='{pick_xy}' "
+        f"-p allocator:={_args.allocator} "
+        f"-p path_planner:={_args.path_planner}",
     )
     mark(f"coordinator_launched_pid={coordinator_proc.pid}")
 
-    # Manipulation pipeline — instantiated in-process per Task 43 plan.
-    # **Phase 1 gap:** the actual FoundationPose + AnyGrasp + MoveIt2
-    # packages aren't installed on the vast.ai instance (model weights
-    # ~GB each, MoveIt2 needs its own ROS deps). The pipeline's
-    # `_lazy_load()` raises ImportError on first call, so we wrap the
-    # instantiation in a try and disable the pipeline if the deps are
-    # missing — keeps run_scenario alive end-to-end. Phase 2 will land
-    # the model installs + a real per-order trigger from the
-    # coordinator's "near pick cell" signal.
-    manip = None
-    try:
-        from manipulation.grasping import GraspGenerator
-        from manipulation.motion_planning import ArmPlanner
-        from manipulation.pipeline import ManipulationPipeline
-        from manipulation.pose_estimation import PoseEstimator
+    # Give the ROS2 stacks time to come up before injecting orders.
+    # move_group takes ~20 s on its own; pure-pursuit needs ~10 s; the
+    # rest are fast.
+    ros2_warmup_s = 30
+    mark(f"sleeping_{ros2_warmup_s}s_for_ros2_warmup")
+    import time as _time
 
-        manip = ManipulationPipeline(
-            pose_estimator=PoseEstimator(model_dir="/vol/models/foundationpose"),
-            grasp_generator=GraspGenerator(model_dir="/vol/models/anygrasp"),
-            arm=ArmPlanner(planning_group="panda_arm"),
-        )
-        mark("manip_pipeline_constructed")
-    except Exception as e:
-        mark(f"manip_pipeline_skipped:{type(e).__name__}")
+    _time.sleep(ros2_warmup_s)
+    mark("ros2_warmup_done")
 
     world.reset()
     mark("world_reset")
@@ -256,11 +311,15 @@ try:
     mark(f"loop_done_orders_enqueued={next_order_idx}")
     recorder.flush()
 
-    coordinator_proc.terminate()
-    try:
-        coordinator_proc.wait(timeout=5)
-    except subprocess.TimeoutExpired:
-        coordinator_proc.kill()
+    # Shut down ROS2 subprocesses in reverse-launch order.
+    ros2_procs = [coordinator_proc, orch_proc, cam_proc, move_group_proc, pp_proc]
+    for proc in ros2_procs:
+        proc.terminate()
+    for proc in ros2_procs:
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
 
     sim.close()
     mark("sim_closed")
