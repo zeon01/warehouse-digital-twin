@@ -25,7 +25,7 @@
 ## What works in Phase 1 — verified
 
 - **Procedural warehouse** generation from YAML → coloured USD scene in <2 seconds locally (`outputs/scenes/small.usd`).
-- **Isaac Sim Kit boots headless** on a vast.ai RTX A5000, opens the warehouse USD, spawns 6 namespaced Nova Carter AMRs + a Franka, renders 4 camera angles to portfolio-quality PNGs ([overhead](docs/images/scene_overhead.png), [iso](docs/images/scene_iso.png), [amrs closeup](docs/images/scene_amrs.png)).
+- **Isaac Sim Kit boots headless** on a rented cloud GPU (RTX A5000-class with driver ≥570), opens the warehouse USD, spawns 6 namespaced Nova Carter AMRs + a Franka, renders 4 camera angles to portfolio-quality PNGs ([overhead](docs/images/scene_overhead.png), [iso](docs/images/scene_iso.png), [amrs closeup](docs/images/scene_amrs.png)).
 - **ROS2 bridge** publishes 60 topics across 6 AMR namespaces (`/amr_N/cmd_vel`, `/amr_N/chassis/odom`, `/amr_N/tf`, `/amr_N/front_3d_lidar/lidar_points`, stereo cameras, 4 IMUs each).
 - **Direct cmd_vel motion**: one Nova Carter moved **2.43 m** in 10 sim seconds in response to `/amr_0/cmd_vel` Twist publishes — proves bridge ↔ `differential_drive` OmniGraph ↔ wheel-joint physics chain is sound.
 - **Coordinator + planner unit tests** all pass: Hungarian assignment (3 tests), CBS multi-agent path planner (2), pairwise deadlock detector (2), strategy registry (2).
@@ -86,7 +86,7 @@ graph TB
         Metrics["metrics/<br/>recorder + ffmpeg"]
     end
 
-    subgraph VastAI["vast.ai RTX A5000 (Linux + Vulkan)"]
+    subgraph Cloud["Rented cloud GPU (Linux + Vulkan)"]
         IsaacSim["Isaac Sim 5.0 Kit<br/>headless · python.sh"]
         ROS2["ROS2 Humble<br/>CycloneDDS rmw"]
         Bridge["isaacsim.ros2.bridge<br/>OmniGraph publishers"]
@@ -104,12 +104,11 @@ graph TB
 
 [Detailed design spec](docs/superpowers/specs/2026-05-14-warehouse-digital-twin-design.md) · [Full Phase 1 plan with all 48 tasks](docs/superpowers/plans/2026-05-14-warehouse-digital-twin-phase-1.md)
 
-## Why Modal + vast.ai
+## Why a hybrid local + rented-GPU setup
 
-We tried Modal for the entire stack first — it's elegant for cloud GPU but **its containers can't run Isaac Sim 5.0's Vulkan stack** (verified on L4, A10G, B200 — all fail with `VkResult: ERROR_DEVICE_LOST` or `ERROR_INITIALIZATION_FAILED` despite the host having driver 580.95 and Vulkan ICD configured). vast.ai datacenter hosts (RTX A5000 with driver 570+) work cleanly with the same Isaac Sim image. The hybrid split:
+The first attempt put the entire stack on a serverless cloud-GPU platform — it's elegant for ML workloads but **its containers can't run Isaac Sim 5.0's Vulkan stack** (verified on L4, A10G, B200 — all fail with `VkResult: ERROR_DEVICE_LOST` or `ERROR_INITIALIZATION_FAILED` despite the host having a recent NVIDIA driver and a Vulkan ICD configured). A traditional rented GPU instance (RTX A5000-class with driver ≥570) runs the same Isaac Sim image cleanly. The hybrid split:
 
-- **Modal**: budget tracker, CI image (built once), any non-render Linux work
-- **vast.ai**: all Isaac Sim + ROS2 + render runs (the rented instance is stopped between sessions, idling at ~$0.025/hr)
+- **Rented GPU instance**: all Isaac Sim + ROS2 + render runs (stopped between sessions to drop billing to storage-only)
 - **Local Mac**: USD authoring (usd-core), pure-Python coordinator + manipulation tests, scenario YAML, render orchestration
 
 ## Run it yourself
@@ -128,7 +127,7 @@ pytest tests/unit/
 # → 14 passing, 2 skipped (fixtures)
 ```
 
-The Isaac Sim rendering + ROS2 integration runs need a vast.ai (or equivalent) RTX instance with driver ≥570; setup instructions are in [`wdt_vast/README.md`](wdt_vast/README.md).
+The Isaac Sim rendering + ROS2 integration runs need a rented RTX-class GPU instance with driver ≥570; setup instructions are in [`wdt_vast/README.md`](wdt_vast/README.md).
 
 ## What's next
 
@@ -139,7 +138,7 @@ The Isaac Sim rendering + ROS2 integration runs need a vast.ai (or equivalent) R
 
 ## Stack
 
-NVIDIA Isaac Sim 5.0 · ROS2 Humble · CycloneDDS · MoveIt2 · OMPL RRTConnect · FoundationPose · pure-pursuit nav · tf2 · usd-core · pydantic · pytest · ruff · Modal · vast.ai
+NVIDIA Isaac Sim 5.0 · ROS2 Humble · CycloneDDS · MoveIt2 · OMPL RRTConnect · FoundationPose · pure-pursuit nav · tf2 · usd-core · pydantic · pytest · ruff
 
 ## License
 
