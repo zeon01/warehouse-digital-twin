@@ -19,6 +19,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -31,8 +32,17 @@ def generate_launch_description():
     joint_limits = PathJoinSubstitution([panda_cfg, "config", "joint_limits.yaml"])
     ompl = PathJoinSubstitution([panda_cfg, "config", "ompl_planning.yaml"])
 
-    robot_description = Command([FindExecutable(name="xacro"), " ", urdf_xacro])
-    robot_description_semantic = Command([FindExecutable(name="cat"), " ", srdf_path])
+    # ParameterValue(value_type=str) — same fix as Carter/Franka RSP
+    # launches. humble's launch_ros YAML-parses robot_description by
+    # default; URDF XML + SRDF XML both fail without the string wrap.
+    robot_description = ParameterValue(
+        Command([FindExecutable(name="xacro"), " ", urdf_xacro]),
+        value_type=str,
+    )
+    robot_description_semantic = ParameterValue(
+        Command([FindExecutable(name="cat"), " ", srdf_path]),
+        value_type=str,
+    )
 
     return LaunchDescription(
         [

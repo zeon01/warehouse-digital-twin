@@ -12,6 +12,7 @@ wdt_manipulation_bringup/move_group.launch.py includes this.
 from launch import LaunchDescription
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -27,7 +28,14 @@ def generate_launch_description():
             "panda.urdf.xacro",
         ]
     )
-    robot_description = Command([FindExecutable(name="xacro"), " ", urdf_xacro])
+    # ParameterValue(value_type=str) — humble's newer launch_ros tries
+    # to YAML-parse robot_description by default; the URDF XML fails
+    # without the explicit string wrap. Same fix as wdt_carter_description
+    # (commit 6fbf86b).
+    robot_description = ParameterValue(
+        Command([FindExecutable(name="xacro"), " ", urdf_xacro]),
+        value_type=str,
+    )
 
     return LaunchDescription(
         [
