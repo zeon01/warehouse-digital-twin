@@ -78,6 +78,7 @@ class ArmPlanner:
         parent_node: Any = None,
         planning_group: str = "panda_arm",
         plan_only: bool = True,
+        executor: Any = None,
     ) -> None:
         self._planning_group = planning_group
         self._parent_node = parent_node
@@ -85,6 +86,12 @@ class ArmPlanner:
         self._client: Any = None
         self._owns_node = parent_node is None
         self._node: Any = None
+        # Optional explicit executor for spin_until_future_complete. The
+        # worker-thread architecture (M5 redesign) requires the action
+        # client's spins to use the worker's own SingleThreadedExecutor,
+        # not the global default — otherwise the worker's spin races with
+        # the orchestrator's main-thread spin on the global executor.
+        self._executor = executor
 
     def _lazy_load(self) -> None:
         if self._client is not None:
@@ -190,13 +197,17 @@ class ArmPlanner:
 
         goal = self._build_goal(translation, rotation)
         send_future = self._client.send_goal_async(goal)
-        rclpy.spin_until_future_complete(self._node, send_future, timeout_sec=ACTION_TIMEOUT_S)
+        rclpy.spin_until_future_complete(
+            self._node, send_future, executor=self._executor, timeout_sec=ACTION_TIMEOUT_S
+        )
         handle = send_future.result()
         if handle is None or not handle.accepted:
             return ArmExecutionResult(False, f"goal_rejected handle={handle!r}")
 
         result_future = handle.get_result_async()
-        rclpy.spin_until_future_complete(self._node, result_future, timeout_sec=GOAL_TIMEOUT_S)
+        rclpy.spin_until_future_complete(
+            self._node, result_future, executor=self._executor, timeout_sec=GOAL_TIMEOUT_S
+        )
         if not result_future.done():
             return ArmExecutionResult(False, f"timeout_{GOAL_TIMEOUT_S}s")
 
