@@ -39,6 +39,21 @@ class AMRConfig(BaseModel):
     count: PositiveInt
     spawn: AMRSpawn
 
+    def spawn_poses(self) -> list[tuple[float, float]]:
+        """Row-major spawn positions for the fleet, in meters.
+
+        Order matches ``sim/multi_robot.py::spawn_amr_fleet``'s iteration
+        (col-then-row): amr_0 is at (origin_x, origin_y), amr_1 is one
+        column over, etc.
+
+        Truncates to ``count`` if the grid is larger than the fleet.
+        """
+        gx, gy = self.spawn.grid
+        ox, oy = self.spawn.origin_xy
+        step = self.spawn.spacing_m
+        poses = [(ox + c * step, oy + r * step) for r in range(gy) for c in range(gx)]
+        return poses[: self.count]
+
 
 class PickCell(BaseModel):
     position_xy: tuple[float, float]

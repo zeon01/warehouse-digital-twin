@@ -23,7 +23,7 @@ setup(
         (f"share/{package_name}", ["package.xml"]),
         (
             f"share/{package_name}/launch",
-            ["launch/single_amr.launch.py"],
+            ["launch/single_amr.launch.py", "launch/multi_amr.launch.py"],
         ),
     ],
     install_requires=["setuptools"],
