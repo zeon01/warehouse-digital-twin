@@ -79,3 +79,107 @@ def spawn_franka(
     )
     world.scene.add(arm)
     return arm
+
+
+def spawn_pick_table(
+    world,
+    prim_path: str = "/World/pick_table",
+    name: str = "pick_table",
+    center_xyz: Sequence[float] = (16.40, 15.0, 0.36),
+    size_xyz: Sequence[float] = (0.6, 0.6, 0.7),
+    color: Sequence[float] = (0.45, 0.30, 0.18),
+):
+    """Spawn a static fixed-cuboid 'workbench' the cube sits on.
+
+    Default geometry (per M5 v13 reachability math): center (16.40, 15.0, 0.36),
+    size 0.6 x 0.6 x 0.7. Top face at z=0.71 places the 8 cm cube's center at
+    z=0.75, which lands in the Franka workspace at panda_link0 (0.4, 0, -0.25)
+    — grasp + 5 cm standoff = (0.4, 0, -0.20), reachable.
+    """
+    import numpy as np
+    from isaacsim.core.api.objects import FixedCuboid
+
+    table = FixedCuboid(
+        prim_path=prim_path,
+        name=name,
+        position=np.array(center_xyz, dtype=np.float32),
+        scale=np.array(size_xyz, dtype=np.float32),
+        color=np.array(color, dtype=np.float32),
+    )
+    world.scene.add(table)
+    return table
+
+
+def spawn_pick_cell_lighting(
+    distant_intensity: float = 4000.0,
+    dome_intensity: float = 1500.0,
+    distant_path: str = "/World/cell_distant_light",
+    dome_path: str = "/World/cell_dome_light",
+):
+    """Add a distant (sun) light + dome (sky/ambient) light over the cell.
+
+    Without this, the camera_periodic-style USD scene the M5 smoke builds
+    has no light source — depth renders correctly but RGB is essentially
+    black. FoundationPose uses both channels; without RGB texture it
+    returns near-uniform candidate scores and the chosen pose is random.
+    Verified M5 v16 — depth showed cube + table cleanly, RGB was nearly
+    black with all FP scores clustered within 0.3 of each other.
+
+    Defaults sized for the 8 cm cube on the 0.6×0.6 m table at world
+    (16.40, 15.0, 0.71 table-top). Distant light angles down from world
+    +Z so the cube top is well-lit. Dome light fills the shadows so FP
+    can see the cube sides during refinement.
+    """
+    import omni
+    from pxr import Gf, UsdGeom, UsdLux
+
+    stage = omni.usd.get_context().get_stage()
+
+    # Distant light (directional, infinite source — like sunlight). Default
+    # USD distant lights shine down -Z; rotate so it also tilts slightly
+    # forward, matching natural overhead-sun feel.
+    distant_prim = stage.DefinePrim(distant_path, "DistantLight")
+    distant = UsdLux.DistantLight(distant_prim)
+    distant.CreateIntensityAttr(distant_intensity)
+    UsdGeom.XformCommonAPI(distant_prim).SetRotate(
+        Gf.Vec3f(-30.0, 0.0, 0.0),
+        UsdGeom.XformCommonAPI.RotationOrderXYZ,
+    )
+
+    # Dome light (image-based ambient). Provides soft fill so the cube
+    # sides aren't pure shadow when only the top is lit by the distant.
+    dome_prim = stage.DefinePrim(dome_path, "DomeLight")
+    dome = UsdLux.DomeLight(dome_prim)
+    dome.CreateIntensityAttr(dome_intensity)
+    return distant_prim, dome_prim
+
+
+def spawn_pick_cube(
+    world,
+    prim_path: str = "/World/pick_cube",
+    name: str = "pick_cube",
+    center_xyz: Sequence[float] = (16.40, 15.0, 0.75),
+    edge_m: float = 0.08,
+    color: Sequence[float] = (0.85, 0.30, 0.20),
+    mass_kg: float = 0.10,
+):
+    """Spawn a dynamic 8 cm cube on top of the pick table for the M5 smoke.
+
+    Default geometry: center (16.40, 15.0, 0.75) — sits on the 0.6x0.6x0.7
+    table at world (16.40, 15.0, 0.36). 0.04 cube half-edge + 0.71 table top
+    = 0.75 cube center. FoundationPose's input CAD ('m5_smoke_box.obj' from
+    run_scenario.py) is the matching 0.08 m trimesh.creation.box.
+    """
+    import numpy as np
+    from isaacsim.core.api.objects import DynamicCuboid
+
+    cube = DynamicCuboid(
+        prim_path=prim_path,
+        name=name,
+        position=np.array(center_xyz, dtype=np.float32),
+        scale=np.array([edge_m, edge_m, edge_m], dtype=np.float32),
+        color=np.array(color, dtype=np.float32),
+        mass=mass_kg,
+    )
+    world.scene.add(cube)
+    return cube

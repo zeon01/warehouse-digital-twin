@@ -139,14 +139,23 @@ class ArmPlanner:
         pos_c.constraint_region.primitive_poses = [target_pose.pose]
         pos_c.weight = 1.0
 
-        # Orientation constraint.
+        # Orientation constraint. Tight X/Y tolerances keep the wrist
+        # pointing in the commanded down direction; wide Z tolerance lets
+        # the gripper rotate freely about its approach axis (rotation
+        # invariance for symmetric grippers + symmetric objects). With
+        # all three at 0.1 rad MoveIt couldn't sample any valid IK
+        # solutions for top-down grasps near the workspace boundary
+        # (verified M5 v14: "Unable to sample any valid states for goal
+        # tree").
+        import math as _math
+
         ori_c = OrientationConstraint()
         ori_c.header.frame_id = PLANNING_FRAME
         ori_c.link_name = END_EFFECTOR_LINK
         ori_c.orientation = target_pose.pose.orientation
-        ori_c.absolute_x_axis_tolerance = 0.1
-        ori_c.absolute_y_axis_tolerance = 0.1
-        ori_c.absolute_z_axis_tolerance = 0.1
+        ori_c.absolute_x_axis_tolerance = 0.5
+        ori_c.absolute_y_axis_tolerance = 0.5
+        ori_c.absolute_z_axis_tolerance = _math.pi
         ori_c.weight = 1.0
 
         constraints = Constraints()

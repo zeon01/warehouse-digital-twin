@@ -155,6 +155,64 @@ try:
     spawn_franka(world, "/World/pick_arm", "pick_arm", position_xyz=(px, py, 1.0))
     mark("franka_spawned")
 
+    # M5 v13: spawn a real table + cube + RGB-D camera so FoundationPose has
+    # a real cube to register against (synthetic depth in v7-v12 returned
+    # noise-confidence poses and unreachable grasp targets). Geometry chosen
+    # from reachability math:
+    #   Franka mounted at world (px, py, 1.0) → panda_link0 = world (px, py, 1.0)
+    #   reachable grasp pose at panda_link0 (0.40, 0, -0.20)
+    #   ↓ TopDownGrasp adds (0, 0, +0.05) standoff
+    #   cube center at panda_link0 (0.40, 0, -0.25) = world (px+0.40, py, 0.75)
+    #   cube edge 0.08 → bottom at z=0.71 → table top at z=0.71
+    #   table height 0.7 → table center at z=0.36
+    from sim.spawn import (  # noqa: E402
+        spawn_pick_cell_lighting,
+        spawn_pick_cube,
+        spawn_pick_table,
+    )
+
+    table_center = (px + 0.40, py, 0.36)
+    cube_center = (px + 0.40, py, 0.75)
+    spawn_pick_table(world, center_xyz=table_center, size_xyz=(0.6, 0.6, 0.7))
+    spawn_pick_cube(world, center_xyz=cube_center, edge_m=0.08)
+    mark(f"pick_table_spawned_center={table_center}")
+    mark(f"pick_cube_spawned_center={cube_center}")
+
+    # M5 v17 fix: scene was rendering with no light source — depth was
+    # correct but RGB was nearly black. FoundationPose uses both
+    # channels for pose refinement; without RGB texture it returns
+    # near-uniform scores and a random pose, leading to unreachable
+    # grasp targets and "Unable to sample any valid states for goal
+    # tree". Distant + dome lighting fixes the RGB channel so FP gets
+    # real visual signal on the cube faces.
+    spawn_pick_cell_lighting()
+    mark("pick_cell_lighting_spawned")
+
+    # Cell camera — looks at the cube from (px+0.40, py-0.80, 1.50) tilted
+    # 46.8° down. Publishes /cell/cam/{rgb,depth,info} with frame_id=
+    # cell_cam_optical. The static TF (world → cell_cam_optical) is launched
+    # below as a separate subprocess so it survives even if the Isaac Sim
+    # process restarts within a session.
+    from sim.cell_camera import (  # noqa: E402
+        DEFAULT_FOCAL_LENGTH_MM,
+        DEFAULT_HORIZONTAL_APERTURE_MM,
+        DEFAULT_VERTICAL_APERTURE_MM,
+        build_ros2_camera_graph,
+        spawn_cell_camera,
+    )
+
+    cam_pos_world = (px + 0.40, py - 0.80, 1.50)
+    cam_euler_deg = (46.8, 0.0, 0.0)
+    spawn_cell_camera(
+        position_xyz=cam_pos_world,
+        euler_xyz_deg=cam_euler_deg,
+        focal_length_mm=DEFAULT_FOCAL_LENGTH_MM,
+        horizontal_aperture_mm=DEFAULT_HORIZONTAL_APERTURE_MM,
+        vertical_aperture_mm=DEFAULT_VERTICAL_APERTURE_MM,
+    )
+    build_ros2_camera_graph()
+    mark(f"cell_camera_spawned_pos={cam_pos_world}_euler={cam_euler_deg}")
+
     # M5 acceptance: orders_completed=1 means the full chain runs:
     #   order -> coordinator -> AMR nav -> at_cell -> /cell/start_pick
     #     -> orchestrator -> FP+grasp+MoveIt plan -> /cell/pick_result
@@ -180,7 +238,9 @@ try:
         "wdt_pure_pursuit/lib/wdt_pure_pursuit/pure_pursuit_driver",
         "fleet_coordinator/lib/fleet_coordinator/fleet_coordinator_node",
         "wdt_manipulation_bringup/lib/wdt_manipulation_bringup/pick_cell_orchestrator",
-        "wdt_vast/synthetic_cell_camera.py",
+        "wdt_vast/synthetic_cell_camera.py",  # legacy v7-v12; harmless if absent
+        "wdt_vast/franka_ready_joint_states.py",
+        "tf2_ros/static_transform_publisher.*cell_cam_optical",
         "moveit_ros_move_group/move_group",
     ):
         subprocess.run(
@@ -206,7 +266,16 @@ try:
     # this way). Keep /opt/ros/humble/* — those are the actual ROS2
     # python entries.
     _pp_parts = ros_env.get("PYTHONPATH", "").split(":")
-    ros_env["PYTHONPATH"] = ":".join(p for p in _pp_parts if p and "/isaac-sim/" not in p)
+    _pp_clean = [p for p in _pp_parts if p and "/isaac-sim/" not in p]
+    # Add /tmp so subprocess ros2 nodes can import the non-colcon python
+    # packages at the repo root (sim/, manipulation/, metrics/, etc.). The
+    # parent script does sys.path.insert(0, "/tmp") on line ~105, but that
+    # only affects the kit process — child ros2 procs need /tmp on their
+    # PYTHONPATH explicitly. v11 hit this with pick_cell_orchestrator dying
+    # at import on `from manipulation.grasping import TopDownGrasp`.
+    if "/tmp" not in _pp_clean:
+        _pp_clean.append("/tmp")
+    ros_env["PYTHONPATH"] = ":".join(_pp_clean)
     # PYTHONHOME from Isaac Sim's kit also has to go — Python 3.11 home
     # poisons the 3.10 ros2 CLI.
     ros_env.pop("PYTHONHOME", None)
@@ -276,13 +345,58 @@ try:
     )
     mark(f"move_group_launched_pid={move_group_proc.pid}")
 
-    # 3. Synthetic cell camera — until Isaac Sim Camera + ROS2CameraHelper
-    #    is wired in (M5b / Phase 3).
+    # 3. Static TF world → cell_cam_optical (replaces synthetic_cell_camera
+    #    from v7-v12; the real camera is now spawned in Isaac Sim above).
+    #    Quaternion (x=0.917, y=0, z=0, w=-0.397) is rotation by -133.2° about X,
+    #    which composes the USD camera's 46.8° X tilt with the optical-frame
+    #    Y-flip + Z-flip (USD Y-up → optical Y-down, USD anti-look → optical
+    #    forward). Validated against the geometry: cube at world (px+0.40,
+    #    py, 0.75) projects to optical (0, 0, 1.097); composing
+    #    T_panda_from_world ∘ T_world_from_optical maps that back to
+    #    panda_link0 (0.40, 0, -0.25), giving a (0.40, 0, -0.20) grasp pose
+    #    after +0.05 standoff — reachable.
+    cam_x, cam_y, cam_z = cam_pos_world
     cam_proc = _ros2_popen(
-        "synth_cell_cam",
-        "/usr/bin/python3 /work/wdt_vast/synthetic_cell_camera.py",
+        "cell_cam_static_tf",
+        (
+            "ros2 run tf2_ros static_transform_publisher "
+            f"--x {cam_x} --y {cam_y} --z {cam_z} "
+            "--qx 0.917 --qy 0.0 --qz 0.0 --qw -0.397 "
+            "--frame-id world --child-frame-id cell_cam_optical"
+        ),
     )
-    mark(f"synth_cell_cam_launched_pid={cam_proc.pid}")
+    mark(f"cell_cam_static_tf_launched_pid={cam_proc.pid}")
+
+    # 3b. Static TF world → panda_link0. robot_state_publisher (launched via
+    # move_group.launch.py) publishes the Franka URDF's panda_link0→panda_link8
+    # chain but doesn't anchor the URDF root in world. Without this, the
+    # orchestrator's TF lookup cell_cam_optical→panda_link0 fails — both
+    # frames need to share a common ancestor. Franka mounted at (px, py, 1.0)
+    # upright (no rotation).
+    panda_tf_proc = _ros2_popen(
+        "panda_link0_static_tf",
+        (
+            "ros2 run tf2_ros static_transform_publisher "
+            f"--x {px} --y {py} --z 1.0 "
+            "--qx 0.0 --qy 0.0 --qz 0.0 --qw 1.0 "
+            "--frame-id world --child-frame-id panda_link0"
+        ),
+    )
+    mark(f"panda_link0_static_tf_launched_pid={panda_tf_proc.pid}")
+
+    # 3c. Franka "ready" /joint_states publisher. MoveIt's planning_scene
+    # monitor needs a valid (non-self-colliding, non-singular) start state
+    # before it can plan; the Panda's URDF zero-position has panda_link5
+    # and panda_link7 in self-collision so every goal returns "Skipping
+    # invalid start state". Until Isaac Sim's Franka articulation publishes
+    # its own /joint_states (M5b / Phase 3), this static publisher fills
+    # the gap. Verified failure mode in M5 v13. Same gotcha as M3 smoke
+    # (wdt_vast/moveit_plan_smoke.py).
+    js_proc = _ros2_popen(
+        "franka_ready_joint_states",
+        "/usr/bin/python3 /work/wdt_vast/franka_ready_joint_states.py",
+    )
+    mark(f"franka_ready_joint_states_launched_pid={js_proc.pid}")
 
     # 4. Pick cell orchestrator — subscribes to /cell/cam/* + /cell/start_pick,
     #    runs FP + TopDownGrasp + ArmPlanner (plan_only), publishes

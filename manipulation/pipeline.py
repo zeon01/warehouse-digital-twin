@@ -54,9 +54,14 @@ class ManipulationPipeline:
             return PickResult(False, 0, perf_counter() - t0, "no_grasp")
 
         attempts = 0
+        last_msg = ""
         for cand in candidates[: self.max_retries]:
             attempts += 1
             res = self.arm.plan_to_pose(cand.translation, cand.rotation)
+            last_msg = res.message
             if res.success:
                 return PickResult(True, attempts, perf_counter() - t0, "")
-        return PickResult(False, attempts, perf_counter() - t0, "exhausted_candidates")
+        # Bubble the ArmPlanner failure message up so the orchestrator log
+        # shows whether OMPL failed, the action was rejected, the result
+        # timed out, or the response status/error_code didn't match.
+        return PickResult(False, attempts, perf_counter() - t0, f"exhausted_candidates({last_msg})")

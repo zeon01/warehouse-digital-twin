@@ -39,12 +39,27 @@ class PoseEstimator:
     ``FoundationPose.reset_object`` rather than re-constructed.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        auto_mask_from_nearest: bool = True,
+        nearest_depth_window_m: float = 0.15,
+    ) -> None:
         self._scorer: Any = None
         self._refiner: Any = None
         self._glctx: Any = None
         self._impl: Any = None
         self._last_cad: str | None = None
+        # Mask strategy: with a cluttered scene (table + cube + walls), a
+        # full-image mask makes FoundationPose register the CAD against
+        # the dominant depth surface — which in M5 v18 was the table, not
+        # the 8 cm cube on top of it. By construction the pick object is
+        # the CLOSEST surface to the camera; mask all pixels within a
+        # tight window above the minimum-depth pixel and FP focuses on
+        # just the cube. Set auto_mask_from_nearest=False to fall back to
+        # the legacy full-image mask (only safe when the depth image has
+        # no other surfaces — e.g. M4's synthetic test fixture).
+        self._auto_mask_from_nearest = auto_mask_from_nearest
+        self._nearest_depth_window_m = nearest_depth_window_m
 
     def _lazy_load(self) -> None:
         if self._scorer is not None:
@@ -105,10 +120,25 @@ class PoseEstimator:
         if cad_path != self._last_cad:
             self._set_object(cad_path)
 
-        # Full-image mask — the warehouse pick cell is empty except for the
-        # target object, so we let FoundationPose register against the
-        # entire frame rather than a tight bbox.
-        mask = np.ones(depth.shape[:2], dtype=bool)
+        if self._auto_mask_from_nearest:
+            # Build a mask of pixels within `nearest_depth_window_m` of the
+            # closest visible depth — i.e. the cube top + sides, excluding
+            # the table around it and the floor behind. M5 v18 verified
+            # without this: FP returned panda_link0 (0.39, 0.49, -0.71)
+            # — the table surface, NOT the cube center at (0.40, 0, -0.25).
+            valid = np.isfinite(depth) & (depth > 0)
+            if not valid.any():
+                return []
+            dmin = float(depth[valid].min())
+            mask = valid & (depth <= dmin + self._nearest_depth_window_m)
+            # Sanity: need at least a few hundred pixels for FP's 160-px
+            # crop to make sense.
+            if int(mask.sum()) < 64:
+                mask = np.ones(depth.shape[:2], dtype=bool)
+        else:
+            # Full-image mask — only safe when the depth image has a single
+            # object on a clean background (e.g. M4's synthetic fixture).
+            mask = np.ones(depth.shape[:2], dtype=bool)
         # trimesh loads mesh.vertices as float64 by default and FP's
         # internal pose math runs in double. Cast K to float64 to match
         # — without this FP's `K @ pts` raises
