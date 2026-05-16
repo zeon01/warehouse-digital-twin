@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from manipulation.pose_source import FoundationPosePoseSource
+from manipulation.pose_source import FoundationPosePoseSource, GroundTruthPoseSource
 
 
 class _FakeFPEstimator:
@@ -52,3 +52,31 @@ def test_foundation_pose_source_returns_none_on_empty_pose_list():
         cad_path="x",
     )
     assert out is None
+
+
+def test_ground_truth_source_returns_none_before_first_set():
+    src = GroundTruthPoseSource()
+    out = src.get_pose(rgb=None, depth=None, camera_K=None, cad_path="x")
+    assert out is None
+
+
+def test_ground_truth_source_returns_latest_pose():
+    src = GroundTruthPoseSource()
+    src.set_latest(np.array([16.40, 15.00, 0.75]), "world")
+    out = src.get_pose(rgb=None, depth=None, camera_K=None, cad_path="x")
+    assert out is not None
+    translation, frame_id = out
+    assert frame_id == "world"
+    np.testing.assert_allclose(translation, [16.40, 15.00, 0.75])
+
+
+def test_ground_truth_source_returns_copy_not_alias():
+    src = GroundTruthPoseSource()
+    payload = np.array([1.0, 2.0, 3.0])
+    src.set_latest(payload, "world")
+    out = src.get_pose(rgb=None, depth=None, camera_K=None, cad_path="x")
+    assert out is not None
+    out[0][0] = 999.0  # mutate the returned translation
+    out2 = src.get_pose(rgb=None, depth=None, camera_K=None, cad_path="x")
+    assert out2 is not None
+    assert out2[0][0] == 1.0  # internal state unchanged
