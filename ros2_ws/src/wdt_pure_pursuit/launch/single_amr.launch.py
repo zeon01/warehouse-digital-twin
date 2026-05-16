@@ -54,6 +54,19 @@ def generate_launch_description():
                             "--child-frame-id",
                             "odom",
                         ],
+                        # static_transform_publisher's C++ broadcaster
+                        # HARDCODES /tf_static (absolute), so PushRosNamespace
+                        # does NOT route it under the namespace. We must
+                        # remap explicitly. Same for /tf (in case any
+                        # publisher elsewhere uses TransformBroadcaster).
+                        # Verified 2026-05-16: without these remappings the
+                        # pp_driver's tf2 buffer sees /amr_0/tf (Carter) but
+                        # not /amr_0/tf_static (this node) — "two
+                        # unconnected trees" error.
+                        remappings=[
+                            ("/tf", "tf"),
+                            ("/tf_static", "tf_static"),
+                        ],
                         output="screen",
                     ),
                     Node(
@@ -72,6 +85,15 @@ def generate_launch_description():
                                 "max_angular": LaunchConfiguration("max_angular"),
                                 "goal_tolerance_m": LaunchConfiguration("goal_tolerance_m"),
                             }
+                        ],
+                        # tf2_ros::TransformListener ALSO hardcodes /tf and
+                        # /tf_static absolute paths. Remap them back to
+                        # relative so PushRosNamespace routes us to
+                        # /amr_0/tf and /amr_0/tf_static where Carter +
+                        # the static publisher actually live.
+                        remappings=[
+                            ("/tf", "tf"),
+                            ("/tf_static", "tf_static"),
                         ],
                         output="screen",
                     ),

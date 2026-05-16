@@ -22,10 +22,22 @@ Invoke:
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+# Isaac Sim 5.0's ROS2 bridge enable_extension hangs without its own lib
+# path on LD_LIBRARY_PATH at process-launch (NVIDIA forum 349495).
+ISAAC_BRIDGE_LIB = "/isaac-sim/exts/isaacsim.ros2.bridge/humble/lib"
+
+
+def _sim_env() -> dict:
+    env = os.environ.copy()
+    env["LD_LIBRARY_PATH"] = ISAAC_BRIDGE_LIB + ":" + env.get("LD_LIBRARY_PATH", "")
+    return env
+
 
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "/tmp/pp_smoke")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -38,9 +50,9 @@ PP_ACTIVATE_S = 10  # pure-pursuit has no lifecycle — instantly ready
 GOAL_TIMEOUT_S = 90
 
 
-def _popen(cmd: list[str], log_name: str) -> subprocess.Popen:
+def _popen(cmd: list[str], log_name: str, env: dict | None = None) -> subprocess.Popen:
     log = OUT / log_name
-    return subprocess.Popen(cmd, stdout=open(log, "w"), stderr=subprocess.STDOUT)
+    return subprocess.Popen(cmd, stdout=open(log, "w"), stderr=subprocess.STDOUT, env=env)
 
 
 def main() -> int:
@@ -49,6 +61,7 @@ def main() -> int:
     sim = _popen(
         ["/isaac-sim/python.sh", "wdt_vast/sim_carter_single.py", str(SIM_DURATION_S)],
         "sim.log",
+        env=_sim_env(),
     )
     print(f"sim pid={sim.pid}, sleeping {SIM_BOOT_S}s for Kit boot")
     time.sleep(SIM_BOOT_S)
@@ -98,16 +111,24 @@ def main() -> int:
 
     # Trace pose every ~3 s for the duration of the goal — useful for
     # confirming actual motion vs. the action-result success-claim.
+    # TF is now namespaced under /amr_0 (per sim_carter_single namespacing
+    # call), so we tail /amr_0/tf, not /tf. timeout=5 with try/except —
+    # an echo timeout shouldn't crash the whole smoke (was a bug
+    # 2026-05-16: subprocess.TimeoutExpired propagated and killed
+    # everything mid-run).
     pose_log = open(OUT / "pose_trace.txt", "w")
     deadline = time.monotonic() + GOAL_TIMEOUT_S
     while time.monotonic() < deadline and goal_proc.poll() is None:
-        echo = subprocess.run(
-            ["ros2", "topic", "echo", "/tf", "--once"],
-            capture_output=True,
-            text=True,
-            timeout=4,
-        )
-        pose_log.write(f"--- t={time.monotonic():.1f}\n{echo.stdout}\n")
+        try:
+            echo = subprocess.run(
+                ["ros2", "topic", "echo", f"/{NS}/tf", "--once"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            pose_log.write(f"--- t={time.monotonic():.1f}\n{echo.stdout}\n")
+        except subprocess.TimeoutExpired:
+            pose_log.write(f"--- t={time.monotonic():.1f}  (echo timeout)\n")
         pose_log.flush()
         time.sleep(3.0)
     pose_log.close()

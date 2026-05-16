@@ -38,11 +38,32 @@ Invoke (after the bootstrap chain + sim is reachable):
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+# Isaac Sim 5.0's `enable_extension("isaacsim.ros2.bridge")` hangs silently
+# unless the bridge's own shared-library path is on LD_LIBRARY_PATH at
+# process-launch time (setting it inside Python is too late; dlopen caches
+# at process start). Per NVIDIA forum thread 349495 (May 2026). Without
+# this, sim_carter_single.py hangs after Kit "app ready", never publishes
+# odom→base_link, and Nav2 sees two unconnected TF trees.
+ISAAC_BRIDGE_LIB = "/isaac-sim/exts/isaacsim.ros2.bridge/humble/lib"
+
+
+def _sim_env() -> dict:
+    """Env dict to pass to subprocess.Popen for any /isaac-sim/python.sh call.
+
+    Prepends Isaac Sim's ROS2 bridge lib path to LD_LIBRARY_PATH so the
+    bridge extension can dlopen its native libs.
+    """
+    env = os.environ.copy()
+    env["LD_LIBRARY_PATH"] = ISAAC_BRIDGE_LIB + ":" + env.get("LD_LIBRARY_PATH", "")
+    return env
+
 
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "/tmp/m1_cmd_vel_probe")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -58,9 +79,9 @@ HZ_WINDOW_S = 30
 GOAL_TIMEOUT_S = 90
 
 
-def _popen(cmd: list[str], log_name: str) -> subprocess.Popen:
+def _popen(cmd: list[str], log_name: str, env: dict | None = None) -> subprocess.Popen:
     log = OUT / log_name
-    return subprocess.Popen(cmd, stdout=open(log, "w"), stderr=subprocess.STDOUT)
+    return subprocess.Popen(cmd, stdout=open(log, "w"), stderr=subprocess.STDOUT, env=env)
 
 
 def _capture(cmd: list[str], timeout_s: float) -> str:
@@ -111,6 +132,7 @@ def main() -> int:
     sim = _popen(
         ["/isaac-sim/python.sh", "wdt_vast/sim_carter_single.py", str(SIM_DURATION_S)],
         "sim.log",
+        env=_sim_env(),
     )
     print(f"sim pid={sim.pid}, sleeping {SIM_BOOT_S}s for Kit boot")
     time.sleep(SIM_BOOT_S)

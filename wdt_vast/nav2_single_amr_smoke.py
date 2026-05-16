@@ -26,10 +26,22 @@ Exit 0 = success, 1 = failure.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+# Isaac Sim 5.0's ROS2 bridge enable_extension hangs without its own lib
+# path on LD_LIBRARY_PATH at process-launch (NVIDIA forum 349495).
+ISAAC_BRIDGE_LIB = "/isaac-sim/exts/isaacsim.ros2.bridge/humble/lib"
+
+
+def _sim_env() -> dict:
+    env = os.environ.copy()
+    env["LD_LIBRARY_PATH"] = ISAAC_BRIDGE_LIB + ":" + env.get("LD_LIBRARY_PATH", "")
+    return env
+
 
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "/tmp/m1_smoke")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -45,9 +57,9 @@ NAV2_ACTIVATE_S = 60
 GOAL_TIMEOUT_S = 180
 
 
-def _popen(cmd: list[str], log_name: str) -> subprocess.Popen:
+def _popen(cmd: list[str], log_name: str, env: dict | None = None) -> subprocess.Popen:
     log = OUT / log_name
-    return subprocess.Popen(cmd, stdout=open(log, "w"), stderr=subprocess.STDOUT)
+    return subprocess.Popen(cmd, stdout=open(log, "w"), stderr=subprocess.STDOUT, env=env)
 
 
 def main() -> int:
@@ -56,6 +68,7 @@ def main() -> int:
     sim = _popen(
         ["/isaac-sim/python.sh", "wdt_vast/sim_carter_single.py", str(SIM_DURATION_S)],
         "sim.log",
+        env=_sim_env(),
     )
     print(f"sim pid={sim.pid}, sleeping {SIM_BOOT_S}s for Kit boot")
     time.sleep(SIM_BOOT_S)

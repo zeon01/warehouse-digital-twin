@@ -18,6 +18,7 @@ from launch.substitutions import (
     PathJoinSubstitution,
 )
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -26,8 +27,15 @@ def generate_launch_description():
     xacro_file = PathJoinSubstitution(
         [FindPackageShare("wdt_carter_description"), "urdf", "carter.urdf.xacro"]
     )
-    robot_description = Command(
-        [FindExecutable(name="xacro"), " ", xacro_file, " robot_namespace:=", ns]
+    # ParameterValue(..., value_type=str) is required on humble's newer
+    # launch_ros — without it, launch tries to YAML-parse the URDF and
+    # fails with "Unable to parse the value of parameter robot_description
+    # as yaml". Bit by this on the 2026-05-16 Quebec instance even though
+    # the unwrapped form worked on Romania last session — host's PyYAML /
+    # launch_ros pinning differs slightly.
+    robot_description = ParameterValue(
+        Command([FindExecutable(name="xacro"), " ", xacro_file, " robot_namespace:=", ns]),
+        value_type=str,
     )
 
     return LaunchDescription(

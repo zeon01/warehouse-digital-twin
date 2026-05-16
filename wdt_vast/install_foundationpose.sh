@@ -159,6 +159,17 @@ $TARGET_PY -m pip install trimesh
 $TARGET_PY -m pip install --force-reinstall \
   "numpy>=1.21.5,<2.0" "scipy<1.12" "lxml<5.0"
 
+# Older datacenter CPUs (e.g. Ivy Bridge — Xeon E5-2697 v2 on vast.ai
+# Quebec mach 52360) lack AVX2/FMA, which the prebuilt kornia_rs Rust
+# wheel requires. `import kornia` then SIGILLs silently and FP's
+# estimater chain fails to import. Downgrade kornia to 0.7.0 (pre-Rust
+# era, pure-Python) and uninstall kornia_rs entirely. Skip on hosts
+# that DO support AVX2 — kornia 0.8.x is fine there — but the pin
+# harms nothing on a modern CPU.
+echo "==> pinning kornia 0.7.0 (Ivy-Bridge AVX2-free hosts SIGILL on kornia_rs)"
+$TARGET_PY -m pip install --upgrade "kornia==0.7.0"
+$TARGET_PY -m pip uninstall -y kornia_rs 2>/dev/null || true
+
 echo "==> staging weights from Modal volume foundationpose-models"
 mkdir -p "$WEIGHTS"
 for run in "$REFINER_RUN" "$SCORER_RUN"; do

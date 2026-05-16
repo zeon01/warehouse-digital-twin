@@ -33,7 +33,13 @@ def mark(phase: str) -> None:
 
 try:
     mark("script_start")
-    sys.path.insert(0, "/tmp")
+    # /isaac-sim/python.sh doesn't inherit project paths; the sim/ pure-
+    # Python package can live at either /work (post-bootstrap convention)
+    # or /tmp (older extraction location). Add both — first match wins.
+    for candidate in ("/work", "/tmp"):
+        if candidate not in sys.path:
+            sys.path.insert(0, candidate)
+    from sim.multi_robot import _namespace_subtree
     from sim.runner import make_simulation_app
     from sim.spawn import spawn_nova_carter
 
@@ -48,7 +54,14 @@ try:
     mark("world_created")
 
     spawn_nova_carter(world, "/World/AMR_0", "amr_0", position_xy=(1.0, 1.0))
-    mark("carter_spawned_at_1_1")
+    # CRITICAL: spawn_nova_carter only adds the USD reference; it does NOT
+    # namespace the OmniGraph publishers/subscribers. Without this call,
+    # Carter's diff_drive OG subscribes to bare /cmd_vel (no namespace),
+    # but Nav2 / pure-pursuit publish to /amr_0/cmd_vel — Carter never
+    # moves. Verified during Phase 2 M1 pure-pursuit smoke 2026-05-16:
+    # cmd_vel publishing at 39 Hz but distance_remaining stayed at 5.64m.
+    n_set = _namespace_subtree("/World/AMR_0", "amr_0")
+    mark(f"carter_spawned_at_1_1_namespaced_n={n_set}")
 
     world.reset()
     mark("world_reset")
