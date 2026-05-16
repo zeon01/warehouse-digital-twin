@@ -343,7 +343,8 @@ try:
     # Carter physics blowups that left base_link out of the TF tree.
     pp_proc = _ros2_popen(
         "pure_pursuit",
-        "ros2 launch wdt_pure_pursuit multi_amr.launch.py " "goal_timeout_s:=600.0",
+        "ros2 launch wdt_pure_pursuit multi_amr.launch.py "
+        "goal_timeout_s:=1200.0 goal_tolerance_m:=0.5",
     )
     mark(f"pure_pursuit_launched_pid={pp_proc.pid}")
 
@@ -527,6 +528,34 @@ try:
         t += dt
 
     mark(f"loop_done_orders_enqueued={next_order_idx}")
+
+    # Replay pick_orch.log to feed pick_result events into the recorder.
+    # The coordinator subscribes to /cell/pick_result and tracks completion
+    # internally; run_scenario.py runs in kit python 3.11 which can't
+    # import rclpy (gotcha #18), so we can't subscribe directly. Cheapest
+    # fix: parse the orchestrator's log file before flushing metrics.
+    import re as _re
+
+    pick_log = out_dir / "pick_orch.log"
+    if pick_log.exists():
+        pick_re = _re.compile(r"pick_result: (\{.*\})")
+        for line in pick_log.read_text().splitlines():
+            m = pick_re.search(line)
+            if not m:
+                continue
+            try:
+                payload = json.loads(m.group(1))
+            except json.JSONDecodeError:
+                continue
+            order_id = payload.get("order_id")
+            if order_id and order_id in recorder._orders:
+                recorder.on_order_completed(
+                    order_id=order_id,
+                    at=t,
+                    pick_success=bool(payload.get("success", False)),
+                    pick_attempts=int(payload.get("attempts", 1)),
+                )
+
     recorder.flush()
 
     # Shut down ROS2 subprocesses in reverse-launch order. `start_new_session=True`

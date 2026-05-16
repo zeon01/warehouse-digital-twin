@@ -146,7 +146,19 @@ class FleetCoordinator(Node):
         t = self.get_clock().now().nanoseconds * 1e-9
         self._deadlock.tick(t, self._poses)
         if self._deadlock.deadlocked():
-            self.get_logger().warn(f"DEADLOCK detected: {self._deadlock.deadlocked()}")
+            # Pre-existing bug: this fires false-positives because
+            # `_refresh_poses` does `lookup_transform("map", "amr_X/base_link")`
+            # on the GLOBAL tf2 buffer, but the AMR TFs are published under
+            # the per-AMR /amr_X/tf topic (gotcha #13). All robots stay
+            # pinned at (0,0) → DeadlockMonitor flags every tick after 5 s.
+            # Suppress to keep logs readable until Option 3 (subscribe to
+            # /amr_X/odom) lands. See docs/m5-expert-response.md §Q11.
+            if not getattr(self, "_deadlock_warned_once", False):
+                self.get_logger().warn(
+                    f"DEADLOCK detected: {self._deadlock.deadlocked()} "
+                    "(suppressing repeats — known false positive from broken TF lookup)"
+                )
+                self._deadlock_warned_once = True
 
         with self._lock:
             free_robots = {a: self._poses[a] for a in self.amr_ids if self._robots[a].free}
