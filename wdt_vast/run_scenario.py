@@ -170,10 +170,59 @@ try:
     # on /amr_i/cmd_vel once `_namespace_subtree` has been called — that
     # is handled by spawn_amr_fleet (don't double-call from here).
 
+    # Defensive: kill any orphaned ros2 procs from a prior run. `start_new_session=True`
+    # below detaches them from our shell so SIGTERM/SIGKILL on the bash wrapper doesn't
+    # propagate. If a prior run was interrupted (kill -9 of the sim, SSH disconnect,
+    # whatever), pp_drivers / coordinator / pick_orch survive and compete for the same
+    # action names. Hit on M5 v8 (2026-05-16) — "Ignoring unexpected goal response. There
+    # may be more than one action server" warning came from a v7 ghost coordinator.
+    for pat in (
+        "wdt_pure_pursuit/lib/wdt_pure_pursuit/pure_pursuit_driver",
+        "fleet_coordinator/lib/fleet_coordinator/fleet_coordinator_node",
+        "wdt_manipulation_bringup/lib/wdt_manipulation_bringup/pick_cell_orchestrator",
+        "wdt_vast/synthetic_cell_camera.py",
+        "moveit_ros_move_group/move_group",
+    ):
+        subprocess.run(
+            ["pkill", "-9", "-f", pat], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+    mark("orphan_ros2_pkill_done")
+
     amr_ids = [f"amr_{i}" for i in range(scenario.fleet_size)]
     pick_xy = list(layout.pick_cell.position_xy)
     ros_env = os.environ.copy()
-    ros_env["ROS_DOMAIN_ID"] = "42"
+    # NOTE: do NOT set ROS_DOMAIN_ID here — Isaac Sim's ROS2 bridge
+    # publishes on the env's default domain (typically 0 unless the
+    # caller exports it). Setting subprocesses to a different domain
+    # (Phase 1 used 42) silently silos them from the sim's TF + cmd_vel.
+    # Verified 2026-05-16: pp_driver on domain 42 saw /amr_0/tf as
+    # "does not exist" while bare SSH on domain 0 saw it at 35 Hz.
+    ros_env.pop("ROS_DOMAIN_ID", None)
+    # Strip Isaac Sim's Python 3.11 paths out of PYTHONPATH for subprocess
+    # environments. The ros2 CLI runs under system /usr/bin/python3 (3.10);
+    # if PYTHONPATH includes /isaac-sim/kit/python/lib/python3.11/*, the
+    # first `import re` crashes with "SRE module mismatch" (verified
+    # 2026-05-16 — coordinator + pick_orch + ros2 topic pub all died
+    # this way). Keep /opt/ros/humble/* — those are the actual ROS2
+    # python entries.
+    _pp_parts = ros_env.get("PYTHONPATH", "").split(":")
+    ros_env["PYTHONPATH"] = ":".join(p for p in _pp_parts if p and "/isaac-sim/" not in p)
+    # PYTHONHOME from Isaac Sim's kit also has to go — Python 3.11 home
+    # poisons the 3.10 ros2 CLI.
+    ros_env.pop("PYTHONHOME", None)
+    # CRITICAL: also scrub /isaac-sim/ from LD_LIBRARY_PATH. We set
+    # /isaac-sim/exts/isaacsim.ros2.bridge/humble/lib for the SIM
+    # process (gotcha #17 — without it the ros2 bridge ext hangs), but
+    # that path has Isaac-Sim-bundled copies of nav2_msgs, geometry_msgs,
+    # tf2_msgs, etc. compiled against a NEWER ROS2 version. Their
+    # typesupport_c .so files reference symbols (e.g.
+    # `nav2_msgs__srv__dynamic_edges__response__convert_to_py`) that
+    # don't exist in the apt-installed C libs. When the ros2 subprocess
+    # dlopens nav2_msgs/typesupport_c, it picks up the Isaac Sim copy
+    # first and fails with `UnsupportedTypeSupport`. Verified 2026-05-16:
+    # ALL pure_pursuit_drivers + fleet_coordinator died this way.
+    _ld_parts = ros_env.get("LD_LIBRARY_PATH", "").split(":")
+    ros_env["LD_LIBRARY_PATH"] = ":".join(p for p in _ld_parts if p and "/isaac-sim/" not in p)
 
     def _ros2_popen(name: str, cmd_str: str) -> subprocess.Popen:
         """Background-launch a ros2 command with sourcing baked in.
@@ -208,9 +257,15 @@ try:
     mark(f"m5_cad_written={m5_cad}")
 
     # 1. Pure-pursuit fleet — NavigateToPose action servers per AMR.
+    # goal_timeout_s: pp_driver uses wallclock for elapsed (it's not on
+    # /clock). Carter does ~0.05 m/s wall at max_linear=0.5 → 6m leg
+    # is 120s wall, 10m leg is 200s wall. Use 600s timeout for margin.
+    # Sticking with the conservative max_linear=0.5 for stability —
+    # bumping to 1.5 was tried in M5 v8/v9 and may correlate with
+    # Carter physics blowups that left base_link out of the TF tree.
     pp_proc = _ros2_popen(
         "pure_pursuit",
-        "ros2 launch wdt_pure_pursuit multi_amr.launch.py",
+        "ros2 launch wdt_pure_pursuit multi_amr.launch.py " "goal_timeout_s:=600.0",
     )
     mark(f"pure_pursuit_launched_pid={pp_proc.pid}")
 
@@ -264,6 +319,16 @@ try:
     world.reset()
     mark("world_reset")
 
+    # Start the simulation timeline. Nova Carter's OmniGraph publishers
+    # (TF, cmd_vel subscriber, LIDAR, IMU, cameras) all use
+    # OnPlaybackTick triggers — they DON'T fire from world.step() alone.
+    # Without world.play(), /amr_0/tf stays empty and pure_pursuit's
+    # tf2 buffer reports "base_link frame does not exist". Verified
+    # 2026-05-16: M5 v5 hit this; gotcha #3 in
+    # feedback-nav2-isaac-sim-gotchas.
+    world.play()
+    mark("world_playing")
+
     # Settle physics a beat before order injection starts.
     for _ in range(30):
         world.step(render=True)
@@ -277,49 +342,73 @@ try:
     next_order_idx = 0
     sorted_orders = sorted(scenario.orders, key=lambda o: o.arrival_t)
 
-    # Phase 2: publish each order on /orders/enqueue when its arrival_t hits.
-    # Phase 1 only recorded them to disk; the coordinator never saw them
-    # because nothing was publishing to the topic it subscribes to.
-    import rclpy  # noqa: E402
-    from geometry_msgs.msg import PoseStamped  # noqa: E402
+    # Order injection: shell out to `ros2 topic pub --once`. We CAN'T
+    # `import rclpy` here — Isaac Sim's kit/python is 3.11 and Humble's
+    # rclpy only ships the cpython-310 binding (the
+    # `_rclpy_pybind11.cpython-310-…so` mismatch is the root cause of
+    # this entire architectural split — see memory note about FP py3.10
+    # install). Shell-out via the system /usr/bin/python3-backed ros2
+    # CLI sidesteps the issue.
 
-    if not rclpy.ok():
-        rclpy.init()
-    order_node = rclpy.create_node("run_scenario_order_publisher")
-    order_pub = order_node.create_publisher(PoseStamped, "/orders/enqueue", 10)
-    mark("order_publisher_up")
+    def _publish_order(order_id: str, shelf_x: float, shelf_y: float) -> None:
+        yaml_arg = (
+            "{header: {frame_id: " + order_id + "}, "
+            f"pose: {{position: {{x: {shelf_x}, y: {shelf_y}, z: 0.0}}, "
+            "orientation: {w: 1.0}}}"
+        )
+        subprocess.Popen(
+            [
+                "bash",
+                "-lc",
+                "set +u && source /opt/ros/humble/setup.bash && set -u && "
+                "ros2 topic pub --once /orders/enqueue "
+                f"geometry_msgs/msg/PoseStamped '{yaml_arg}'",
+            ],
+            env=ros_env,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+    mark("order_publisher_via_shell_ready")
 
     while t < scenario.duration_s:
         while next_order_idx < len(sorted_orders) and sorted_orders[next_order_idx].arrival_t <= t:
             o = sorted_orders[next_order_idx]
             recorder.on_order_enqueued(order_id=o.id, at=t)
-            msg = PoseStamped()
-            msg.header.frame_id = o.id  # coordinator reads this as the order id
-            msg.header.stamp = order_node.get_clock().now().to_msg()
-            msg.pose.position.x = float(o.shelf_xy[0])
-            msg.pose.position.y = float(o.shelf_xy[1])
-            msg.pose.orientation.w = 1.0
-            order_pub.publish(msg)
+            _publish_order(o.id, float(o.shelf_xy[0]), float(o.shelf_xy[1]))
+            mark(f"order_published_{o.id}")
             next_order_idx += 1
-        rclpy.spin_once(order_node, timeout_sec=0.0)
-        world.step(render=scenario.record_video)
+        # render=True regardless of scenario.record_video — Carter's
+        # diff_drive OG subscriber fires only on render ticks (gotcha
+        # #4 in feedback-nav2-isaac-sim-gotchas). With render=False the
+        # AMR ignores all cmd_vel and never moves. Frame capture for
+        # MP4 is gated on scenario.record_video elsewhere (recorder).
+        world.step(render=True)
         t += dt
-
-    order_node.destroy_node()
-    rclpy.shutdown()
 
     mark(f"loop_done_orders_enqueued={next_order_idx}")
     recorder.flush()
 
-    # Shut down ROS2 subprocesses in reverse-launch order.
+    # Shut down ROS2 subprocesses in reverse-launch order. `start_new_session=True`
+    # put each child in its own process group, so we must killpg the GROUP not just
+    # the bash wrapper (which exits early after exec'ing ros2). Without killpg, the
+    # actual ros2 node binaries survive and become orphans for the next run.
+    import signal as _signal
+
     ros2_procs = [coordinator_proc, orch_proc, cam_proc, move_group_proc, pp_proc]
     for proc in ros2_procs:
-        proc.terminate()
+        try:
+            os.killpg(os.getpgid(proc.pid), _signal.SIGTERM)
+        except ProcessLookupError:
+            pass
     for proc in ros2_procs:
         try:
             proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            proc.kill()
+            try:
+                os.killpg(os.getpgid(proc.pid), _signal.SIGKILL)
+            except ProcessLookupError:
+                pass
 
     sim.close()
     mark("sim_closed")

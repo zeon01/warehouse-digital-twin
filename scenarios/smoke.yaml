@@ -1,5 +1,14 @@
 name: smoke
 layout: small
+# Sim/wall ratio empirically ~0.23 with render=True + multi-AMR fleet
+# (M5 v7: 60s sim took 261s wall). Carter's effective sim speed is
+# only ~0.21 m/s with max_linear=0.5 (42% of commanded — sim physics
+# dampens the diff_drive response). Budget:
+#   spawn (2,2) -> shelf (4,8) 6m at 0.21 m/s sim = 28s sim
+#   shelf -> cell (16,15) ~10m at 0.21 m/s sim = 47s sim
+#   pick orchestration ~5s sim
+# Total ~80s sim. 120s gives margin for slow startup + pick chain.
+# Wall: 120 * (1/0.23) ~= 520s = ~8.7 min wall.
 duration_s: 120.0
 fleet_size: 2
 planner: greedy
