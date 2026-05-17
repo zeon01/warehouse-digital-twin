@@ -1,0 +1,4 @@
+[INFO] [1778975355.596252325] [static_transform_publisher_yfLvTV3O3ZoUmj2K]: Spinning until stopped - publishing transform
+translation: ('16.000000', '15.000000', '1.000000')
+rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+from 'world' to 'panda_link0'

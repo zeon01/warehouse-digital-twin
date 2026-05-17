@@ -1,0 +1,50 @@
+[INFO] [1778975356.776028902] [pick_cell_orchestrator]: pose_source=gt — subscribing to /world/cube_pose
+[INFO] [1778975356.783671924] [pick_cell_orchestrator]: pick_cell_orchestrator ready
+[INFO] [1778975583.918823879] [pick_cell_orchestrator]: start_pick received: o1
+[INFO] [1778975584.082527102] [pick_cell_orchestrator]: pick_result: {"order_id": "o1", "success": true, "attempts": 1, "cycle_time_s": 0.16139200099860318, "failure_reason": ""}
+Exception in thread Thread-1 (_spin_worker_executor):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+Traceback (most recent call last):
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/python3.10/site-packages/wdt_manipulation_bringup/pick_cell_orchestrator.py", line 244, in main
+    self.run()
+  File "/usr/lib/python3.10/threading.py", line 953, in run
+    rclpy.spin(node)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+    self._target(*self._args, **self._kwargs)
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/python3.10/site-packages/wdt_manipulation_bringup/pick_cell_orchestrator.py", line 229, in _spin_worker_executor
+    executor.spin_once()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    executor.spin_once(timeout_sec=0.1)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 653, in _wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 681, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:130
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+    raise ExternalShutdownException()
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/wdt_manipulation_bringup/pick_cell_orchestrator", line 33, in <module>
+rclpy.executors.ExternalShutdownException
+    sys.exit(load_entry_point('wdt-manipulation-bringup==0.2.0', 'console_scripts', 'pick_cell_orchestrator')())
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/python3.10/site-packages/wdt_manipulation_bringup/pick_cell_orchestrator.py", line 248, in main
+    rclpy.shutdown()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 130, in shutdown
+    _shutdown(context=context)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/utilities.py", line 58, in shutdown
+    return context.shutdown()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/context.py", line 102, in shutdown
+    self.__context.shutdown()
+rclpy._rclpy_pybind11.RCLError: failed to shutdown: rcl_shutdown already called on the given context, at ./src/rcl/init.c:241

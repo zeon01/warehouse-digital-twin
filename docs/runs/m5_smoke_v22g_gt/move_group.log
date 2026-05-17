@@ -1,0 +1,167 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-05-16-23-40-25-279922-ead4cd957a4b-13989
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [robot_state_publisher-1]: process started with pid [14663]
+[INFO] [move_group-2]: process started with pid [14665]
+[robot_state_publisher-1] [INFO] [1778974825.965028293] [franka_robot_state_publisher]: got segment panda_hand
+[robot_state_publisher-1] [INFO] [1778974825.965144740] [franka_robot_state_publisher]: got segment panda_leftfinger
+[robot_state_publisher-1] [INFO] [1778974825.965153981] [franka_robot_state_publisher]: got segment panda_link0
+[robot_state_publisher-1] [INFO] [1778974825.965161771] [franka_robot_state_publisher]: got segment panda_link1
+[robot_state_publisher-1] [INFO] [1778974825.965168452] [franka_robot_state_publisher]: got segment panda_link2
+[robot_state_publisher-1] [INFO] [1778974825.965175082] [franka_robot_state_publisher]: got segment panda_link3
+[robot_state_publisher-1] [INFO] [1778974825.965181983] [franka_robot_state_publisher]: got segment panda_link4
+[robot_state_publisher-1] [INFO] [1778974825.965190303] [franka_robot_state_publisher]: got segment panda_link5
+[robot_state_publisher-1] [INFO] [1778974825.965197254] [franka_robot_state_publisher]: got segment panda_link6
+[robot_state_publisher-1] [INFO] [1778974825.965205224] [franka_robot_state_publisher]: got segment panda_link7
+[robot_state_publisher-1] [INFO] [1778974825.965213195] [franka_robot_state_publisher]: got segment panda_link8
+[robot_state_publisher-1] [INFO] [1778974825.965219805] [franka_robot_state_publisher]: got segment panda_rightfinger
+[move_group-2] [INFO] [1778974825.990814270] [moveit_rdf_loader.rdf_loader]: Loaded robot model in 0 seconds
+[move_group-2] [INFO] [1778974825.990893405] [moveit_robot_model.robot_model]: Loading robot model 'panda'...
+[move_group-2] [INFO] [1778974826.035538216] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-2] [INFO] [1778974826.035711857] [moveit.ros_planning_interface.moveit_cpp]: Listening to 'joint_states' for joint states
+[move_group-2] [INFO] [1778974826.036492396] [moveit_ros.current_state_monitor]: Listening to joint states on topic 'joint_states'
+[move_group-2] [INFO] [1778974826.036957865] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Listening to '/attached_collision_object' for attached collision objects
+[move_group-2] [INFO] [1778974826.036974116] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Starting planning scene monitor
+[move_group-2] [INFO] [1778974826.037820568] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Listening to '/planning_scene'
+[move_group-2] [INFO] [1778974826.037836189] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Starting world geometry update monitor for collision objects, attached objects, octomap updates.
+[move_group-2] [INFO] [1778974826.038160049] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Listening to 'collision_object'
+[move_group-2] [INFO] [1778974826.038527882] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Listening to 'planning_scene_world' for planning scene world geometry
+[move_group-2] [WARN] [1778974826.038900626] [moveit.ros.occupancy_map_monitor.middleware_handle]: Resolution not specified for Octomap. Assuming resolution = 0.1 instead
+[move_group-2] [ERROR] [1778974826.038913786] [moveit.ros.occupancy_map_monitor.middleware_handle]: No 3D sensor plugin(s) defined for octomap updates
+[move_group-2] [INFO] [1778974826.039607900] [moveit.ros_planning_interface.moveit_cpp]: Loading planning pipeline 'pilz_industrial_motion_planner'
+[move_group-2] [INFO] [1778974826.042691911] [moveit.pilz_industrial_motion_planner.joint_limits_aggregator]: Reading limits from namespace robot_description_planning
+[move_group-2] [WARN] [1778974826.044043836] [moveit.pilz_industrial_motion_planner.joint_limits_aggregator]: Multi-DOF-Joint 'virtual_joint' not supported.
+[move_group-2] [WARN] [1778974826.044061337] [moveit.pilz_industrial_motion_planner.joint_limits_aggregator]: Multi-DOF-Joint 'virtual_joint' not supported.
+[move_group-2] [ERROR] [1778974826.050441014] [move_group]: Parameter 'robot_description_planning.cartesian_limits.max_trans_vel', is not set in the config file.
+[move_group-2] [ERROR] [1778974826.050582563] [move_group]: Parameter 'robot_description_planning.cartesian_limits.max_trans_acc', is not set in the config file.
+[move_group-2] [ERROR] [1778974826.050661638] [move_group]: Parameter 'robot_description_planning.cartesian_limits.max_trans_dec', is not set in the config file.
+[move_group-2] [ERROR] [1778974826.050741013] [move_group]: Parameter 'robot_description_planning.cartesian_limits.max_rot_vel', is not set in the config file.
+[move_group-2] [INFO] [1778974826.051412465] [moveit.pilz_industrial_motion_planner]: Available plugins: pilz_industrial_motion_planner/PlanningContextLoaderCIRC pilz_industrial_motion_planner/PlanningContextLoaderLIN pilz_industrial_motion_planner/PlanningContextLoaderPTP
+[move_group-2] [INFO] [1778974826.051423035] [moveit.pilz_industrial_motion_planner]: About to load: pilz_industrial_motion_planner/PlanningContextLoaderCIRC
+[move_group-2] [INFO] [1778974826.052542445] [moveit.pilz_industrial_motion_planner]: Registered Algorithm [CIRC]
+[move_group-2] [INFO] [1778974826.052553416] [moveit.pilz_industrial_motion_planner]: About to load: pilz_industrial_motion_planner/PlanningContextLoaderLIN
+[move_group-2] [INFO] [1778974826.053314063] [moveit.pilz_industrial_motion_planner]: Registered Algorithm [LIN]
+[move_group-2] [INFO] [1778974826.053324704] [moveit.pilz_industrial_motion_planner]: About to load: pilz_industrial_motion_planner/PlanningContextLoaderPTP
+[move_group-2] [INFO] [1778974826.054028958] [moveit.pilz_industrial_motion_planner]: Registered Algorithm [PTP]
+[move_group-2] [INFO] [1778974826.054042459] [moveit.ros_planning.planning_pipeline]: Using planning interface 'Pilz Industrial Motion Planner'
+[move_group-2] [INFO] [1778974826.056909047] [moveit_ros.fix_workspace_bounds]: Param 'pilz_industrial_motion_planner.default_workspace_bounds' was not set. Using default value: 10.000000
+[move_group-2] [INFO] [1778974826.056945239] [moveit_ros.fix_start_state_bounds]: Param 'pilz_industrial_motion_planner.start_state_max_bounds_error' was not set. Using default value: 0.050000
+[move_group-2] [INFO] [1778974826.056951490] [moveit_ros.fix_start_state_bounds]: Param 'pilz_industrial_motion_planner.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.056964310] [moveit_ros.fix_start_state_collision]: Param 'pilz_industrial_motion_planner.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.056969641] [moveit_ros.fix_start_state_collision]: Param 'pilz_industrial_motion_planner.jiggle_fraction' was not set. Using default value: 0.020000
+[move_group-2] [INFO] [1778974826.056975161] [moveit_ros.fix_start_state_collision]: Param 'pilz_industrial_motion_planner.max_sampling_attempts' was not set. Using default value: 100
+[move_group-2] [INFO] [1778974826.056987072] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Workspace Bounds'
+[move_group-2] [INFO] [1778974826.056992112] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Bounds'
+[move_group-2] [INFO] [1778974826.056996312] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State In Collision'
+[move_group-2] [INFO] [1778974826.057000413] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Path Constraints'
+[move_group-2] [INFO] [1778974826.058391669] [moveit.ros_planning_interface.moveit_cpp]: Loading planning pipeline 'ompl'
+[move_group-2] [INFO] [1778974826.074644141] [moveit.ros_planning.planning_pipeline]: Using planning interface 'OMPL'
+[move_group-2] [INFO] [1778974826.076507437] [moveit_ros.add_time_optimal_parameterization]: Param 'ompl.path_tolerance' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.076517698] [moveit_ros.add_time_optimal_parameterization]: Param 'ompl.resample_dt' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.076522878] [moveit_ros.add_time_optimal_parameterization]: Param 'ompl.min_angle_change' was not set. Using default value: 0.001000
+[move_group-2] [INFO] [1778974826.076543759] [moveit_ros.fix_workspace_bounds]: Param 'ompl.default_workspace_bounds' was not set. Using default value: 10.000000
+[move_group-2] [INFO] [1778974826.076558500] [moveit_ros.fix_start_state_bounds]: Param 'ompl.start_state_max_bounds_error' was set to 0.100000
+[move_group-2] [INFO] [1778974826.076563741] [moveit_ros.fix_start_state_bounds]: Param 'ompl.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.076575941] [moveit_ros.fix_start_state_collision]: Param 'ompl.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.076581082] [moveit_ros.fix_start_state_collision]: Param 'ompl.jiggle_fraction' was not set. Using default value: 0.020000
+[move_group-2] [INFO] [1778974826.076585802] [moveit_ros.fix_start_state_collision]: Param 'ompl.max_sampling_attempts' was not set. Using default value: 100
+[move_group-2] [INFO] [1778974826.076617044] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Add Time Optimal Parameterization'
+[move_group-2] [INFO] [1778974826.076621634] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Resolve constraint frames to robot links'
+[move_group-2] [INFO] [1778974826.076625715] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Workspace Bounds'
+[move_group-2] [INFO] [1778974826.076629635] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Bounds'
+[move_group-2] [INFO] [1778974826.076633615] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State In Collision'
+[move_group-2] [INFO] [1778974826.076637795] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Path Constraints'
+[move_group-2] [INFO] [1778974826.077558133] [moveit.ros_planning_interface.moveit_cpp]: Loading planning pipeline 'trajopt'
+[move_group-2] [ERROR] [1778974826.079574368] [moveit.ros_planning.planning_pipeline]: Exception while loading planner 'trajopt_interface/TrajOptPlanner': According to the loaded plugin descriptions the class trajopt_interface/TrajOptPlanner with base class type planning_interface::PlannerManager does not exist. Declared types are  chomp_interface/CHOMPPlanner ompl_interface/OMPLPlanner pilz_industrial_motion_planner/CommandPlannerAvailable plugins: chomp_interface/CHOMPPlanner, ompl_interface/OMPLPlanner, pilz_industrial_motion_planner/CommandPlanner
+[move_group-2] [INFO] [1778974826.081416963] [moveit_ros.add_time_optimal_parameterization]: Param 'trajopt.path_tolerance' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.081427903] [moveit_ros.add_time_optimal_parameterization]: Param 'trajopt.resample_dt' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.081433324] [moveit_ros.add_time_optimal_parameterization]: Param 'trajopt.min_angle_change' was not set. Using default value: 0.001000
+[move_group-2] [INFO] [1778974826.081447015] [moveit_ros.fix_workspace_bounds]: Param 'trajopt.default_workspace_bounds' was not set. Using default value: 10.000000
+[move_group-2] [INFO] [1778974826.081460876] [moveit_ros.fix_start_state_bounds]: Param 'trajopt.start_state_max_bounds_error' was set to 0.100000
+[move_group-2] [INFO] [1778974826.081465926] [moveit_ros.fix_start_state_bounds]: Param 'trajopt.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.081477997] [moveit_ros.fix_start_state_collision]: Param 'trajopt.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.081482987] [moveit_ros.fix_start_state_collision]: Param 'trajopt.jiggle_fraction' was not set. Using default value: 0.020000
+[move_group-2] [INFO] [1778974826.081487507] [moveit_ros.fix_start_state_collision]: Param 'trajopt.max_sampling_attempts' was not set. Using default value: 100
+[move_group-2] [INFO] [1778974826.081499208] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Add Time Optimal Parameterization'
+[move_group-2] [INFO] [1778974826.081503468] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Workspace Bounds'
+[move_group-2] [INFO] [1778974826.081507448] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Bounds'
+[move_group-2] [INFO] [1778974826.081511359] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State In Collision'
+[move_group-2] [INFO] [1778974826.081515149] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Path Constraints'
+[move_group-2] [ERROR] [1778974826.082407254] [moveit.ros_planning_interface.moveit_cpp]: Failed to initialize planning pipeline 'trajopt'.
+[move_group-2] [INFO] [1778974826.083819712] [moveit.ros_planning_interface.moveit_cpp]: Loading planning pipeline 'chomp'
+[move_group-2] [INFO] [1778974826.087986632] [moveit.ros_planning.planning_pipeline]: Using planning interface 'CHOMP'
+[move_group-2] [INFO] [1778974826.089827157] [moveit_ros.add_time_optimal_parameterization]: Param 'chomp.path_tolerance' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.089837727] [moveit_ros.add_time_optimal_parameterization]: Param 'chomp.resample_dt' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.089843028] [moveit_ros.add_time_optimal_parameterization]: Param 'chomp.min_angle_change' was not set. Using default value: 0.001000
+[move_group-2] [INFO] [1778974826.089856429] [moveit_ros.fix_workspace_bounds]: Param 'chomp.default_workspace_bounds' was not set. Using default value: 10.000000
+[move_group-2] [INFO] [1778974826.089869909] [moveit_ros.fix_start_state_bounds]: Param 'chomp.start_state_max_bounds_error' was set to 0.100000
+[move_group-2] [INFO] [1778974826.089874860] [moveit_ros.fix_start_state_bounds]: Param 'chomp.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.089887161] [moveit_ros.fix_start_state_collision]: Param 'chomp.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.089892111] [moveit_ros.fix_start_state_collision]: Param 'chomp.jiggle_fraction' was not set. Using default value: 0.020000
+[move_group-2] [INFO] [1778974826.089896601] [moveit_ros.fix_start_state_collision]: Param 'chomp.max_sampling_attempts' was not set. Using default value: 100
+[move_group-2] [INFO] [1778974826.089908312] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Add Time Optimal Parameterization'
+[move_group-2] [INFO] [1778974826.089912562] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Workspace Bounds'
+[move_group-2] [INFO] [1778974826.089916642] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Bounds'
+[move_group-2] [INFO] [1778974826.089920643] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State In Collision'
+[move_group-2] [INFO] [1778974826.089924423] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Path Constraints'
+[move_group-2] [INFO] [1778974826.090785926] [moveit.ros_planning_interface.moveit_cpp]: Loading planning pipeline 'lerp'
+[move_group-2] [ERROR] [1778974826.092463911] [moveit.ros_planning.planning_pipeline]: Exception while loading planner 'lerp_interface/LERPPlanner': According to the loaded plugin descriptions the class lerp_interface/LERPPlanner with base class type planning_interface::PlannerManager does not exist. Declared types are  chomp_interface/CHOMPPlanner ompl_interface/OMPLPlanner pilz_industrial_motion_planner/CommandPlannerAvailable plugins: chomp_interface/CHOMPPlanner, ompl_interface/OMPLPlanner, pilz_industrial_motion_planner/CommandPlanner
+[move_group-2] [INFO] [1778974826.094272693] [moveit_ros.add_time_optimal_parameterization]: Param 'lerp.path_tolerance' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.094282564] [moveit_ros.add_time_optimal_parameterization]: Param 'lerp.resample_dt' was not set. Using default value: 0.100000
+[move_group-2] [INFO] [1778974826.094287924] [moveit_ros.add_time_optimal_parameterization]: Param 'lerp.min_angle_change' was not set. Using default value: 0.001000
+[move_group-2] [INFO] [1778974826.094301235] [moveit_ros.fix_workspace_bounds]: Param 'lerp.default_workspace_bounds' was not set. Using default value: 10.000000
+[move_group-2] [INFO] [1778974826.094314426] [moveit_ros.fix_start_state_bounds]: Param 'lerp.start_state_max_bounds_error' was set to 0.100000
+[move_group-2] [INFO] [1778974826.094319526] [moveit_ros.fix_start_state_bounds]: Param 'lerp.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.094331677] [moveit_ros.fix_start_state_collision]: Param 'lerp.start_state_max_dt' was not set. Using default value: 0.500000
+[move_group-2] [INFO] [1778974826.094336827] [moveit_ros.fix_start_state_collision]: Param 'lerp.jiggle_fraction' was not set. Using default value: 0.020000
+[move_group-2] [INFO] [1778974826.094341588] [moveit_ros.fix_start_state_collision]: Param 'lerp.max_sampling_attempts' was not set. Using default value: 100
+[move_group-2] [INFO] [1778974826.094353369] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Add Time Optimal Parameterization'
+[move_group-2] [INFO] [1778974826.094357729] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Workspace Bounds'
+[move_group-2] [INFO] [1778974826.094361689] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Bounds'
+[move_group-2] [INFO] [1778974826.094365589] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State In Collision'
+[move_group-2] [INFO] [1778974826.094369490] [moveit.ros_planning.planning_pipeline]: Using planning request adapter 'Fix Start State Path Constraints'
+[move_group-2] [ERROR] [1778974826.095191841] [moveit.ros_planning_interface.moveit_cpp]: Failed to initialize planning pipeline 'lerp'.
+[move_group-2] [INFO] [1778974826.136330102] [moveit.plugins.moveit_simple_controller_manager]: Added FollowJointTrajectory controller for panda_arm_controller
+[move_group-2] [INFO] [1778974826.136516274] [moveit.plugins.moveit_simple_controller_manager]: Returned 1 controllers in list
+[move_group-2] [INFO] [1778974826.136533565] [moveit.plugins.moveit_simple_controller_manager]: Returned 1 controllers in list
+[move_group-2] [INFO] [1778974826.136808902] [moveit_ros.trajectory_execution_manager]: Trajectory execution is managing controllers
+[move_group-2] [INFO] [1778974826.136821283] [move_group.move_group]: MoveGroup debug mode is ON
+[move_group-2] [INFO] [1778974826.155116662] [move_group.move_group]:
+[move_group-2]
+[move_group-2] ********************************************************
+[move_group-2] * MoveGroup using:
+[move_group-2] *     - ApplyPlanningSceneService
+[move_group-2] *     - ClearOctomapService
+[move_group-2] *     - CartesianPathService
+[move_group-2] *     - ExecuteTrajectoryAction
+[move_group-2] *     - GetPlanningSceneService
+[move_group-2] *     - KinematicsService
+[move_group-2] *     - MoveAction
+[move_group-2] *     - MotionPlanService
+[move_group-2] *     - QueryPlannersService
+[move_group-2] *     - StateValidationService
+[move_group-2] ********************************************************
+[move_group-2]
+[move_group-2] [INFO] [1778974826.155148454] [moveit_move_group_capabilities_base.move_group_context]: MoveGroup context using planning plugin ompl_interface/OMPLPlanner
+[move_group-2] [INFO] [1778974826.155156924] [moveit_move_group_capabilities_base.move_group_context]: MoveGroup context initialization complete
+[move_group-2] [96mLoading 'move_group/ApplyPlanningSceneService'...
+[move_group-2] [0m[96mLoading 'move_group/ClearOctomapService'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupCartesianPathService'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupExecuteTrajectoryAction'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupGetPlanningSceneService'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupKinematicsService'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupMoveAction'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupPlanService'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupQueryPlannersService'...
+[move_group-2] [0m[96mLoading 'move_group/MoveGroupStateValidationService'...
+[move_group-2] [0m[92m
+[move_group-2] You can start planning now!
+[move_group-2]
+[move_group-2] [INFO] [1778975073.006298940] [moveit_move_group_default_capabilities.move_action_capability]: Received request
+[move_group-2] [INFO] [1778975073.006645968] [moveit_move_group_default_capabilities.move_action_capability]: executing..
+[move_group-2] [INFO] [1778975073.006837537] [moveit_move_group_default_capabilities.move_action_capability]: Planning request received for MoveGroup action. Forwarding to planning pipeline.
+[move_group-2] [ERROR] [1778975073.007319132] [moveit_robot_state.conversions]: Found empty JointState message
+[move_group-2] [ERROR] [1778975073.007417027] [moveit_robot_state.conversions]: Found empty JointState message
+[move_group-2] [ERROR] [1778975073.007708022] [moveit_robot_state.conversions]: Found empty JointState message
+[move_group-2] [ERROR] [1778975073.008353625] [moveit_robot_state.conversions]: Found empty JointState message
+[move_group-2] [INFO] [1778975073.009136635] [moveit.ompl_planning.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-2] [INFO] [1778975073.054840131] [moveit_move_group_default_capabilities.move_action_capability]: Motion plan was computed successfully.

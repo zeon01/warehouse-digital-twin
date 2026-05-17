@@ -1,0 +1,64 @@
+[INFO] [1778978801.961148466] [pick_cell_orchestrator]: pose_source=gt — subscribing to /world/cube_pose
+[INFO] [1778978801.968714861] [pick_cell_orchestrator]: pick_cell_orchestrator ready
+[INFO] [1778979267.231141867] [pick_cell_orchestrator]: start_pick received: o03
+[INFO] [1778979267.394930432] [pick_cell_orchestrator]: pick_result: {"order_id": "o03", "success": true, "attempts": 1, "cycle_time_s": 0.16101223000441678, "failure_reason": ""}
+[INFO] [1778979849.511191461] [pick_cell_orchestrator]: start_pick received: o05
+[INFO] [1778979849.567964134] [pick_cell_orchestrator]: pick_result: {"order_id": "o05", "success": true, "attempts": 1, "cycle_time_s": 0.05141322100098478, "failure_reason": ""}
+[INFO] [1778979894.793600923] [pick_cell_orchestrator]: start_pick received: o04
+[INFO] [1778979894.863157265] [pick_cell_orchestrator]: pick_result: {"order_id": "o04", "success": true, "attempts": 1, "cycle_time_s": 0.06118525600322755, "failure_reason": ""}
+[INFO] [1778980205.048625246] [pick_cell_orchestrator]: start_pick received: o01
+[INFO] [1778980205.120476460] [pick_cell_orchestrator]: pick_result: {"order_id": "o01", "success": true, "attempts": 1, "cycle_time_s": 0.06816284600063227, "failure_reason": ""}
+[INFO] [1778980440.214069595] [pick_cell_orchestrator]: start_pick received: o14
+[INFO] [1778980440.280681920] [pick_cell_orchestrator]: pick_result: {"order_id": "o14", "success": true, "attempts": 1, "cycle_time_s": 0.0556347640012973, "failure_reason": ""}
+[INFO] [1778980543.860809686] [pick_cell_orchestrator]: start_pick received: o02
+[INFO] [1778980543.927581294] [pick_cell_orchestrator]: pick_result: {"order_id": "o02", "success": true, "attempts": 1, "cycle_time_s": 0.0626100109948311, "failure_reason": ""}
+[INFO] [1778981086.198124375] [pick_cell_orchestrator]: start_pick received: o28
+[INFO] [1778981086.269630037] [pick_cell_orchestrator]: pick_result: {"order_id": "o28", "success": true, "attempts": 1, "cycle_time_s": 0.06678478400135646, "failure_reason": ""}
+[INFO] [1778981690.988973568] [pick_cell_orchestrator]: start_pick received: o49
+[INFO] [1778981691.037762418] [pick_cell_orchestrator]: pick_result: {"order_id": "o49", "success": true, "attempts": 1, "cycle_time_s": 0.04693135400157189, "failure_reason": ""}
+Exception in thread Thread-1 (_spin_worker_executor):
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.10/threading.py", line 953, in run
+Traceback (most recent call last):
+    self._target(*self._args, **self._kwargs)
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/python3.10/site-packages/wdt_manipulation_bringup/pick_cell_orchestrator.py", line 244, in main
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/python3.10/site-packages/wdt_manipulation_bringup/pick_cell_orchestrator.py", line 229, in _spin_worker_executor
+    rclpy.spin(node)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+    executor.spin_once(timeout_sec=0.1)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    executor.spin_once()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 681, in _wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 681, in _wait_for_ready_callbacks
+    raise ExternalShutdownException()
+    raise ExternalShutdownException()
+rclpy.executors.ExternalShutdownException
+rclpy.executors.ExternalShutdownException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/wdt_manipulation_bringup/pick_cell_orchestrator", line 33, in <module>
+    sys.exit(load_entry_point('wdt-manipulation-bringup==0.2.0', 'console_scripts', 'pick_cell_orchestrator')())
+  File "/work/ros2_ws/install/wdt_manipulation_bringup/lib/python3.10/site-packages/wdt_manipulation_bringup/pick_cell_orchestrator.py", line 248, in main
+    rclpy.shutdown()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 130, in shutdown
+    _shutdown(context=context)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/utilities.py", line 58, in shutdown
+    return context.shutdown()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/context.py", line 102, in shutdown
+    self.__context.shutdown()
+rclpy._rclpy_pybind11.RCLError: failed to shutdown: rcl_shutdown already called on the given context, at ./src/rcl/init.c:241

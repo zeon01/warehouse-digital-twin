@@ -1,0 +1,48 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-05-17-00-24-59-004642-ead4cd957a4b-5106
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [static_transform_publisher-1]: process started with pid [5418]
+[INFO] [pure_pursuit_driver-2]: process started with pid [5420]
+[INFO] [static_transform_publisher-3]: process started with pid [5422]
+[INFO] [pure_pursuit_driver-4]: process started with pid [5424]
+[INFO] [static_transform_publisher-5]: process started with pid [5426]
+[INFO] [pure_pursuit_driver-6]: process started with pid [5428]
+[INFO] [static_transform_publisher-7]: process started with pid [5430]
+[INFO] [pure_pursuit_driver-8]: process started with pid [5432]
+[INFO] [static_transform_publisher-9]: process started with pid [5434]
+[INFO] [pure_pursuit_driver-10]: process started with pid [5436]
+[INFO] [static_transform_publisher-11]: process started with pid [5438]
+[INFO] [pure_pursuit_driver-12]: process started with pid [5440]
+[static_transform_publisher-1] [INFO] [1778977499.152634609] [amr_0.map_to_odom_static]: Spinning until stopped - publishing transform
+[static_transform_publisher-1] translation: ('2.000000', '2.000000', '0.000000')
+[static_transform_publisher-1] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-1] from 'map' to 'odom'
+[static_transform_publisher-3] [INFO] [1778977499.153127576] [amr_1.map_to_odom_static]: Spinning until stopped - publishing transform
+[static_transform_publisher-3] translation: ('3.500000', '2.000000', '0.000000')
+[static_transform_publisher-3] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-3] from 'map' to 'odom'
+[static_transform_publisher-5] [INFO] [1778977499.154839837] [amr_2.map_to_odom_static]: Spinning until stopped - publishing transform
+[static_transform_publisher-5] translation: ('5.000000', '2.000000', '0.000000')
+[static_transform_publisher-5] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-5] from 'map' to 'odom'
+[static_transform_publisher-7] [INFO] [1778977499.155275894] [amr_3.map_to_odom_static]: Spinning until stopped - publishing transform
+[static_transform_publisher-7] translation: ('2.000000', '3.500000', '0.000000')
+[static_transform_publisher-7] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-7] from 'map' to 'odom'
+[static_transform_publisher-9] [INFO] [1778977499.161313581] [amr_4.map_to_odom_static]: Spinning until stopped - publishing transform
+[static_transform_publisher-9] translation: ('3.500000', '3.500000', '0.000000')
+[static_transform_publisher-9] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-9] from 'map' to 'odom'
+[static_transform_publisher-11] [INFO] [1778977499.162153886] [amr_5.map_to_odom_static]: Spinning until stopped - publishing transform
+[static_transform_publisher-11] translation: ('5.000000', '3.500000', '0.000000')
+[static_transform_publisher-11] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-11] from 'map' to 'odom'
+[pure_pursuit_driver-12] [INFO] [1778977499.703503716] [amr_5.pure_pursuit_driver]: pure_pursuit_driver ready — action /amr_5/navigate_to_pose cmd_vel→cmd_vel frames=map↔base_link
+[pure_pursuit_driver-4] [INFO] [1778977499.703502746] [amr_1.pure_pursuit_driver]: pure_pursuit_driver ready — action /amr_1/navigate_to_pose cmd_vel→cmd_vel frames=map↔base_link
+[pure_pursuit_driver-8] [INFO] [1778977499.711174775] [amr_3.pure_pursuit_driver]: pure_pursuit_driver ready — action /amr_3/navigate_to_pose cmd_vel→cmd_vel frames=map↔base_link
+[pure_pursuit_driver-6] [INFO] [1778977499.714071289] [amr_2.pure_pursuit_driver]: pure_pursuit_driver ready — action /amr_2/navigate_to_pose cmd_vel→cmd_vel frames=map↔base_link
+[pure_pursuit_driver-10] [INFO] [1778977499.714361348] [amr_4.pure_pursuit_driver]: pure_pursuit_driver ready — action /amr_4/navigate_to_pose cmd_vel→cmd_vel frames=map↔base_link
+[pure_pursuit_driver-2] [INFO] [1778977499.719731578] [amr_0.pure_pursuit_driver]: pure_pursuit_driver ready — action /amr_0/navigate_to_pose cmd_vel→cmd_vel frames=map↔base_link
+[pure_pursuit_driver-2] [INFO] [1778977547.781612471] [amr_0.pure_pursuit_driver]: goal received: (4.00, 8.00) in map
+[pure_pursuit_driver-2] [INFO] [1778977605.802782339] [amr_0.pure_pursuit_driver]: goal SUCCEEDED at (3.85, 7.52) (dist=0.499 m, elapsed=58.0s)
+[pure_pursuit_driver-2] [INFO] [1778977605.812918121] [amr_0.pure_pursuit_driver]: goal received: (16.00, 15.00) in map
+[pure_pursuit_driver-2] [INFO] [1778977732.392501432] [amr_0.pure_pursuit_driver]: goal SUCCEEDED at (15.57, 14.74) (dist=0.500 m, elapsed=126.6s)

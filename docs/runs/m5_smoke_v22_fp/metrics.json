@@ -1,0 +1,8 @@
+{
+  "orders_total": 1,
+  "orders_completed": 1,
+  "pick_success_rate": 0.0,
+  "avg_cycle_time_s": 118.63333333332908,
+  "p95_cycle_time_s": 0.0,
+  "deadlocks_total": 0
+}

@@ -1,0 +1,1334 @@
+==> target python: /usr/bin/python3 (3.10)
+==> using pytorch3d wheels from /weights/wheels-py310
+==> apt deps for mycpp build + CUDA toolkit for nvdiffrast
+Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Hit:2 http://packages.ros.org/ros2/ubuntu jammy InRelease
+Get:3 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:4 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+Get:5 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Fetched 384 kB in 2s (178 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+build-essential is already the newest version (12.9ubuntu3).
+libboost-all-dev is already the newest version (1.74.0.3ubuntu7).
+libboost-all-dev set to manually installed.
+libeigen3-dev is already the newest version (3.4.0-2ubuntu2).
+libeigen3-dev set to manually installed.
+cmake is already the newest version (3.22.1-1ubuntu1.22.04.2).
+cmake set to manually installed.
+gnupg is already the newest version (2.2.27-3ubuntu2.5).
+gnupg set to manually installed.
+python3-dev is already the newest version (3.10.6-1~22.04.1).
+python3-dev set to manually installed.
+wget is already the newest version (1.21.2-2ubuntu1.1).
+python3-pip is already the newest version (22.0.2+dfsg-1ubuntu0.7).
+The following NEW packages will be installed:
+  ninja-build python3-pybind11
+0 upgraded, 2 newly installed, 0 to remove and 32 not upgraded.
+Need to get 268 kB of archives.
+After this operation, 1196 kB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 ninja-build amd64 1.10.1-1 [111 kB]
+Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 python3-pybind11 all 2.9.1-2 [156 kB]
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "UTF-8",
+	LANG = (unset)
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 268 kB in 1s (248 kB/s)
+Selecting previously unselected package ninja-build.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 104311 files and directories currently installed.)
+Preparing to unpack .../ninja-build_1.10.1-1_amd64.deb ...
+Unpacking ninja-build (1.10.1-1) ...
+Selecting previously unselected package python3-pybind11.
+Preparing to unpack .../python3-pybind11_2.9.1-2_all.deb ...
+Unpacking python3-pybind11 (2.9.1-2) ...
+Setting up ninja-build (1.10.1-1) ...
+Setting up python3-pybind11 (2.9.1-2) ...
+Selecting previously unselected package cuda-keyring.
+(Reading database ... 104384 files and directories currently installed.)
+Preparing to unpack /tmp/cuda-keyring.deb ...
+Unpacking cuda-keyring (1.1-1) ...
+Setting up cuda-keyring (1.1-1) ...
+Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Hit:2 http://packages.ros.org/ros2/ubuntu jammy InRelease
+Hit:3 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
+Get:5 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  InRelease [1581 B]
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Get:7 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  Packages [2644 kB]
+Fetched 2646 kB in 2s (1732 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  ca-certificates-java cuda-cccl-12-4 cuda-command-line-tools-12-4
+  cuda-compiler-12-4 cuda-crt-12-4 cuda-cudart-12-4 cuda-cudart-dev-12-4
+  cuda-cuobjdump-12-4 cuda-cupti-12-4 cuda-cupti-dev-12-4 cuda-cuxxfilt-12-4
+  cuda-documentation-12-4 cuda-driver-dev-12-4 cuda-gdb-12-4
+  cuda-libraries-12-4 cuda-libraries-dev-12-4 cuda-nsight-12-4
+  cuda-nsight-compute-12-4 cuda-nsight-systems-12-4 cuda-nvcc-12-4
+  cuda-nvdisasm-12-4 cuda-nvml-dev-12-4 cuda-nvprof-12-4 cuda-nvprune-12-4
+  cuda-nvrtc-12-4 cuda-nvrtc-dev-12-4 cuda-nvtx-12-4 cuda-nvvm-12-4
+  cuda-nvvp-12-4 cuda-opencl-12-4 cuda-opencl-dev-12-4 cuda-profiler-api-12-4
+  cuda-sanitizer-12-4 cuda-toolkit-12-4-config-common
+  cuda-toolkit-12-config-common cuda-toolkit-config-common cuda-tools-12-4
+  cuda-visual-tools-12-4 default-jre default-jre-headless gds-tools-12-4
+  java-common libasound2 libasound2-data libcublas-12-4 libcublas-dev-12-4
+  libcufft-12-4 libcufft-dev-12-4 libcufile-12-4 libcufile-dev-12-4
+  libcurand-12-4 libcurand-dev-12-4 libcusolver-12-4 libcusolver-dev-12-4
+  libcusparse-12-4 libcusparse-dev-12-4 libnpp-12-4 libnpp-dev-12-4
+  libnvfatbin-12-4 libnvfatbin-dev-12-4 libnvjitlink-12-4
+  libnvjitlink-dev-12-4 libnvjpeg-12-4 libnvjpeg-dev-12-4 libpcsclite1
+  libtinfo5 libxtst6 nsight-compute-2024.1.1 nsight-systems-2023.4.4
+  openjdk-11-jre openjdk-11-jre-headless
+Suggested packages:
+  libasound2-plugins alsa-utils pcscd libnss-mdns fonts-dejavu-extra
+  fonts-ipafont-gothic fonts-ipafont-mincho fonts-wqy-microhei
+  | fonts-wqy-zenhei fonts-indic
+Recommended packages:
+  alsa-ucm-conf alsa-topology-conf libatk-wrapper-java-jni fonts-dejavu-extra
+The following NEW packages will be installed:
+  ca-certificates-java cuda-cccl-12-4 cuda-command-line-tools-12-4
+  cuda-compiler-12-4 cuda-crt-12-4 cuda-cudart-12-4 cuda-cudart-dev-12-4
+  cuda-cuobjdump-12-4 cuda-cupti-12-4 cuda-cupti-dev-12-4 cuda-cuxxfilt-12-4
+  cuda-documentation-12-4 cuda-driver-dev-12-4 cuda-gdb-12-4
+  cuda-libraries-12-4 cuda-libraries-dev-12-4 cuda-nsight-12-4
+  cuda-nsight-compute-12-4 cuda-nsight-systems-12-4 cuda-nvcc-12-4
+  cuda-nvdisasm-12-4 cuda-nvml-dev-12-4 cuda-nvprof-12-4 cuda-nvprune-12-4
+  cuda-nvrtc-12-4 cuda-nvrtc-dev-12-4 cuda-nvtx-12-4 cuda-nvvm-12-4
+  cuda-nvvp-12-4 cuda-opencl-12-4 cuda-opencl-dev-12-4 cuda-profiler-api-12-4
+  cuda-sanitizer-12-4 cuda-toolkit-12-4 cuda-toolkit-12-4-config-common
+  cuda-toolkit-12-config-common cuda-toolkit-config-common cuda-tools-12-4
+  cuda-visual-tools-12-4 default-jre default-jre-headless gds-tools-12-4
+  java-common libasound2 libasound2-data libcublas-12-4 libcublas-dev-12-4
+  libcufft-12-4 libcufft-dev-12-4 libcufile-12-4 libcufile-dev-12-4
+  libcurand-12-4 libcurand-dev-12-4 libcusolver-12-4 libcusolver-dev-12-4
+  libcusparse-12-4 libcusparse-dev-12-4 libnpp-12-4 libnpp-dev-12-4
+  libnvfatbin-12-4 libnvfatbin-dev-12-4 libnvjitlink-12-4
+  libnvjitlink-dev-12-4 libnvjpeg-12-4 libnvjpeg-dev-12-4 libpcsclite1
+  libtinfo5 libxtst6 nsight-compute-2024.1.1 nsight-systems-2023.4.4
+  openjdk-11-jre openjdk-11-jre-headless
+0 upgraded, 72 newly installed, 0 to remove and 33 not upgraded.
+Need to get 3065 MB of archives.
+After this operation, 6770 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 java-common all 0.72build2 [6782 B]
+Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libasound2-data all 1.2.6.1-1ubuntu1.1 [19.3 kB]
+Get:3 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libasound2 amd64 1.2.6.1-1ubuntu1.1 [391 kB]
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcsclite1 amd64 1.9.5-3ubuntu1 [19.8 kB]
+Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openjdk-11-jre-headless amd64 11.0.30+7-1ubuntu1~22.04 [42.6 MB]
+Get:4 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cccl-12-4 12.4.127-1 [1200 kB]
+Get:7 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cupti-12-4 12.4.127-1 [16.8 MB]
+Get:8 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cupti-dev-12-4 12.4.127-1 [3830 kB]
+Get:9 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvdisasm-12-4 12.4.127-1 [49.9 MB]
+Get:10 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cuobjdump-12-4 12.4.127-1 [225 kB]
+Get:11 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-gdb-12-4 12.4.127-1 [4920 kB]
+Get:12 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvprof-12-4 12.4.127-1 [2431 kB]
+Get:13 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvtx-12-4 12.4.127-1 [51.5 kB]
+Get:14 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-sanitizer-12-4 12.4.127-1 [9148 kB]
+Get:15 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-command-line-tools-12-4 12.4.1-1 [2538 B]
+Get:16 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cuxxfilt-12-4 12.4.127-1 [191 kB]
+Get:17 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-toolkit-config-common 13.2.75-1 [17.4 kB]
+Get:18 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-toolkit-12-config-common 12.9.79-1 [16.6 kB]
+Get:19 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-toolkit-12-4-config-common 12.4.127-1 [16.4 kB]
+Get:20 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cudart-12-4 12.4.127-1 [165 kB]
+Get:21 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-driver-dev-12-4 12.4.127-1 [28.6 kB]
+Get:22 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-cudart-dev-12-4 12.4.127-1 [1000 kB]
+Get:23 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvvm-12-4 12.4.131-1 [19.5 MB]
+Get:24 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-crt-12-4 12.4.131-1 [78.0 kB]
+Get:25 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvcc-12-4 12.4.131-1 [32.0 MB]
+Get:26 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvprune-12-4 12.4.127-1 [58.8 kB]
+Get:27 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-compiler-12-4 12.4.1-1 [2510 B]
+Get:28 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-documentation-12-4 12.4.127-1 [50.0 kB]
+Get:29 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvrtc-12-4 12.4.127-1 [17.6 MB]
+Get:30 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-opencl-12-4 12.4.127-1 [24.0 kB]
+Get:31 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcublas-12-4 12.4.5.8-1 [231 MB]
+Get:67 http://archive.ubuntu.com/ubuntu jammy/main amd64 default-jre-headless amd64 2:1.11-72build2 [3042 B]
+Get:68 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates-java all 20190909ubuntu1.3 [12.3 kB]
+Get:69 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxtst6 amd64 2:1.2.3-1build4 [13.4 kB]
+Get:70 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openjdk-11-jre amd64 11.0.30+7-1ubuntu1~22.04 [214 kB]
+Get:71 http://archive.ubuntu.com/ubuntu jammy/main amd64 default-jre amd64 2:1.11-72build2 [896 B]
+Get:72 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 libtinfo5 amd64 6.3-2ubuntu0.1 [100 kB]
+Get:32 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcufft-12-4 11.2.1.3-1 [171 MB]
+Get:33 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcufile-12-4 1.9.1.3-1 [850 kB]
+Get:34 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcurand-12-4 10.3.5.147-1 [41.4 MB]
+Get:35 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcusolver-12-4 11.6.1.9-1 [78.9 MB]
+Get:36 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcusparse-12-4 12.3.1.170-1 [115 MB]
+Get:37 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnpp-12-4 12.2.5.30-1 [95.5 MB]
+Get:38 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnvjitlink-12-4 12.4.127-1 [15.5 MB]
+Get:39 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnvfatbin-12-4 12.4.127-1 [721 kB]
+Get:40 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnvjpeg-12-4 12.3.1.117-1 [2327 kB]
+Get:41 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-libraries-12-4 12.4.1-1 [2606 B]
+Get:42 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-profiler-api-12-4 12.4.127-1 [18.7 kB]
+Get:43 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvrtc-dev-12-4 12.4.127-1 [16.9 MB]
+Get:44 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-opencl-dev-12-4 12.4.127-1 [87.0 kB]
+Get:45 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcublas-dev-12-4 12.4.5.8-1 [249 MB]
+Get:46 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcufft-dev-12-4 11.2.1.3-1 [342 MB]
+Get:47 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcufile-dev-12-4 1.9.1.3-1 [2435 kB]
+Get:48 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcurand-dev-12-4 10.3.5.147-1 [41.6 MB]
+Get:49 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcusolver-dev-12-4 11.6.1.9-1 [51.4 MB]
+Get:50 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libcusparse-dev-12-4 12.3.1.170-1 [116 MB]
+Get:51 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnpp-dev-12-4 12.2.5.30-1 [92.0 MB]
+Get:52 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnvjitlink-dev-12-4 12.4.127-1 [13.9 MB]
+Get:53 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnvfatbin-dev-12-4 12.4.127-1 [591 kB]
+Get:54 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  libnvjpeg-dev-12-4 12.3.1.117-1 [2025 kB]
+Get:55 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-libraries-dev-12-4 12.4.1-1 [2646 B]
+Get:56 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nsight-12-4 12.4.127-1 [119 MB]
+Get:57 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  nsight-compute-2024.1.1 2024.1.1.4-1 [594 MB]
+Get:58 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nsight-compute-12-4 12.4.1-1 [4060 B]
+Get:59 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  nsight-systems-2023.4.4 2023.4.4.54-234433681190v0 [316 MB]
+Get:60 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nsight-systems-12-4 12.4.1-1 [3348 B]
+Get:61 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvml-dev-12-4 12.4.127-1 [145 kB]
+Get:62 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-nvvp-12-4 12.4.127-1 [115 MB]
+Get:63 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-visual-tools-12-4 12.4.1-1 [2942 B]
+Get:64 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  gds-tools-12-4 1.9.1.3-1 [39.0 MB]
+Get:65 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-tools-12-4 12.4.1-1 [2462 B]
+Get:66 https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu2204/x86_64  cuda-toolkit-12-4 12.4.1-1 [3336 B]
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "UTF-8",
+	LANG = (unset)
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 3065 MB in 52s (59.0 MB/s)
+Selecting previously unselected package java-common.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 104389 files and directories currently installed.)
+Preparing to unpack .../00-java-common_0.72build2_all.deb ...
+Unpacking java-common (0.72build2) ...
+Selecting previously unselected package libasound2-data.
+Preparing to unpack .../01-libasound2-data_1.2.6.1-1ubuntu1.1_all.deb ...
+Unpacking libasound2-data (1.2.6.1-1ubuntu1.1) ...
+Selecting previously unselected package libasound2:amd64.
+Preparing to unpack .../02-libasound2_1.2.6.1-1ubuntu1.1_amd64.deb ...
+Unpacking libasound2:amd64 (1.2.6.1-1ubuntu1.1) ...
+Selecting previously unselected package libpcsclite1:amd64.
+Preparing to unpack .../03-libpcsclite1_1.9.5-3ubuntu1_amd64.deb ...
+Unpacking libpcsclite1:amd64 (1.9.5-3ubuntu1) ...
+Selecting previously unselected package openjdk-11-jre-headless:amd64.
+Preparing to unpack .../04-openjdk-11-jre-headless_11.0.30+7-1ubuntu1~22.04_amd64.deb ...
+Unpacking openjdk-11-jre-headless:amd64 (11.0.30+7-1ubuntu1~22.04) ...
+Selecting previously unselected package default-jre-headless.
+Preparing to unpack .../05-default-jre-headless_2%3a1.11-72build2_amd64.deb ...
+Unpacking default-jre-headless (2:1.11-72build2) ...
+Selecting previously unselected package ca-certificates-java.
+Preparing to unpack .../06-ca-certificates-java_20190909ubuntu1.3_all.deb ...
+Unpacking ca-certificates-java (20190909ubuntu1.3) ...
+Selecting previously unselected package cuda-cccl-12-4.
+Preparing to unpack .../07-cuda-cccl-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cccl-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-cupti-12-4.
+Preparing to unpack .../08-cuda-cupti-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cupti-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-cupti-dev-12-4.
+Preparing to unpack .../09-cuda-cupti-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cupti-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvdisasm-12-4.
+Preparing to unpack .../10-cuda-nvdisasm-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvdisasm-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-cuobjdump-12-4.
+Preparing to unpack .../11-cuda-cuobjdump-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cuobjdump-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-gdb-12-4.
+Preparing to unpack .../12-cuda-gdb-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-gdb-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvprof-12-4.
+Preparing to unpack .../13-cuda-nvprof-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvprof-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvtx-12-4.
+Preparing to unpack .../14-cuda-nvtx-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvtx-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-sanitizer-12-4.
+Preparing to unpack .../15-cuda-sanitizer-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-sanitizer-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-command-line-tools-12-4.
+Preparing to unpack .../16-cuda-command-line-tools-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-command-line-tools-12-4 (12.4.1-1) ...
+Selecting previously unselected package cuda-cuxxfilt-12-4.
+Preparing to unpack .../17-cuda-cuxxfilt-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cuxxfilt-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-toolkit-config-common.
+Preparing to unpack .../18-cuda-toolkit-config-common_13.2.75-1_all.deb ...
+Unpacking cuda-toolkit-config-common (13.2.75-1) ...
+Selecting previously unselected package cuda-toolkit-12-config-common.
+Preparing to unpack .../19-cuda-toolkit-12-config-common_12.9.79-1_all.deb ...
+Unpacking cuda-toolkit-12-config-common (12.9.79-1) ...
+Selecting previously unselected package cuda-toolkit-12-4-config-common.
+Preparing to unpack .../20-cuda-toolkit-12-4-config-common_12.4.127-1_all.deb ...
+Unpacking cuda-toolkit-12-4-config-common (12.4.127-1) ...
+Selecting previously unselected package cuda-cudart-12-4.
+Preparing to unpack .../21-cuda-cudart-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cudart-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-driver-dev-12-4.
+Preparing to unpack .../22-cuda-driver-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-driver-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-cudart-dev-12-4.
+Preparing to unpack .../23-cuda-cudart-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-cudart-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvvm-12-4.
+Preparing to unpack .../24-cuda-nvvm-12-4_12.4.131-1_amd64.deb ...
+Unpacking cuda-nvvm-12-4 (12.4.131-1) ...
+Selecting previously unselected package cuda-crt-12-4.
+Preparing to unpack .../25-cuda-crt-12-4_12.4.131-1_amd64.deb ...
+Unpacking cuda-crt-12-4 (12.4.131-1) ...
+Selecting previously unselected package cuda-nvcc-12-4.
+Preparing to unpack .../26-cuda-nvcc-12-4_12.4.131-1_amd64.deb ...
+Unpacking cuda-nvcc-12-4 (12.4.131-1) ...
+Selecting previously unselected package cuda-nvprune-12-4.
+Preparing to unpack .../27-cuda-nvprune-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvprune-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-compiler-12-4.
+Preparing to unpack .../28-cuda-compiler-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-compiler-12-4 (12.4.1-1) ...
+Selecting previously unselected package cuda-documentation-12-4.
+Preparing to unpack .../29-cuda-documentation-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-documentation-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvrtc-12-4.
+Preparing to unpack .../30-cuda-nvrtc-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvrtc-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-opencl-12-4.
+Preparing to unpack .../31-cuda-opencl-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-opencl-12-4 (12.4.127-1) ...
+Selecting previously unselected package libcublas-12-4.
+Preparing to unpack .../32-libcublas-12-4_12.4.5.8-1_amd64.deb ...
+Unpacking libcublas-12-4 (12.4.5.8-1) ...
+Selecting previously unselected package libcufft-12-4.
+Preparing to unpack .../33-libcufft-12-4_11.2.1.3-1_amd64.deb ...
+Unpacking libcufft-12-4 (11.2.1.3-1) ...
+Selecting previously unselected package libcufile-12-4.
+Preparing to unpack .../34-libcufile-12-4_1.9.1.3-1_amd64.deb ...
+Unpacking libcufile-12-4 (1.9.1.3-1) ...
+Selecting previously unselected package libcurand-12-4.
+Preparing to unpack .../35-libcurand-12-4_10.3.5.147-1_amd64.deb ...
+Unpacking libcurand-12-4 (10.3.5.147-1) ...
+Selecting previously unselected package libcusolver-12-4.
+Preparing to unpack .../36-libcusolver-12-4_11.6.1.9-1_amd64.deb ...
+Unpacking libcusolver-12-4 (11.6.1.9-1) ...
+Selecting previously unselected package libcusparse-12-4.
+Preparing to unpack .../37-libcusparse-12-4_12.3.1.170-1_amd64.deb ...
+Unpacking libcusparse-12-4 (12.3.1.170-1) ...
+Selecting previously unselected package libnpp-12-4.
+Preparing to unpack .../38-libnpp-12-4_12.2.5.30-1_amd64.deb ...
+Unpacking libnpp-12-4 (12.2.5.30-1) ...
+Selecting previously unselected package libnvjitlink-12-4.
+Preparing to unpack .../39-libnvjitlink-12-4_12.4.127-1_amd64.deb ...
+Unpacking libnvjitlink-12-4 (12.4.127-1) ...
+Selecting previously unselected package libnvfatbin-12-4.
+Preparing to unpack .../40-libnvfatbin-12-4_12.4.127-1_amd64.deb ...
+Unpacking libnvfatbin-12-4 (12.4.127-1) ...
+Selecting previously unselected package libnvjpeg-12-4.
+Preparing to unpack .../41-libnvjpeg-12-4_12.3.1.117-1_amd64.deb ...
+Unpacking libnvjpeg-12-4 (12.3.1.117-1) ...
+Selecting previously unselected package cuda-libraries-12-4.
+Preparing to unpack .../42-cuda-libraries-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-libraries-12-4 (12.4.1-1) ...
+Selecting previously unselected package cuda-profiler-api-12-4.
+Preparing to unpack .../43-cuda-profiler-api-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-profiler-api-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvrtc-dev-12-4.
+Preparing to unpack .../44-cuda-nvrtc-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvrtc-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-opencl-dev-12-4.
+Preparing to unpack .../45-cuda-opencl-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-opencl-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package libcublas-dev-12-4.
+Preparing to unpack .../46-libcublas-dev-12-4_12.4.5.8-1_amd64.deb ...
+Unpacking libcublas-dev-12-4 (12.4.5.8-1) ...
+Selecting previously unselected package libcufft-dev-12-4.
+Preparing to unpack .../47-libcufft-dev-12-4_11.2.1.3-1_amd64.deb ...
+Unpacking libcufft-dev-12-4 (11.2.1.3-1) ...
+Selecting previously unselected package libcufile-dev-12-4.
+Preparing to unpack .../48-libcufile-dev-12-4_1.9.1.3-1_amd64.deb ...
+Unpacking libcufile-dev-12-4 (1.9.1.3-1) ...
+Selecting previously unselected package libcurand-dev-12-4.
+Preparing to unpack .../49-libcurand-dev-12-4_10.3.5.147-1_amd64.deb ...
+Unpacking libcurand-dev-12-4 (10.3.5.147-1) ...
+Selecting previously unselected package libcusolver-dev-12-4.
+Preparing to unpack .../50-libcusolver-dev-12-4_11.6.1.9-1_amd64.deb ...
+Unpacking libcusolver-dev-12-4 (11.6.1.9-1) ...
+Selecting previously unselected package libcusparse-dev-12-4.
+Preparing to unpack .../51-libcusparse-dev-12-4_12.3.1.170-1_amd64.deb ...
+Unpacking libcusparse-dev-12-4 (12.3.1.170-1) ...
+Selecting previously unselected package libnpp-dev-12-4.
+Preparing to unpack .../52-libnpp-dev-12-4_12.2.5.30-1_amd64.deb ...
+Unpacking libnpp-dev-12-4 (12.2.5.30-1) ...
+Selecting previously unselected package libnvjitlink-dev-12-4.
+Preparing to unpack .../53-libnvjitlink-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking libnvjitlink-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package libnvfatbin-dev-12-4.
+Preparing to unpack .../54-libnvfatbin-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking libnvfatbin-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package libnvjpeg-dev-12-4.
+Preparing to unpack .../55-libnvjpeg-dev-12-4_12.3.1.117-1_amd64.deb ...
+Unpacking libnvjpeg-dev-12-4 (12.3.1.117-1) ...
+Selecting previously unselected package cuda-libraries-dev-12-4.
+Preparing to unpack .../56-cuda-libraries-dev-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-libraries-dev-12-4 (12.4.1-1) ...
+Selecting previously unselected package libxtst6:amd64.
+Preparing to unpack .../57-libxtst6_2%3a1.2.3-1build4_amd64.deb ...
+Unpacking libxtst6:amd64 (2:1.2.3-1build4) ...
+Selecting previously unselected package openjdk-11-jre:amd64.
+Preparing to unpack .../58-openjdk-11-jre_11.0.30+7-1ubuntu1~22.04_amd64.deb ...
+Unpacking openjdk-11-jre:amd64 (11.0.30+7-1ubuntu1~22.04) ...
+Selecting previously unselected package default-jre.
+Preparing to unpack .../59-default-jre_2%3a1.11-72build2_amd64.deb ...
+Unpacking default-jre (2:1.11-72build2) ...
+Selecting previously unselected package cuda-nsight-12-4.
+Preparing to unpack .../60-cuda-nsight-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nsight-12-4 (12.4.127-1) ...
+Selecting previously unselected package nsight-compute-2024.1.1.
+Preparing to unpack .../61-nsight-compute-2024.1.1_2024.1.1.4-1_amd64.deb ...
+Unpacking nsight-compute-2024.1.1 (2024.1.1.4-1) ...
+Selecting previously unselected package cuda-nsight-compute-12-4.
+Preparing to unpack .../62-cuda-nsight-compute-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-nsight-compute-12-4 (12.4.1-1) ...
+Selecting previously unselected package libtinfo5:amd64.
+Preparing to unpack .../63-libtinfo5_6.3-2ubuntu0.1_amd64.deb ...
+Unpacking libtinfo5:amd64 (6.3-2ubuntu0.1) ...
+Selecting previously unselected package nsight-systems-2023.4.4.
+Preparing to unpack .../64-nsight-systems-2023.4.4_2023.4.4.54-234433681190v0_amd64.deb ...
+Unpacking nsight-systems-2023.4.4 (2023.4.4.54-234433681190v0) ...
+Selecting previously unselected package cuda-nsight-systems-12-4.
+Preparing to unpack .../65-cuda-nsight-systems-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-nsight-systems-12-4 (12.4.1-1) ...
+Selecting previously unselected package cuda-nvml-dev-12-4.
+Preparing to unpack .../66-cuda-nvml-dev-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvml-dev-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-nvvp-12-4.
+Preparing to unpack .../67-cuda-nvvp-12-4_12.4.127-1_amd64.deb ...
+Unpacking cuda-nvvp-12-4 (12.4.127-1) ...
+Selecting previously unselected package cuda-visual-tools-12-4.
+Preparing to unpack .../68-cuda-visual-tools-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-visual-tools-12-4 (12.4.1-1) ...
+Selecting previously unselected package gds-tools-12-4.
+Preparing to unpack .../69-gds-tools-12-4_1.9.1.3-1_amd64.deb ...
+Unpacking gds-tools-12-4 (1.9.1.3-1) ...
+Selecting previously unselected package cuda-tools-12-4.
+Preparing to unpack .../70-cuda-tools-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-tools-12-4 (12.4.1-1) ...
+Selecting previously unselected package cuda-toolkit-12-4.
+Preparing to unpack .../71-cuda-toolkit-12-4_12.4.1-1_amd64.deb ...
+Unpacking cuda-toolkit-12-4 (12.4.1-1) ...
+Setting up cuda-cupti-12-4 (12.4.127-1) ...
+Setting up cuda-toolkit-config-common (13.2.75-1) ...
+Setting up cuda-nvml-dev-12-4 (12.4.127-1) ...
+Setting up cuda-cccl-12-4 (12.4.127-1) ...
+Setting up java-common (0.72build2) ...
+Setting up cuda-cupti-dev-12-4 (12.4.127-1) ...
+Setting up gds-tools-12-4 (1.9.1.3-1) ...
+Setting up libxtst6:amd64 (2:1.2.3-1build4) ...
+Setting up cuda-documentation-12-4 (12.4.127-1) ...
+Setting up cuda-profiler-api-12-4 (12.4.127-1) ...
+Setting up cuda-nvdisasm-12-4 (12.4.127-1) ...
+Setting up cuda-nvvm-12-4 (12.4.131-1) ...
+Setting up cuda-nvprune-12-4 (12.4.127-1) ...
+Setting up libasound2-data (1.2.6.1-1ubuntu1.1) ...
+Setting up cuda-nvtx-12-4 (12.4.127-1) ...
+Setting up cuda-cuxxfilt-12-4 (12.4.127-1) ...
+Setting up libpcsclite1:amd64 (1.9.5-3ubuntu1) ...
+Setting up nsight-compute-2024.1.1 (2024.1.1.4-1) ...
+Setting up cuda-driver-dev-12-4 (12.4.127-1) ...
+Setting up cuda-nvprof-12-4 (12.4.127-1) ...
+Setting up libasound2:amd64 (1.2.6.1-1ubuntu1.1) ...
+Setting up libtinfo5:amd64 (6.3-2ubuntu0.1) ...
+Setting up cuda-cuobjdump-12-4 (12.4.127-1) ...
+Setting up cuda-toolkit-12-config-common (12.9.79-1) ...
+Setting up cuda-toolkit-12-4-config-common (12.4.127-1) ...
+Setting alternatives
+update-alternatives: using /usr/local/cuda-12.4 to provide /usr/local/cuda (cuda) in auto mode
+update-alternatives: using /usr/local/cuda-12.4 to provide /usr/local/cuda-12 (cuda-12) in auto mode
+Setting up libnvjitlink-12-4 (12.4.127-1) ...
+Setting up cuda-nvrtc-12-4 (12.4.127-1) ...
+Setting up cuda-sanitizer-12-4 (12.4.127-1) ...
+Setting up libcurand-12-4 (10.3.5.147-1) ...
+Setting up libnpp-12-4 (12.2.5.30-1) ...
+Setting up libcufft-12-4 (11.2.1.3-1) ...
+Setting up libnvjitlink-dev-12-4 (12.4.127-1) ...
+Setting up libcublas-12-4 (12.4.5.8-1) ...
+Setting up libcusparse-12-4 (12.3.1.170-1) ...
+Setting up libnvfatbin-12-4 (12.4.127-1) ...
+Setting up libcurand-dev-12-4 (10.3.5.147-1) ...
+Setting up libnvjpeg-12-4 (12.3.1.117-1) ...
+Setting up cuda-nsight-compute-12-4 (12.4.1-1) ...
+Setting up libcufile-12-4 (1.9.1.3-1) ...
+Setting alternatives
+update-alternatives: using /usr/local/cuda-12.4/gds/cufile.json to provide /etc/cufile.json (cufile.json) in auto mode
+Setting up nsight-systems-2023.4.4 (2023.4.4.54-234433681190v0) ...
+update-alternatives: using /opt/nvidia/nsight-systems/2023.4.4/target-linux-x64/nsys to provide /usr/local/bin/nsys (nsys) in auto mode
+update-alternatives: using /opt/nvidia/nsight-systems/2023.4.4/host-linux-x64/nsys-ui to provide /usr/local/bin/nsys-ui (nsys-ui) in auto mode
+Setting up libnpp-dev-12-4 (12.2.5.30-1) ...
+Setting up cuda-opencl-12-4 (12.4.127-1) ...
+Setting up libcusparse-dev-12-4 (12.3.1.170-1) ...
+Setting up cuda-nvrtc-dev-12-4 (12.4.127-1) ...
+Setting up libcublas-dev-12-4 (12.4.5.8-1) ...
+Setting up cuda-cudart-12-4 (12.4.127-1) ...
+Setting up cuda-gdb-12-4 (12.4.127-1) ...
+Setting up libcusolver-12-4 (11.6.1.9-1) ...
+Setting up cuda-libraries-12-4 (12.4.1-1) ...
+Setting up cuda-nsight-systems-12-4 (12.4.1-1) ...
+Setting up libcusolver-dev-12-4 (11.6.1.9-1) ...
+Setting up libcufft-dev-12-4 (11.2.1.3-1) ...
+Setting up cuda-command-line-tools-12-4 (12.4.1-1) ...
+Setting up cuda-opencl-dev-12-4 (12.4.127-1) ...
+Setting up libnvfatbin-dev-12-4 (12.4.127-1) ...
+Setting up cuda-cudart-dev-12-4 (12.4.127-1) ...
+Setting up cuda-crt-12-4 (12.4.131-1) ...
+Setting up libnvjpeg-dev-12-4 (12.3.1.117-1) ...
+Setting up libcufile-dev-12-4 (1.9.1.3-1) ...
+Setting up cuda-nvcc-12-4 (12.4.131-1) ...
+Setting up cuda-compiler-12-4 (12.4.1-1) ...
+Setting up cuda-libraries-dev-12-4 (12.4.1-1) ...
+Setting up ca-certificates-java (20190909ubuntu1.3) ...
+head: cannot open '/etc/ssl/certs/java/cacerts' for reading: No such file or directory
+Adding debian:SecureSign_RootCA11.pem
+Adding debian:Security_Communication_ECC_RootCA1.pem
+Adding debian:TunTrust_Root_CA.pem
+Adding debian:DigiCert_Global_Root_G3.pem
+Adding debian:DigiCert_Assured_ID_Root_CA.pem
+Adding debian:IdenTrust_Commercial_Root_CA_1.pem
+Adding debian:certSIGN_ROOT_CA.pem
+Adding debian:Amazon_Root_CA_2.pem
+Adding debian:Certainly_Root_E1.pem
+Adding debian:GDCA_TrustAUTH_R5_ROOT.pem
+Adding debian:Hellenic_Academic_and_Research_Institutions_RootCA_2015.pem
+Adding debian:Atos_TrustedRoot_Root_CA_ECC_TLS_2021.pem
+Adding debian:GTS_Root_R4.pem
+Adding debian:Izenpe.com.pem
+Adding debian:BJCA_Global_Root_CA1.pem
+Adding debian:QuoVadis_Root_CA_1_G3.pem
+Adding debian:D-TRUST_EV_Root_CA_1_2020.pem
+Adding debian:Certigna.pem
+Adding debian:Certum_Trusted_Network_CA_2.pem
+Adding debian:Trustwave_Global_ECC_P256_Certification_Authority.pem
+Adding debian:BJCA_Global_Root_CA2.pem
+Adding debian:GlobalSign_Root_E46.pem
+Adding debian:Baltimore_CyberTrust_Root.pem
+Adding debian:Starfield_Services_Root_Certificate_Authority_-_G2.pem
+Adding debian:Autoridad_de_Certificacion_Firmaprofesional_CIF_A62634068.pem
+Adding debian:QuoVadis_Root_CA_2.pem
+Adding debian:Sectigo_Public_Server_Authentication_Root_R46.pem
+Adding debian:SwissSign_Gold_CA_-_G2.pem
+Adding debian:AffirmTrust_Premium_ECC.pem
+Adding debian:Amazon_Root_CA_4.pem
+Adding debian:D-TRUST_BR_Root_CA_1_2020.pem
+Adding debian:Certum_EC-384_CA.pem
+Adding debian:Comodo_AAA_Services_root.pem
+Adding debian:CommScope_Public_Trust_RSA_Root-01.pem
+Adding debian:CommScope_Public_Trust_RSA_Root-02.pem
+Adding debian:DigiCert_Assured_ID_Root_G2.pem
+Adding debian:TUBITAK_Kamu_SM_SSL_Kok_Sertifikasi_-_Surum_1.pem
+Adding debian:Hellenic_Academic_and_Research_Institutions_ECC_RootCA_2015.pem
+Adding debian:Hongkong_Post_Root_CA_3.pem
+Adding debian:SZAFIR_ROOT_CA2.pem
+Adding debian:NAVER_Global_Root_Certification_Authority.pem
+Adding debian:TWCA_Root_Certification_Authority.pem
+Adding debian:CommScope_Public_Trust_ECC_Root-02.pem
+Adding debian:XRamp_Global_CA_Root.pem
+Adding debian:DigiCert_Assured_ID_Root_G3.pem
+Adding debian:HARICA_TLS_ECC_Root_CA_2021.pem
+Adding debian:Certigna_Root_CA.pem
+Adding debian:ePKI_Root_Certification_Authority.pem
+Adding debian:vTrus_Root_CA.pem
+Adding debian:SSL.com_Root_Certification_Authority_RSA.pem
+Adding debian:Atos_TrustedRoot_2011.pem
+Adding debian:CommScope_Public_Trust_ECC_Root-01.pem
+Adding debian:Amazon_Root_CA_1.pem
+Adding debian:USERTrust_RSA_Certification_Authority.pem
+Adding debian:GLOBALTRUST_2020.pem
+Adding debian:Security_Communication_Root_CA.pem
+Adding debian:Entrust_Root_Certification_Authority_-_G2.pem
+Adding debian:QuoVadis_Root_CA_3_G3.pem
+Adding debian:D-TRUST_Root_Class_3_CA_2_EV_2009.pem
+Adding debian:TWCA_Global_Root_CA.pem
+Adding debian:T-TeleSec_GlobalRoot_Class_2.pem
+Adding debian:ANF_Secure_Server_Root_CA.pem
+Adding debian:AffirmTrust_Networking.pem
+Adding debian:DigiCert_TLS_ECC_P384_Root_G5.pem
+Adding debian:SSL.com_EV_Root_Certification_Authority_ECC.pem
+Adding debian:ACCVRAIZ1.pem
+Adding debian:DigiCert_Global_Root_CA.pem
+Adding debian:COMODO_ECC_Certification_Authority.pem
+Adding debian:Telia_Root_CA_v2.pem
+Adding debian:UCA_Extended_Validation_Root.pem
+Adding debian:QuoVadis_Root_CA_3.pem
+Adding debian:emSign_Root_CA_-_C1.pem
+Adding debian:Certainly_Root_R1.pem
+Adding debian:CFCA_EV_ROOT.pem
+Adding debian:Starfield_Class_2_CA.pem
+Adding debian:Starfield_Root_Certificate_Authority_-_G2.pem
+Adding debian:Sectigo_Public_Server_Authentication_Root_E46.pem
+Adding debian:emSign_ECC_Root_CA_-_G3.pem
+Adding debian:Buypass_Class_2_Root_CA.pem
+Adding debian:emSign_ECC_Root_CA_-_C3.pem
+Adding debian:USERTrust_ECC_Certification_Authority.pem
+Adding debian:AC_RAIZ_FNMT-RCM_SERVIDORES_SEGUROS.pem
+Adding debian:COMODO_Certification_Authority.pem
+Adding debian:OISTE_WISeKey_Global_Root_GB_CA.pem
+Adding debian:AffirmTrust_Commercial.pem
+Adding debian:Buypass_Class_3_Root_CA.pem
+Adding debian:Entrust_Root_Certification_Authority_-_G4.pem
+Adding debian:GlobalSign_Root_CA_-_R6.pem
+Adding debian:certSIGN_Root_CA_G2.pem
+Adding debian:Actalis_Authentication_Root_CA.pem
+Adding debian:QuoVadis_Root_CA_2_G3.pem
+Adding debian:Certum_Trusted_Root_CA.pem
+Adding debian:Secure_Global_CA.pem
+Adding debian:CA_Disig_Root_R2.pem
+Adding debian:Microsoft_RSA_Root_Certificate_Authority_2017.pem
+Adding debian:Security_Communication_RootCA2.pem
+Adding debian:AffirmTrust_Premium.pem
+Adding debian:TrustAsia_Global_Root_CA_G3.pem
+Adding debian:Entrust_Root_Certification_Authority_-_EC1.pem
+Adding debian:Microsec_e-Szigno_Root_CA_2009.pem
+Adding debian:DigiCert_Global_Root_G2.pem
+Adding debian:SSL.com_TLS_ECC_Root_CA_2022.pem
+Adding debian:SecureTrust_CA.pem
+Adding debian:Go_Daddy_Root_Certificate_Authority_-_G2.pem
+Adding debian:Amazon_Root_CA_3.pem
+Adding debian:SSL.com_TLS_RSA_Root_CA_2022.pem
+Adding debian:Certum_Trusted_Network_CA.pem
+Adding debian:HARICA_TLS_RSA_Root_CA_2021.pem
+Adding debian:GlobalSign_Root_CA.pem
+Adding debian:T-TeleSec_GlobalRoot_Class_3.pem
+Adding debian:Atos_TrustedRoot_Root_CA_RSA_TLS_2021.pem
+Adding debian:UCA_Global_G2_Root.pem
+Adding debian:DigiCert_High_Assurance_EV_Root_CA.pem
+Adding debian:HiPKI_Root_CA_-_G1.pem
+Adding debian:SSL.com_EV_Root_Certification_Authority_RSA_R2.pem
+Adding debian:COMODO_RSA_Certification_Authority.pem
+Adding debian:GTS_Root_R1.pem
+Adding debian:SwissSign_Silver_CA_-_G2.pem
+Adding debian:GlobalSign_ECC_Root_CA_-_R5.pem
+Adding debian:Go_Daddy_Class_2_CA.pem
+Adding debian:AC_RAIZ_FNMT-RCM.pem
+Adding debian:ISRG_Root_X2.pem
+Adding debian:TeliaSonera_Root_CA_v1.pem
+Adding debian:DigiCert_TLS_RSA4096_Root_G5.pem
+Adding debian:TrustAsia_Global_Root_CA_G4.pem
+Adding debian:Trustwave_Global_Certification_Authority.pem
+Adding debian:Trustwave_Global_ECC_P384_Certification_Authority.pem
+Adding debian:e-Szigno_Root_CA_2017.pem
+Adding debian:GTS_Root_R3.pem
+Adding debian:SSL.com_Root_Certification_Authority_ECC.pem
+Adding debian:IdenTrust_Public_Sector_Root_CA_1.pem
+Adding debian:GlobalSign_ECC_Root_CA_-_R4.pem
+Adding debian:ISRG_Root_X1.pem
+Adding debian:Security_Communication_RootCA3.pem
+Adding debian:OISTE_WISeKey_Global_Root_GC_CA.pem
+Adding debian:GTS_Root_R2.pem
+Adding debian:Entrust.net_Premium_2048_Secure_Server_CA.pem
+Adding debian:DigiCert_Trusted_Root_G4.pem
+Adding debian:GlobalSign_Root_R46.pem
+Adding debian:GlobalSign_Root_CA_-_R3.pem
+Adding debian:emSign_Root_CA_-_G1.pem
+Adding debian:Entrust_Root_Certification_Authority.pem
+Adding debian:Microsoft_ECC_Root_Certificate_Authority_2017.pem
+Adding debian:NetLock_Arany_=Class_Gold=_Főtanúsítvány.pem
+Adding debian:D-TRUST_Root_Class_3_CA_2_2009.pem
+Adding debian:vTrus_ECC_Root_CA.pem
+done.
+Setting up default-jre-headless (2:1.11-72build2) ...
+Setting up openjdk-11-jre-headless:amd64 (11.0.30+7-1ubuntu1~22.04) ...
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/java to provide /usr/bin/java (java) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/jjs to provide /usr/bin/jjs (jjs) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/keytool to provide /usr/bin/keytool (keytool) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/rmid to provide /usr/bin/rmid (rmid) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/rmiregistry to provide /usr/bin/rmiregistry (rmiregistry) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/pack200 to provide /usr/bin/pack200 (pack200) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/bin/unpack200 to provide /usr/bin/unpack200 (unpack200) in auto mode
+update-alternatives: using /usr/lib/jvm/java-11-openjdk-amd64/lib/jexec to provide /usr/bin/jexec (jexec) in auto mode
+Setting up openjdk-11-jre:amd64 (11.0.30+7-1ubuntu1~22.04) ...
+Setting up default-jre (2:1.11-72build2) ...
+Setting up cuda-nsight-12-4 (12.4.127-1) ...
+Setting up cuda-nvvp-12-4 (12.4.127-1) ...
+Setting up cuda-visual-tools-12-4 (12.4.1-1) ...
+Setting up cuda-tools-12-4 (12.4.1-1) ...
+Setting up cuda-toolkit-12-4 (12.4.1-1) ...
+Processing triggers for hicolor-icon-theme (0.17-2) ...
+Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
+Processing triggers for ca-certificates (20240203~22.04.1) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+
+done.
+done.
+==> cloning + pinning FoundationPose (a1b694b83e633c2cb6115b9063d940a687759392)
+Cloning into '/opt/foundationpose/src'...
+From https://github.com/NVlabs/FoundationPose
+ * branch            a1b694b83e633c2cb6115b9063d940a687759392 -> FETCH_HEAD
+Note: switching to 'a1b694b83e633c2cb6115b9063d940a687759392'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at a1b694b Local Conda install: fix mycpp import, streamline dependencies, refresh readme (#407)
+==> building mycpp (pybind11) for /usr/bin/python3
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system program_options
+-- Found OpenMP_C: -fopenmp (found version "4.5")
+-- Found OpenMP_CXX: -fopenmp (found version "4.5")
+-- Found OpenMP: TRUE (found version "4.5")
+-- Found PythonInterp: /usr/bin/python3.10 (found version "3.10.12")
+-- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+-- Performing Test HAS_FLTO
+-- Performing Test HAS_FLTO - Success
+-- Found pybind11: /usr/include (found version "2.9.1")
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    Python3_ROOT_DIR
+
+
+-- Build files have been written to: /opt/foundationpose/src/mycpp/build
+[ 33%] Building CXX object CMakeFiles/mycpp.dir/src/app/pybind_api.cpp.o
+[ 66%] Building CXX object CMakeFiles/mycpp.dir/src/Utils.cpp.o
+/opt/foundationpose/src/mycpp/src/app/pybind_api.cpp: In function 'vectorMatrix4f cluster_poses(float, float, const vectorMatrix4f&, const vectorMatrix4f&)':
+/opt/foundationpose/src/mycpp/src/app/pybind_api.cpp:26:38: warning: format '%d' expects argument of type 'int', but argument 2 has type 'std::vector<Eigen::Matrix<float, 4, 4>, Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4> > >::size_type' {aka 'long unsigned int'} [-Wformat=]
+   26 |   printf("num original candidates = %d\n",poses_in.size());
+      |                                     ~^    ~~~~~~~~~~~~~~~
+      |                                      |                 |
+      |                                      int               std::vector<Eigen::Matrix<float, 4, 4>, Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4> > >::size_type {aka long unsigned int}
+      |                                     %ld
+/opt/foundationpose/src/mycpp/src/app/pybind_api.cpp:66:42: warning: format '%d' expects argument of type 'int', but argument 2 has type 'std::vector<Eigen::Matrix<float, 4, 4>, Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4> > >::size_type' {aka 'long unsigned int'} [-Wformat=]
+   66 |   printf("num of pose after clustering: %d\n",poses_out.size());
+      |                                         ~^    ~~~~~~~~~~~~~~~~
+      |                                          |                  |
+      |                                          int                std::vector<Eigen::Matrix<float, 4, 4>, Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4> > >::size_type {aka long unsigned int}
+      |                                         %ld
+[100%] Linking CXX shared module mycpp.cpython-310-x86_64-linux-gnu.so
+lto-wrapper: warning: using serial compilation of 2 LTRANS jobs
+[100%] Built target mycpp
+==> pip-installing PyTorch (cu124) + nvdiffrast + FoundationPose deps
+Requirement already satisfied: pip in /usr/lib/python3/dist-packages (22.0.2)
+Collecting pip
+  Downloading pip-26.1.1-py3-none-any.whl (1.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 5.1 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 22.0.2
+    Not uninstalling pip at /usr/lib/python3/dist-packages, outside environment /usr
+    Can't uninstall 'pip'. No files were found to uninstall.
+Successfully installed pip-26.1.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+Looking in indexes: https://download.pytorch.org/whl/cu124
+Collecting torch==2.4.0
+  Downloading torch-2.4.0%2Bcu124-cp310-cp310-linux_x86_64.whl (797.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 797.3/797.3 MB 14.3 MB/s  0:00:51
+Collecting torchvision==0.19.0
+  Downloading torchvision-0.19.0%2Bcu124-cp310-cp310-linux_x86_64.whl (7.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 12.9 MB/s  0:00:00
+Collecting filelock (from torch==2.4.0)
+  Downloading filelock-3.29.0-py3-none-any.whl.metadata (2.0 kB)
+Requirement already satisfied: typing-extensions>=4.8.0 in /usr/local/lib/python3.10/dist-packages (from torch==2.4.0) (4.15.0)
+Collecting sympy (from torch==2.4.0)
+  Downloading sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch==2.4.0) (3.4.2)
+Requirement already satisfied: jinja2 in /usr/lib/python3/dist-packages (from torch==2.4.0) (3.0.3)
+Collecting fsspec (from torch==2.4.0)
+  Downloading fsspec-2026.4.0-py3-none-any.whl.metadata (10 kB)
+Collecting nvidia-cuda-nvrtc-cu12==12.4.99 (from torch==2.4.0)
+  Downloading nvidia_cuda_nvrtc_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl (24.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 24.7/24.7 MB 11.2 MB/s  0:00:02
+Collecting nvidia-cuda-runtime-cu12==12.4.99 (from torch==2.4.0)
+  Downloading nvidia_cuda_runtime_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl (883 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 883.4/883.4 kB 10.9 MB/s  0:00:00
+Collecting nvidia-cuda-cupti-cu12==12.4.99 (from torch==2.4.0)
+  Downloading nvidia_cuda_cupti_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl (13.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.8/13.8 MB 13.9 MB/s  0:00:00
+Collecting nvidia-cudnn-cu12==9.1.0.70 (from torch==2.4.0)
+  Downloading nvidia_cudnn_cu12-9.1.0.70-py3-none-manylinux2014_x86_64.whl (664.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 664.8/664.8 MB 13.7 MB/s  0:00:46
+Collecting nvidia-cublas-cu12==12.4.2.65 (from torch==2.4.0)
+  Downloading nvidia_cublas_cu12-12.4.2.65-py3-none-manylinux2014_x86_64.whl (363.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 363.0/363.0 MB 14.1 MB/s  0:00:25
+Collecting nvidia-cufft-cu12==11.2.0.44 (from torch==2.4.0)
+  Downloading nvidia_cufft_cu12-11.2.0.44-py3-none-manylinux2014_x86_64.whl (211.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 211.5/211.5 MB 14.2 MB/s  0:00:14
+Collecting nvidia-curand-cu12==10.3.5.119 (from torch==2.4.0)
+  Downloading nvidia_curand_cu12-10.3.5.119-py3-none-manylinux2014_x86_64.whl (56.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.3/56.3 MB 14.7 MB/s  0:00:03
+Collecting nvidia-cusolver-cu12==11.6.0.99 (from torch==2.4.0)
+  Downloading nvidia_cusolver_cu12-11.6.0.99-py3-none-manylinux2014_x86_64.whl (128.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 128.4/128.4 MB 14.6 MB/s  0:00:08
+Collecting nvidia-cusparse-cu12==12.3.0.142 (from torch==2.4.0)
+  Downloading nvidia_cusparse_cu12-12.3.0.142-py3-none-manylinux2014_x86_64.whl (207.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 207.5/207.5 MB 14.1 MB/s  0:00:14
+Collecting nvidia-nccl-cu12==2.20.5 (from torch==2.4.0)
+  Downloading nvidia_nccl_cu12-2.20.5-py3-none-manylinux2014_x86_64.whl (176.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 176.2/176.2 MB 13.9 MB/s  0:00:12
+Collecting nvidia-nvtx-cu12==12.4.99 (from torch==2.4.0)
+  Downloading nvidia_nvtx_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl (99 kB)
+Collecting nvidia-nvjitlink-cu12==12.4.99 (from torch==2.4.0)
+  Downloading nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl (21.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 21.1/21.1 MB 14.3 MB/s  0:00:01
+Collecting triton==3.0.0 (from torch==2.4.0)
+  Downloading triton-3.0.0-1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (209.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 209.4/209.4 MB 15.5 MB/s  0:00:13
+Requirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from torchvision==0.19.0) (1.26.4)
+Collecting pillow!=8.3.*,>=5.3.0 (from torchvision==0.19.0)
+  Downloading pillow-12.2.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)
+Collecting mpmath<1.4,>=1.1.0 (from sympy->torch==2.4.0)
+  Downloading mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Downloading pillow-12.2.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 11.9 MB/s  0:00:00
+Downloading filelock-3.29.0-py3-none-any.whl (39 kB)
+Downloading fsspec-2026.4.0-py3-none-any.whl (203 kB)
+Downloading sympy-1.14.0-py3-none-any.whl (6.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 18.9 MB/s  0:00:00
+Downloading mpmath-1.3.0-py3-none-any.whl (536 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 536.2/536.2 kB 9.0 MB/s  0:00:00
+Installing collected packages: mpmath, sympy, pillow, nvidia-nvtx-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufft-cu12, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, fsspec, filelock, triton, nvidia-cusparse-cu12, nvidia-cudnn-cu12, nvidia-cusolver-cu12, torch, torchvision
+
+Successfully installed filelock-3.29.0 fsspec-2026.4.0 mpmath-1.3.0 nvidia-cublas-cu12-12.4.2.65 nvidia-cuda-cupti-cu12-12.4.99 nvidia-cuda-nvrtc-cu12-12.4.99 nvidia-cuda-runtime-cu12-12.4.99 nvidia-cudnn-cu12-9.1.0.70 nvidia-cufft-cu12-11.2.0.44 nvidia-curand-cu12-10.3.5.119 nvidia-cusolver-cu12-11.6.0.99 nvidia-cusparse-cu12-12.3.0.142 nvidia-nccl-cu12-2.20.5 nvidia-nvjitlink-cu12-12.4.99 nvidia-nvtx-cu12-12.4.99 pillow-12.2.0 sympy-1.14.0 torch-2.4.0+cu124 torchvision-0.19.0+cu124 triton-3.0.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Collecting setuptools>=68
+  Downloading setuptools-82.0.1-py3-none-any.whl.metadata (6.5 kB)
+Requirement already satisfied: wheel in /usr/lib/python3/dist-packages (0.37.1)
+Collecting wheel
+  Downloading wheel-0.47.0-py3-none-any.whl.metadata (2.3 kB)
+Collecting ninja
+  Downloading ninja-1.13.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.1 kB)
+Collecting packaging>=24.0 (from wheel)
+  Downloading packaging-26.2-py3-none-any.whl.metadata (3.5 kB)
+Downloading setuptools-82.0.1-py3-none-any.whl (1.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 4.6 MB/s  0:00:00
+Downloading wheel-0.47.0-py3-none-any.whl (32 kB)
+Downloading ninja-1.13.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (180 kB)
+Downloading packaging-26.2-py3-none-any.whl (100 kB)
+Installing collected packages: setuptools, packaging, ninja, wheel
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 59.6.0
+    Uninstalling setuptools-59.6.0:
+      Successfully uninstalled setuptools-59.6.0
+  Attempting uninstall: packaging
+    Found existing installation: packaging 21.3
+    Uninstalling packaging-21.3:
+      Successfully uninstalled packaging-21.3
+  Attempting uninstall: wheel
+    Found existing installation: wheel 0.37.1
+    Uninstalling wheel-0.37.1:
+      Successfully uninstalled wheel-0.37.1
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+colcon-core 0.20.1 requires setuptools<80,>=30.3.0, but you have setuptools 82.0.1 which is incompatible.
+Successfully installed ninja-1.13.0 packaging-26.2 setuptools-82.0.1 wheel-0.47.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Cloning into '/opt/foundationpose/nvdiffrast'...
+Processing /opt/foundationpose/nvdiffrast
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from nvdiffrast==0.4.0) (1.26.4)
+Building wheels for collected packages: nvdiffrast
+  Building wheel for nvdiffrast (pyproject.toml): started
+  Building wheel for nvdiffrast (pyproject.toml): finished with status 'done'
+  Created wheel for nvdiffrast: filename=nvdiffrast-0.4.0-cp310-cp310-linux_x86_64.whl size=15085822 sha256=e1481d384be72e62e2fc55ad23480d8d9a8bb2e51be1266e8354a0a8f78fc0e7
+  Stored in directory: /tmp/pip-ephem-wheel-cache-48x5mz2g/wheels/d8/7d/4e/4e951e804e11c1c014de3976c237ebe40d7e5c0f66234aef56
+Successfully built nvdiffrast
+Installing collected packages: nvdiffrast
+Successfully installed nvdiffrast-0.4.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Processing /opt/foundationpose/wheels-py310/pytorch3d-0.7.9-cp310-cp310-linux_x86_64.whl
+Collecting iopath (from pytorch3d==0.7.9)
+  Downloading iopath-0.1.10.tar.gz (42 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting tqdm (from iopath->pytorch3d==0.7.9)
+  Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+Requirement already satisfied: typing_extensions in /usr/local/lib/python3.10/dist-packages (from iopath->pytorch3d==0.7.9) (4.15.0)
+Collecting portalocker (from iopath->pytorch3d==0.7.9)
+  Downloading portalocker-3.2.0-py3-none-any.whl.metadata (8.7 kB)
+Downloading portalocker-3.2.0-py3-none-any.whl (22 kB)
+Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
+Building wheels for collected packages: iopath
+  Building wheel for iopath (pyproject.toml): started
+  Building wheel for iopath (pyproject.toml): finished with status 'done'
+  Created wheel for iopath: filename=iopath-0.1.10-py3-none-any.whl size=31596 sha256=54690539ccee27cf15dcf325d37600436b3b7a045fcab4e7767a3ab291ab3deb
+  Stored in directory: /root/.cache/pip/wheels/9a/a3/b6/ac0fcd1b4ed5cfeb3db92e6a0e476cfd48ed0df92b91080c1d
+Successfully built iopath
+Installing collected packages: tqdm, portalocker, iopath, pytorch3d
+
+Successfully installed iopath-0.1.10 portalocker-3.2.0 pytorch3d-0.7.9 tqdm-4.67.3
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Collecting blinker>=1.6
+  Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Installing collected packages: blinker
+Successfully installed blinker-1.9.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Collecting numpy>=2 (from -r /opt/foundationpose/src/requirements.txt (line 12))
+  Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+Requirement already satisfied: scipy in /usr/local/lib/python3.10/dist-packages (from -r /opt/foundationpose/src/requirements.txt (line 13)) (1.11.4)
+Collecting scikit-learn (from -r /opt/foundationpose/src/requirements.txt (line 14))
+  Downloading scikit_learn-1.7.2-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (11 kB)
+Collecting h5py (from -r /opt/foundationpose/src/requirements.txt (line 15))
+  Downloading h5py-3.16.0-cp310-cp310-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting joblib (from -r /opt/foundationpose/src/requirements.txt (line 16))
+  Downloading joblib-1.5.3-py3-none-any.whl.metadata (5.5 kB)
+Collecting PyYAML>=6 (from -r /opt/foundationpose/src/requirements.txt (line 19))
+  Downloading pyyaml-6.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting ruamel.yaml>=0.18 (from -r /opt/foundationpose/src/requirements.txt (line 20))
+  Downloading ruamel_yaml-0.19.1-py3-none-any.whl.metadata (16 kB)
+Collecting opencv-python (from -r /opt/foundationpose/src/requirements.txt (line 23))
+  Downloading opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl.metadata (19 kB)
+Collecting imageio (from -r /opt/foundationpose/src/requirements.txt (line 24))
+  Downloading imageio-2.37.3-py3-none-any.whl.metadata (9.7 kB)
+Collecting open3d (from -r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading open3d-0.19.0-cp310-cp310-manylinux_2_31_x86_64.whl.metadata (4.3 kB)
+Collecting trimesh (from -r /opt/foundationpose/src/requirements.txt (line 26))
+  Downloading trimesh-4.12.2-py3-none-any.whl.metadata (13 kB)
+Collecting transformations (from -r /opt/foundationpose/src/requirements.txt (line 27))
+  Downloading transformations-2025.1.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.0 kB)
+Collecting matplotlib (from -r /opt/foundationpose/src/requirements.txt (line 28))
+  Downloading matplotlib-3.10.9-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (52 kB)
+Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (from -r /opt/foundationpose/src/requirements.txt (line 29)) (2.3.3)
+Requirement already satisfied: Pillow in /usr/local/lib/python3.10/dist-packages (from -r /opt/foundationpose/src/requirements.txt (line 30)) (12.2.0)
+Collecting pyrender (from -r /opt/foundationpose/src/requirements.txt (line 31))
+  Downloading pyrender-0.1.45-py3-none-any.whl.metadata (1.5 kB)
+Collecting pyOpenGL>=3.1 (from -r /opt/foundationpose/src/requirements.txt (line 32))
+  Downloading pyopengl-3.1.10-py3-none-any.whl.metadata (3.3 kB)
+Collecting pyOpenGL_accelerate>=3.1 (from -r /opt/foundationpose/src/requirements.txt (line 33))
+  Downloading pyopengl_accelerate-3.1.10-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (3.9 kB)
+Collecting kornia>=0.7 (from -r /opt/foundationpose/src/requirements.txt (line 36))
+  Downloading kornia-0.8.2-py2.py3-none-any.whl.metadata (18 kB)
+Collecting omegaconf>=2.3 (from -r /opt/foundationpose/src/requirements.txt (line 37))
+  Downloading omegaconf-2.3.0-py3-none-any.whl.metadata (3.9 kB)
+Requirement already satisfied: psutil in /usr/lib/python3/dist-packages (from -r /opt/foundationpose/src/requirements.txt (line 38)) (5.9.0)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from -r /opt/foundationpose/src/requirements.txt (line 39)) (4.67.3)
+Collecting warp-lang (from -r /opt/foundationpose/src/requirements.txt (line 40))
+  Downloading warp_lang-1.13.0-py3-none-manylinux_2_28_x86_64.whl.metadata (25 kB)
+Collecting scikit-image (from -r /opt/foundationpose/src/requirements.txt (line 43))
+  Downloading scikit_image-0.25.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (14 kB)
+INFO: pip is looking at multiple versions of scipy to determine which version is compatible with other requirements. This could take a while.
+Collecting scipy (from -r /opt/foundationpose/src/requirements.txt (line 13))
+  Downloading scipy-1.15.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Collecting threadpoolctl>=3.1.0 (from scikit-learn->-r /opt/foundationpose/src/requirements.txt (line 14))
+  Downloading threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+Collecting dash>=2.6.0 (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading dash-4.1.0-py3-none-any.whl.metadata (11 kB)
+Collecting werkzeug>=3.0.0 (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+Collecting flask>=3.0.0 (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+Collecting nbformat>=5.7.0 (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading nbformat-5.10.4-py3-none-any.whl.metadata (3.6 kB)
+Collecting configargparse (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading configargparse-1.7.5-py3-none-any.whl.metadata (23 kB)
+Collecting ipywidgets>=8.0.4 (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading ipywidgets-8.1.8-py3-none-any.whl.metadata (2.4 kB)
+Collecting addict (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading addict-2.4.0-py3-none-any.whl.metadata (1.0 kB)
+Collecting pyquaternion (from open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading pyquaternion-0.9.9-py3-none-any.whl.metadata (1.4 kB)
+Collecting contourpy>=1.0.1 (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28))
+  Downloading contourpy-1.3.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.5 kB)
+Collecting cycler>=0.10 (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28))
+  Downloading cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting fonttools>=4.22.0 (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28))
+  Downloading fonttools-4.63.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (118 kB)
+Collecting kiwisolver>=1.3.1 (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28))
+  Downloading kiwisolver-1.5.0-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (5.1 kB)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28)) (26.2)
+Collecting pyparsing>=3 (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28))
+  Downloading pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.10/dist-packages (from matplotlib->-r /opt/foundationpose/src/requirements.txt (line 28)) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/lib/python3/dist-packages (from pandas->-r /opt/foundationpose/src/requirements.txt (line 29)) (2022.1)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas->-r /opt/foundationpose/src/requirements.txt (line 29)) (2026.2)
+Collecting freetype-py (from pyrender->-r /opt/foundationpose/src/requirements.txt (line 31))
+  Downloading freetype_py-2.5.1-py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (6.3 kB)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from pyrender->-r /opt/foundationpose/src/requirements.txt (line 31)) (3.4.2)
+Collecting pyglet>=1.4.10 (from pyrender->-r /opt/foundationpose/src/requirements.txt (line 31))
+  Downloading pyglet-2.1.14-py3-none-any.whl.metadata (7.7 kB)
+Collecting pyOpenGL>=3.1 (from -r /opt/foundationpose/src/requirements.txt (line 32))
+  Downloading PyOpenGL-3.1.0.zip (2.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 8.5 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: six in /usr/lib/python3/dist-packages (from pyrender->-r /opt/foundationpose/src/requirements.txt (line 31)) (1.16.0)
+Collecting kornia_rs>=0.1.9 (from kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36))
+  Downloading kornia_rs-0.1.11-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (15 kB)
+Requirement already satisfied: torch>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (2.4.0+cu124)
+Collecting antlr4-python3-runtime==4.9.* (from omegaconf>=2.3->-r /opt/foundationpose/src/requirements.txt (line 37))
+  Downloading antlr4-python3-runtime-4.9.3.tar.gz (117 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting tifffile>=2022.8.12 (from scikit-image->-r /opt/foundationpose/src/requirements.txt (line 43))
+  Downloading tifffile-2025.5.10-py3-none-any.whl.metadata (31 kB)
+Collecting lazy-loader>=0.4 (from scikit-image->-r /opt/foundationpose/src/requirements.txt (line 43))
+  Downloading lazy_loader-0.5-py3-none-any.whl.metadata (5.9 kB)
+Collecting plotly>=5.0.0 (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading plotly-6.7.0-py3-none-any.whl.metadata (8.6 kB)
+Requirement already satisfied: importlib-metadata in /usr/lib/python3/dist-packages (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25)) (4.6.4)
+Requirement already satisfied: typing_extensions>=4.1.1 in /usr/local/lib/python3.10/dist-packages (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25)) (4.15.0)
+Collecting requests (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting retrying (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading retrying-1.4.2-py3-none-any.whl.metadata (5.5 kB)
+Collecting nest-asyncio (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading nest_asyncio-1.6.0-py3-none-any.whl.metadata (2.8 kB)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25)) (82.0.1)
+Requirement already satisfied: blinker>=1.9.0 in /usr/local/lib/python3.10/dist-packages (from flask>=3.0.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25)) (1.9.0)
+Collecting click>=8.1.3 (from flask>=3.0.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading click-8.3.3-py3-none-any.whl.metadata (2.6 kB)
+Collecting itsdangerous>=2.2.0 (from flask>=3.0.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting jinja2>=3.1.2 (from flask>=3.0.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting markupsafe>=2.1.1 (from flask>=3.0.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading markupsafe-3.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Collecting comm>=0.1.3 (from ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading comm-0.2.3-py3-none-any.whl.metadata (3.7 kB)
+Collecting ipython>=6.1.0 (from ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading ipython-8.39.0-py3-none-any.whl.metadata (5.1 kB)
+Collecting traitlets>=4.3.1 (from ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading traitlets-5.15.0-py3-none-any.whl.metadata (10 kB)
+Collecting widgetsnbextension~=4.0.14 (from ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading widgetsnbextension-4.0.15-py3-none-any.whl.metadata (1.6 kB)
+Collecting jupyterlab_widgets~=3.0.15 (from ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading jupyterlab_widgets-3.0.16-py3-none-any.whl.metadata (20 kB)
+Collecting decorator (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading decorator-5.2.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting exceptiongroup (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading exceptiongroup-1.3.1-py3-none-any.whl.metadata (6.7 kB)
+Collecting jedi>=0.16 (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading jedi-0.20.0-py2.py3-none-any.whl.metadata (23 kB)
+Collecting matplotlib-inline (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading matplotlib_inline-0.2.2-py3-none-any.whl.metadata (2.4 kB)
+Collecting pexpect>4.3 (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading pexpect-4.9.0-py2.py3-none-any.whl.metadata (2.5 kB)
+Collecting prompt_toolkit<3.1.0,>=3.0.41 (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading prompt_toolkit-3.0.52-py3-none-any.whl.metadata (6.4 kB)
+Requirement already satisfied: pygments>=2.4.0 in /usr/lib/python3/dist-packages (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25)) (2.11.2)
+Collecting stack_data (from ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading stack_data-0.6.3-py3-none-any.whl.metadata (18 kB)
+Collecting wcwidth (from prompt_toolkit<3.1.0,>=3.0.41->ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading wcwidth-0.7.0-py3-none-any.whl.metadata (36 kB)
+Collecting parso<0.9.0,>=0.8.6 (from jedi>=0.16->ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading parso-0.8.7-py2.py3-none-any.whl.metadata (8.2 kB)
+Collecting fastjsonschema>=2.15 (from nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading fastjsonschema-2.21.2-py3-none-any.whl.metadata (2.3 kB)
+Collecting jsonschema>=2.6 (from nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting jupyter-core!=5.0.*,>=4.12 (from nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading jupyter_core-5.9.1-py3-none-any.whl.metadata (1.5 kB)
+Collecting attrs>=22.2.0 (from jsonschema>=2.6->nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=2.6->nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema>=2.6->nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.25.0 (from jsonschema>=2.6->nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading rpds_py-0.30.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting platformdirs>=2.5 (from jupyter-core!=5.0.*,>=4.12->nbformat>=5.7.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading platformdirs-4.9.6-py3-none-any.whl.metadata (4.7 kB)
+Collecting ptyprocess>=0.5 (from pexpect>4.3->ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading ptyprocess-0.7.0-py2.py3-none-any.whl.metadata (1.3 kB)
+Collecting narwhals>=1.15.1 (from plotly>=5.0.0->dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading narwhals-2.21.2-py3-none-any.whl.metadata (16 kB)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (3.29.0)
+Requirement already satisfied: sympy in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (1.14.0)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (2026.4.0)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.4.99)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.4.99)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.4.99)
+Requirement already satisfied: nvidia-cudnn-cu12==9.1.0.70 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (9.1.0.70)
+Requirement already satisfied: nvidia-cublas-cu12==12.4.2.65 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.4.2.65)
+Requirement already satisfied: nvidia-cufft-cu12==11.2.0.44 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (11.2.0.44)
+Requirement already satisfied: nvidia-curand-cu12==10.3.5.119 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (10.3.5.119)
+Requirement already satisfied: nvidia-cusolver-cu12==11.6.0.99 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (11.6.0.99)
+Requirement already satisfied: nvidia-cusparse-cu12==12.3.0.142 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.3.0.142)
+Requirement already satisfied: nvidia-nccl-cu12==2.20.5 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (2.20.5)
+Requirement already satisfied: nvidia-nvtx-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.4.99)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (12.4.99)
+Requirement already satisfied: triton==3.0.0 in /usr/local/lib/python3.10/dist-packages (from torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (3.0.0)
+Collecting charset_normalizer<4,>=2 (from requests->dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading charset_normalizer-3.4.7-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting idna<4,>=2.5 (from requests->dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading idna-3.15-py3-none-any.whl.metadata (7.7 kB)
+Collecting urllib3<3,>=1.26 (from requests->dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+Collecting certifi>=2023.5.7 (from requests->dash>=2.6.0->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading certifi-2026.4.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting executing>=1.2.0 (from stack_data->ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading executing-2.2.1-py2.py3-none-any.whl.metadata (8.9 kB)
+Collecting asttokens>=2.1.0 (from stack_data->ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading asttokens-3.0.1-py3-none-any.whl.metadata (4.9 kB)
+Collecting pure-eval (from stack_data->ipython>=6.1.0->ipywidgets>=8.0.4->open3d->-r /opt/foundationpose/src/requirements.txt (line 25))
+  Downloading pure_eval-0.2.3-py3-none-any.whl.metadata (6.3 kB)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from sympy->torch>=2.0.0->kornia>=0.7->-r /opt/foundationpose/src/requirements.txt (line 36)) (1.3.0)
+Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 15.0 MB/s  0:00:01
+Downloading scipy-1.15.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (37.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 37.7/37.7 MB 25.2 MB/s  0:00:01
+Downloading scikit_learn-1.7.2-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.7/9.7 MB 26.5 MB/s  0:00:00
+Downloading h5py-3.16.0-cp310-cp310-manylinux_2_28_x86_64.whl (5.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.1/5.1 MB 28.6 MB/s  0:00:00
+Downloading joblib-1.5.3-py3-none-any.whl (309 kB)
+Downloading pyyaml-6.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (770 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 770.3/770.3 kB 23.7 MB/s  0:00:00
+Downloading ruamel_yaml-0.19.1-py3-none-any.whl (118 kB)
+Downloading opencv_python-4.13.0.92-cp37-abi3-manylinux_2_28_x86_64.whl (72.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 72.9/72.9 MB 27.5 MB/s  0:00:02
+Downloading imageio-2.37.3-py3-none-any.whl (317 kB)
+Downloading open3d-0.19.0-cp310-cp310-manylinux_2_31_x86_64.whl (447.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 447.7/447.7 MB 21.8 MB/s  0:00:19
+Downloading trimesh-4.12.2-py3-none-any.whl (741 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 741.0/741.0 kB 14.5 MB/s  0:00:00
+Downloading transformations-2025.1.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (140 kB)
+Downloading matplotlib-3.10.9-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (8.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 25.6 MB/s  0:00:00
+Downloading pyrender-0.1.45-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 17.0 MB/s  0:00:00
+Downloading pyopengl_accelerate-3.1.10-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 33.1 MB/s  0:00:00
+Downloading kornia-0.8.2-py2.py3-none-any.whl (1.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 19.1 MB/s  0:00:00
+Downloading omegaconf-2.3.0-py3-none-any.whl (79 kB)
+Downloading warp_lang-1.13.0-py3-none-manylinux_2_28_x86_64.whl (138.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 138.3/138.3 MB 25.3 MB/s  0:00:05
+Downloading scikit_image-0.25.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (14.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 14.8/14.8 MB 29.7 MB/s  0:00:00
+Downloading contourpy-1.3.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (325 kB)
+Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Downloading dash-4.1.0-py3-none-any.whl (7.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.2/7.2 MB 30.5 MB/s  0:00:00
+Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+Downloading click-8.3.3-py3-none-any.whl (110 kB)
+Downloading fonttools-4.63.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.9/4.9 MB 28.8 MB/s  0:00:00
+Downloading ipywidgets-8.1.8-py3-none-any.whl (139 kB)
+Downloading jupyterlab_widgets-3.0.16-py3-none-any.whl (914 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 914.9/914.9 kB 23.9 MB/s  0:00:00
+Downloading widgetsnbextension-4.0.15-py3-none-any.whl (2.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 29.3 MB/s  0:00:00
+Downloading comm-0.2.3-py3-none-any.whl (7.3 kB)
+Downloading ipython-8.39.0-py3-none-any.whl (831 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 831.8/831.8 kB 18.1 MB/s  0:00:00
+Downloading prompt_toolkit-3.0.52-py3-none-any.whl (391 kB)
+Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Downloading jedi-0.20.0-py2.py3-none-any.whl (4.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.9/4.9 MB 28.3 MB/s  0:00:00
+Downloading parso-0.8.7-py2.py3-none-any.whl (107 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading kiwisolver-1.5.0-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (1.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.6/1.6 MB 27.5 MB/s  0:00:00
+Downloading kornia_rs-0.1.11-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.4/3.4 MB 26.4 MB/s  0:00:00
+Downloading lazy_loader-0.5-py3-none-any.whl (8.0 kB)
+Downloading markupsafe-3.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (20 kB)
+Downloading nbformat-5.10.4-py3-none-any.whl (78 kB)
+Downloading fastjsonschema-2.21.2-py3-none-any.whl (24 kB)
+Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Downloading jupyter_core-5.9.1-py3-none-any.whl (29 kB)
+Downloading pexpect-4.9.0-py2.py3-none-any.whl (63 kB)
+Downloading platformdirs-4.9.6-py3-none-any.whl (21 kB)
+Downloading plotly-6.7.0-py3-none-any.whl (9.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.9/9.9 MB 27.3 MB/s  0:00:00
+Downloading narwhals-2.21.2-py3-none-any.whl (451 kB)
+Downloading ptyprocess-0.7.0-py2.py3-none-any.whl (13 kB)
+Downloading pyglet-2.1.14-py3-none-any.whl (1.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 21.7 MB/s  0:00:00
+Downloading pyparsing-3.3.2-py3-none-any.whl (122 kB)
+Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+Downloading rpds_py-0.30.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (390 kB)
+Downloading threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+Downloading tifffile-2025.5.10-py3-none-any.whl (226 kB)
+Downloading traitlets-5.15.0-py3-none-any.whl (85 kB)
+Downloading addict-2.4.0-py3-none-any.whl (3.8 kB)
+Downloading configargparse-1.7.5-py3-none-any.whl (27 kB)
+Downloading decorator-5.2.1-py3-none-any.whl (9.2 kB)
+Downloading exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+Downloading freetype_py-2.5.1-py3-none-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl (1.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 26.1 MB/s  0:00:00
+Downloading matplotlib_inline-0.2.2-py3-none-any.whl (9.5 kB)
+Downloading nest_asyncio-1.6.0-py3-none-any.whl (5.2 kB)
+Downloading pyquaternion-0.9.9-py3-none-any.whl (14 kB)
+Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+Downloading charset_normalizer-3.4.7-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (216 kB)
+Downloading idna-3.15-py3-none-any.whl (72 kB)
+Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+Downloading certifi-2026.4.22-py3-none-any.whl (135 kB)
+Downloading retrying-1.4.2-py3-none-any.whl (10 kB)
+Downloading stack_data-0.6.3-py3-none-any.whl (24 kB)
+Downloading asttokens-3.0.1-py3-none-any.whl (27 kB)
+Downloading executing-2.2.1-py2.py3-none-any.whl (28 kB)
+Downloading pure_eval-0.2.3-py3-none-any.whl (11 kB)
+Downloading wcwidth-0.7.0-py3-none-any.whl (110 kB)
+Building wheels for collected packages: pyOpenGL, antlr4-python3-runtime
+  Building wheel for pyOpenGL (pyproject.toml): started
+  Building wheel for pyOpenGL (pyproject.toml): finished with status 'done'
+  Created wheel for pyOpenGL: filename=pyopengl-3.1.0-py3-none-any.whl size=1745238 sha256=c7ef3d093992b3dff2e244af078f9afc449d22e21c53c9da95390412cae23bcf
+  Stored in directory: /root/.cache/pip/wheels/a1/3c/d2/1f9533f908d86176637521e533c6cdb2d4e48b59003b5c3f19
+  Building wheel for antlr4-python3-runtime (pyproject.toml): started
+  Building wheel for antlr4-python3-runtime (pyproject.toml): finished with status 'done'
+  Created wheel for antlr4-python3-runtime: filename=antlr4_python3_runtime-4.9.3-py3-none-any.whl size=144590 sha256=e0f101641e233480757d8ee6707977fa2fec67abc336d1e28a55c94f83e7fdd2
+  Stored in directory: /root/.cache/pip/wheels/12/93/dd/1f6a127edc45659556564c5730f6d4e300888f4bca2d4c5a88
+Successfully built pyOpenGL antlr4-python3-runtime
+Installing collected packages: pyOpenGL_accelerate, pyOpenGL, pure-eval, ptyprocess, fastjsonschema, antlr4-python3-runtime, addict, widgetsnbextension, wcwidth, urllib3, traitlets, threadpoolctl, ruamel.yaml, rpds-py, retrying, PyYAML, pyparsing, pyglet, platformdirs, pexpect, parso, numpy, nest-asyncio, narwhals, markupsafe, lazy-loader, kornia_rs, kiwisolver, jupyterlab_widgets, joblib, itsdangerous, idna, freetype-py, fonttools, executing, exceptiongroup, decorator, cycler, configargparse, comm, click, charset_normalizer, certifi, attrs, asttokens, werkzeug, warp-lang, trimesh, transformations, tifffile, stack_data, scipy, requests, referencing, pyquaternion, prompt_toolkit, plotly, opencv-python, omegaconf, matplotlib-inline, jupyter-core, jinja2, jedi, imageio, h5py, contourpy, scikit-learn, scikit-image, pyrender, matplotlib, jsonschema-specifications, ipython, flask, kornia, jsonschema, ipywidgets, dash, nbformat, open3d
+  Attempting uninstall: PyYAML
+    Found existing installation: PyYAML 5.4.1
+    Uninstalling PyYAML-5.4.1:
+      Successfully uninstalled PyYAML-5.4.1
+  Attempting uninstall: pyparsing
+    Found existing installation: pyparsing 2.4.7
+    Uninstalling pyparsing-2.4.7:
+      Successfully uninstalled pyparsing-2.4.7
+  Attempting uninstall: numpy
+    Found existing installation: numpy 1.26.4
+    Uninstalling numpy-1.26.4:
+      Successfully uninstalled numpy-1.26.4
+  Attempting uninstall: markupsafe
+    Found existing installation: MarkupSafe 2.0.1
+    Uninstalling MarkupSafe-2.0.1:
+      Successfully uninstalled MarkupSafe-2.0.1
+  Attempting uninstall: attrs
+    Found existing installation: attrs 21.2.0
+    Uninstalling attrs-21.2.0:
+      Successfully uninstalled attrs-21.2.0
+  Attempting uninstall: scipy
+    Found existing installation: scipy 1.11.4
+    Uninstalling scipy-1.11.4:
+      Successfully uninstalled scipy-1.11.4
+  Attempting uninstall: jinja2
+    Found existing installation: Jinja2 3.0.3
+    Uninstalling Jinja2-3.0.3:
+      Successfully uninstalled Jinja2-3.0.3
+
+Successfully installed PyYAML-6.0.3 addict-2.4.0 antlr4-python3-runtime-4.9.3 asttokens-3.0.1 attrs-26.1.0 certifi-2026.4.22 charset_normalizer-3.4.7 click-8.3.3 comm-0.2.3 configargparse-1.7.5 contourpy-1.3.2 cycler-0.12.1 dash-4.1.0 decorator-5.2.1 exceptiongroup-1.3.1 executing-2.2.1 fastjsonschema-2.21.2 flask-3.1.3 fonttools-4.63.0 freetype-py-2.5.1 h5py-3.16.0 idna-3.15 imageio-2.37.3 ipython-8.39.0 ipywidgets-8.1.8 itsdangerous-2.2.0 jedi-0.20.0 jinja2-3.1.6 joblib-1.5.3 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 jupyter-core-5.9.1 jupyterlab_widgets-3.0.16 kiwisolver-1.5.0 kornia-0.8.2 kornia_rs-0.1.11 lazy-loader-0.5 markupsafe-3.0.3 matplotlib-3.10.9 matplotlib-inline-0.2.2 narwhals-2.21.2 nbformat-5.10.4 nest-asyncio-1.6.0 numpy-2.2.6 omegaconf-2.3.0 open3d-0.19.0 opencv-python-4.13.0.92 parso-0.8.7 pexpect-4.9.0 platformdirs-4.9.6 plotly-6.7.0 prompt_toolkit-3.0.52 ptyprocess-0.7.0 pure-eval-0.2.3 pyOpenGL-3.1.0 pyOpenGL_accelerate-3.1.10 pyglet-2.1.14 pyparsing-3.3.2 pyquaternion-0.9.9 pyrender-0.1.45 referencing-0.37.0 requests-2.34.2 retrying-1.4.2 rpds-py-0.30.0 ruamel.yaml-0.19.1 scikit-image-0.25.2 scikit-learn-1.7.2 scipy-1.15.3 stack_data-0.6.3 threadpoolctl-3.6.0 tifffile-2025.5.10 traitlets-5.15.0 transformations-2025.1.1 trimesh-4.12.2 urllib3-2.7.0 warp-lang-1.13.0 wcwidth-0.7.0 werkzeug-3.1.8 widgetsnbextension-4.0.15
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+    wrote /usr/local/lib/python3.10/dist-packages/foundationpose.pth -> /opt/foundationpose/src
+Requirement already satisfied: trimesh in /usr/local/lib/python3.10/dist-packages (4.12.2)
+Requirement already satisfied: numpy>=1.20 in /usr/local/lib/python3.10/dist-packages (from trimesh) (2.2.6)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Collecting numpy<2.0,>=1.21.5
+  Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Collecting scipy<1.12
+  Downloading scipy-1.11.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
+Collecting lxml<5.0
+  Downloading lxml-4.9.4-cp310-cp310-manylinux_2_28_x86_64.whl.metadata (3.7 kB)
+Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.2/18.2 MB 20.2 MB/s  0:00:00
+Downloading scipy-1.11.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (36.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 36.4/36.4 MB 25.1 MB/s  0:00:01
+Downloading lxml-4.9.4-cp310-cp310-manylinux_2_28_x86_64.whl (7.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.9/7.9 MB 27.6 MB/s  0:00:00
+Installing collected packages: numpy, lxml, scipy
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.2.6
+    Uninstalling numpy-2.2.6:
+      Successfully uninstalled numpy-2.2.6
+  Attempting uninstall: lxml
+    Found existing installation: lxml 4.8.0
+    Uninstalling lxml-4.8.0:
+      Successfully uninstalled lxml-4.8.0
+  Attempting uninstall: scipy
+    Found existing installation: scipy 1.15.3
+    Uninstalling scipy-1.15.3:
+      Successfully uninstalled scipy-1.15.3
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+opencv-python 4.13.0.92 requires numpy>=2; python_version >= "3.9", but you have numpy 1.26.4 which is incompatible.
+Successfully installed lxml-4.9.4 numpy-1.26.4 scipy-1.11.4
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+==> pinning kornia 0.7.0 (Ivy-Bridge AVX2-free hosts SIGILL on kornia_rs)
+Collecting kornia==0.7.0
+  Downloading kornia-0.7.0-py2.py3-none-any.whl.metadata (12 kB)
+Requirement already satisfied: packaging in /usr/local/lib/python3.10/dist-packages (from kornia==0.7.0) (26.2)
+Requirement already satisfied: torch>=1.9.1 in /usr/local/lib/python3.10/dist-packages (from kornia==0.7.0) (2.4.0+cu124)
+Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (3.29.0)
+Requirement already satisfied: typing-extensions>=4.8.0 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (4.15.0)
+Requirement already satisfied: sympy in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (1.14.0)
+Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (3.4.2)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (3.1.6)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (2026.4.0)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.4.99)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.4.99)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.4.99)
+Requirement already satisfied: nvidia-cudnn-cu12==9.1.0.70 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (9.1.0.70)
+Requirement already satisfied: nvidia-cublas-cu12==12.4.2.65 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.4.2.65)
+Requirement already satisfied: nvidia-cufft-cu12==11.2.0.44 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (11.2.0.44)
+Requirement already satisfied: nvidia-curand-cu12==10.3.5.119 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (10.3.5.119)
+Requirement already satisfied: nvidia-cusolver-cu12==11.6.0.99 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (11.6.0.99)
+Requirement already satisfied: nvidia-cusparse-cu12==12.3.0.142 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.3.0.142)
+Requirement already satisfied: nvidia-nccl-cu12==2.20.5 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (2.20.5)
+Requirement already satisfied: nvidia-nvtx-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.4.99)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.4.99 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (12.4.99)
+Requirement already satisfied: triton==3.0.0 in /usr/local/lib/python3.10/dist-packages (from torch>=1.9.1->kornia==0.7.0) (3.0.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2->torch>=1.9.1->kornia==0.7.0) (3.0.3)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from sympy->torch>=1.9.1->kornia==0.7.0) (1.3.0)
+Downloading kornia-0.7.0-py2.py3-none-any.whl (705 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 705.7/705.7 kB 4.7 MB/s  0:00:00
+Installing collected packages: kornia
+  Attempting uninstall: kornia
+    Found existing installation: kornia 0.8.2
+    Uninstalling kornia-0.8.2:
+      Successfully uninstalled kornia-0.8.2
+Successfully installed kornia-0.7.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Found existing installation: kornia_rs 0.1.11
+Uninstalling kornia_rs-0.1.11:
+  Successfully uninstalled kornia_rs-0.1.11
+==> staging weights from Modal volume foundationpose-models
+    [skip] 2023-10-28-18-33-37 already present
+    [skip] 2024-01-11-20-02-45 already present
+==> verifying import via /usr/bin/python3
+/usr/local/lib/python3.10/dist-packages/kornia/feature/lightglue.py:30: FutureWarning: `torch.cuda.amp.custom_fwd(args...)` is deprecated. Please use `torch.amp.custom_fwd(args..., device_type='cuda')` instead.
+  @torch.cuda.amp.custom_fwd(cast_inputs=torch.float32)
+Warp 1.13.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.13.0
+FoundationPose import OK
+==> done. FoundationPose installed at /opt/foundationpose for /usr/bin/python3

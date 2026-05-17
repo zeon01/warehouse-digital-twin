@@ -1,0 +1,26 @@
+[INFO] [1778977499.835478187] [fleet_coordinator]: fleet_coordinator up — 2 AMRs, pick_cell at (16.00, 15.00)
+[WARN] [1778977506.775987229] [fleet_coordinator]: DEADLOCK detected: {'amr_1', 'amr_0'} (suppressing repeats — known false positive from broken TF lookup)
+[INFO] [1778977546.999173553] [fleet_coordinator]: enqueued order o1 at (4.00, 8.00)
+[INFO] [1778977605.806680104] [fleet_coordinator]: amr_0 arrived at shelf for order o1
+[INFO] [1778977732.396962933] [fleet_coordinator]: amr_0 arrived at pick cell for order o1 — starting pick
+[WARN] [1778977741.663574708] [fleet_coordinator]: order o1 FAILED: worker_crashed: RuntimeError: CUDA error: no kernel image is available for execution on the device
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+Traceback (most recent call last):
+  File "/work/ros2_ws/install/fleet_coordinator/lib/fleet_coordinator/fleet_coordinator_node", line 33, in <module>
+    sys.exit(load_entry_point('fleet-coordinator==0.0.1', 'console_scripts', 'fleet_coordinator_node')())
+  File "/work/ros2_ws/install/fleet_coordinator/lib/python3.10/site-packages/fleet_coordinator/node.py", line 310, in main
+    rclpy.spin(FleetCoordinator())
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+    executor.spin_once()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 681, in _wait_for_ready_callbacks
+    raise ExternalShutdownException()
+rclpy.executors.ExternalShutdownException

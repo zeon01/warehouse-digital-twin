@@ -1,0 +1,115 @@
+[INFO] [1778978802.271080706] [fleet_coordinator]: fleet_coordinator up — 6 AMRs, pick_cell at (16.00, 15.00)
+[WARN] [1778978809.214534367] [fleet_coordinator]: DEADLOCK detected: {'amr_3', 'amr_5', 'amr_4', 'amr_0', 'amr_2', 'amr_1'} (suppressing repeats — known false positive from broken TF lookup)
+[INFO] [1778978879.244315839] [fleet_coordinator]: enqueued order o02 at (7.00, 8.00)
+[INFO] [1778978885.002658284] [fleet_coordinator]: enqueued order o01 at (4.00, 8.00)
+[INFO] [1778978917.832191641] [fleet_coordinator]: enqueued order o03 at (10.00, 8.00)
+[INFO] [1778978941.168791863] [fleet_coordinator]: enqueued order o04 at (4.00, 12.00)
+[INFO] [1778978992.656742881] [fleet_coordinator]: enqueued order o05 at (7.00, 12.00)
+[INFO] [1778979014.451555220] [fleet_coordinator]: enqueued order o06 at (10.00, 12.00)
+[INFO] [1778979034.869782150] [fleet_coordinator]: enqueued order o08 at (7.00, 16.00)
+[INFO] [1778979050.118817509] [fleet_coordinator]: enqueued order o07 at (4.00, 16.00)
+[INFO] [1778979072.953347876] [fleet_coordinator]: amr_2 arrived at shelf for order o03
+[INFO] [1778979076.515023928] [fleet_coordinator]: enqueued order o09 at (10.00, 16.00)
+[INFO] [1778979081.963095518] [fleet_coordinator]: enqueued order o10 at (4.00, 20.00)
+[INFO] [1778979116.077559284] [fleet_coordinator]: enqueued order o11 at (7.00, 20.00)
+[INFO] [1778979118.706222127] [fleet_coordinator]: amr_3 arrived at shelf for order o04
+[INFO] [1778979156.779295138] [fleet_coordinator]: enqueued order o12 at (10.00, 20.00)
+[INFO] [1778979157.936664366] [fleet_coordinator]: enqueued order o13 at (4.00, 8.00)
+[INFO] [1778979192.907979121] [fleet_coordinator]: enqueued order o14 at (7.00, 8.00)
+[INFO] [1778979215.788246144] [fleet_coordinator]: amr_5 arrived at shelf for order o06
+[INFO] [1778979244.608653910] [fleet_coordinator]: enqueued order o15 at (10.00, 8.00)
+[INFO] [1778979265.874253821] [fleet_coordinator]: enqueued order o16 at (4.00, 12.00)
+[INFO] [1778979267.228158553] [fleet_coordinator]: amr_2 arrived at pick cell for order o03 — starting pick
+[INFO] [1778979267.394820307] [fleet_coordinator]: order o03 COMPLETED
+[INFO] [1778979275.569179125] [fleet_coordinator]: enqueued order o17 at (7.00, 12.00)
+[INFO] [1778979321.534381517] [fleet_coordinator]: enqueued order o18 at (10.00, 12.00)
+[INFO] [1778979344.189982021] [fleet_coordinator]: enqueued order o20 at (7.00, 16.00)
+[INFO] [1778979360.493372066] [fleet_coordinator]: enqueued order o19 at (4.00, 16.00)
+[INFO] [1778979413.763709830] [fleet_coordinator]: enqueued order o21 at (10.00, 16.00)
+[INFO] [1778979434.422569354] [fleet_coordinator]: enqueued order o22 at (4.00, 20.00)
+[INFO] [1778979441.597732345] [fleet_coordinator]: enqueued order o23 at (7.00, 20.00)
+[INFO] [1778979457.797514471] [fleet_coordinator]: enqueued order o24 at (10.00, 20.00)
+[INFO] [1778979580.515730401] [fleet_coordinator]: enqueued order o25 at (4.00, 8.00)
+[INFO] [1778979587.991693969] [fleet_coordinator]: amr_1 arrived at shelf for order o01
+[INFO] [1778979600.992843977] [fleet_coordinator]: enqueued order o26 at (7.00, 8.00)
+[INFO] [1778979640.792493052] [fleet_coordinator]: enqueued order o27 at (10.00, 8.00)
+[INFO] [1778979645.608373716] [fleet_coordinator]: amr_4 arrived at shelf for order o05
+[INFO] [1778979694.280625271] [fleet_coordinator]: enqueued order o28 at (4.00, 12.00)
+[INFO] [1778979787.616706461] [fleet_coordinator]: enqueued order o29 at (7.00, 12.00)
+[INFO] [1778979827.987307805] [fleet_coordinator]: enqueued order o30 at (10.00, 12.00)
+[INFO] [1778979849.506421059] [fleet_coordinator]: amr_4 arrived at pick cell for order o05 — starting pick
+[INFO] [1778979849.565919992] [fleet_coordinator]: order o05 COMPLETED
+[INFO] [1778979892.581065762] [fleet_coordinator]: enqueued order o31 at (4.00, 16.00)
+[INFO] [1778979894.790965200] [fleet_coordinator]: amr_3 arrived at pick cell for order o04 — starting pick
+[INFO] [1778979894.862210526] [fleet_coordinator]: order o04 COMPLETED
+[INFO] [1778979941.212045230] [fleet_coordinator]: enqueued order o32 at (7.00, 16.00)
+[INFO] [1778979982.719303624] [fleet_coordinator]: enqueued order o33 at (10.00, 16.00)
+[INFO] [1778979989.811082422] [fleet_coordinator]: amr_0 arrived at shelf for order o02
+[INFO] [1778980056.193864351] [fleet_coordinator]: enqueued order o34 at (4.00, 20.00)
+[INFO] [1778980077.169454038] [fleet_coordinator]: enqueued order o35 at (7.00, 20.00)
+[INFO] [1778980137.710248004] [fleet_coordinator]: enqueued order o36 at (10.00, 20.00)
+[INFO] [1778980149.111237161] [fleet_coordinator]: amr_4 arrived at shelf for order o25
+[INFO] [1778980196.835177589] [fleet_coordinator]: amr_3 arrived at shelf for order o14
+[INFO] [1778980203.052533373] [fleet_coordinator]: enqueued order o37 at (4.00, 8.00)
+[INFO] [1778980205.046187343] [fleet_coordinator]: amr_1 arrived at pick cell for order o01 — starting pick
+[INFO] [1778980205.119284432] [fleet_coordinator]: order o01 COMPLETED
+[INFO] [1778980244.386951704] [fleet_coordinator]: enqueued order o38 at (7.00, 8.00)
+[INFO] [1778980307.654809226] [fleet_coordinator]: enqueued order o39 at (10.00, 8.00)
+[INFO] [1778980343.853232446] [fleet_coordinator]: enqueued order o40 at (4.00, 12.00)
+[INFO] [1778980400.276098585] [fleet_coordinator]: enqueued order o41 at (7.00, 12.00)
+[WARN] [1778980415.819025868] [fleet_coordinator]: order o06 FAILED during nav: nav_status_6
+[INFO] [1778980417.829510796] [fleet_coordinator]: enqueued order o42 at (10.00, 12.00)
+[INFO] [1778980440.211403956] [fleet_coordinator]: amr_3 arrived at pick cell for order o14 — starting pick
+[INFO] [1778980440.278760867] [fleet_coordinator]: order o14 COMPLETED
+[WARN] [1778980468.270856830] [fleet_coordinator]: order o13 FAILED during nav: nav_status_6
+[INFO] [1778980477.305752722] [fleet_coordinator]: enqueued order o43 at (4.00, 16.00)
+[INFO] [1778980532.814110355] [fleet_coordinator]: enqueued order o44 at (7.00, 16.00)
+[INFO] [1778980543.858028180] [fleet_coordinator]: amr_0 arrived at pick cell for order o02 — starting pick
+[INFO] [1778980543.926352671] [fleet_coordinator]: order o02 COMPLETED
+[INFO] [1778980574.023907670] [fleet_coordinator]: enqueued order o45 at (10.00, 16.00)
+[INFO] [1778980632.979635812] [fleet_coordinator]: enqueued order o46 at (4.00, 20.00)
+[INFO] [1778980676.451679396] [fleet_coordinator]: enqueued order o47 at (7.00, 20.00)
+[INFO] [1778980739.060094480] [fleet_coordinator]: enqueued order o48 at (10.00, 20.00)
+[INFO] [1778980809.172064538] [fleet_coordinator]: enqueued order o49 at (4.00, 8.00)
+[INFO] [1778980809.386737740] [fleet_coordinator]: amr_0 arrived at shelf for order o28
+[INFO] [1778980847.192312593] [fleet_coordinator]: enqueued order o50 at (7.00, 8.00)
+[INFO] [1778980901.924620090] [fleet_coordinator]: enqueued order o51 at (10.00, 8.00)
+[INFO] [1778980947.098017395] [fleet_coordinator]: enqueued order o52 at (4.00, 12.00)
+[INFO] [1778981002.803437505] [fleet_coordinator]: enqueued order o53 at (7.00, 12.00)
+[INFO] [1778981086.195425797] [fleet_coordinator]: amr_0 arrived at pick cell for order o28 — starting pick
+[INFO] [1778981086.268052135] [fleet_coordinator]: order o28 COMPLETED
+[INFO] [1778981091.290392962] [fleet_coordinator]: enqueued order o54 at (10.00, 12.00)
+[INFO] [1778981128.405823694] [fleet_coordinator]: enqueued order o55 at (4.00, 16.00)
+[INFO] [1778981179.072326505] [fleet_coordinator]: enqueued order o56 at (7.00, 16.00)
+[INFO] [1778981209.246023985] [fleet_coordinator]: enqueued order o57 at (10.00, 16.00)
+[INFO] [1778981293.919063081] [fleet_coordinator]: enqueued order o58 at (4.00, 20.00)
+[INFO] [1778981316.564577336] [fleet_coordinator]: enqueued order o59 at (7.00, 20.00)
+[WARN] [1778981349.169894288] [fleet_coordinator]: order o25 FAILED during nav: nav_status_6
+[INFO] [1778981381.202522620] [fleet_coordinator]: enqueued order o60 at (10.00, 20.00)
+[INFO] [1778981394.079464916] [fleet_coordinator]: amr_0 arrived at shelf for order o49
+[WARN] [1778981405.255216116] [fleet_coordinator]: order o37 FAILED during nav: nav_status_6
+[INFO] [1778981465.832882976] [fleet_coordinator]: enqueued order o61 at (4.00, 8.00)
+[INFO] [1778981500.031167022] [fleet_coordinator]: enqueued order o62 at (7.00, 8.00)
+[INFO] [1778981510.762345374] [fleet_coordinator]: amr_1 arrived at shelf for order o40
+[INFO] [1778981545.636728390] [fleet_coordinator]: amr_4 arrived at shelf for order o50
+[INFO] [1778981547.202170037] [fleet_coordinator]: enqueued order o63 at (10.00, 8.00)
+[INFO] [1778981578.475060678] [fleet_coordinator]: amr_3 arrived at shelf for order o38
+[INFO] [1778981605.708019666] [fleet_coordinator]: enqueued order o64 at (4.00, 12.00)
+[INFO] [1778981690.987482002] [fleet_coordinator]: amr_0 arrived at pick cell for order o49 — starting pick
+[INFO] [1778981691.038359797] [fleet_coordinator]: order o49 COMPLETED
+Traceback (most recent call last):
+  File "/work/ros2_ws/install/fleet_coordinator/lib/fleet_coordinator/fleet_coordinator_node", line 33, in <module>
+    sys.exit(load_entry_point('fleet-coordinator==0.0.1', 'console_scripts', 'fleet_coordinator_node')())
+  File "/work/ros2_ws/install/fleet_coordinator/lib/python3.10/site-packages/fleet_coordinator/node.py", line 310, in main
+    rclpy.spin(FleetCoordinator())
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+    executor.spin_once()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 653, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:130

@@ -1,0 +1,5 @@
+[INFO] [1778977498.957227954] [static_transform_publisher_AKdP8EuBriLG9Hff]: Spinning until stopped - publishing transform
+translation: ('16.400000', '14.200000', '1.500000')
+rotation: ('0.917000', '0.000000', '0.000000', '-0.397000')
+from 'world' to 'cell_cam_optical'
+[INFO] [1778977812.657024329] [rclcpp]: signal_handler(SIGINT/SIGTERM)

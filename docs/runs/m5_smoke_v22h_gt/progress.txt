@@ -1,0 +1,27 @@
+2026-05-16T23:48:39.817901+00:00  script_start
+2026-05-16T23:48:39.971191+00:00  imports_ok
+2026-05-16T23:48:39.974892+00:00  scenario_loaded_smoke_orders=1_alloc=hungarian_planner=cbs_seed=42
+2026-05-16T23:49:04.346911+00:00  simapp_booted_bridge_enabled
+2026-05-16T23:49:09.223348+00:00  fleet_spawned_n=2
+2026-05-16T23:49:10.062919+00:00  franka_spawned
+2026-05-16T23:49:10.090072+00:00  pick_table_spawned_center=(16.4, 15.0, 0.36)
+2026-05-16T23:49:10.090152+00:00  pick_cube_spawned_center=(16.4, 15.0, 0.75)
+2026-05-16T23:49:10.092125+00:00  pick_cell_lighting_spawned
+2026-05-16T23:49:14.172145+00:00  cell_camera_spawned_pos=(16.4, 14.2, 1.5)_euler=(46.8, 0.0, 0.0)
+2026-05-16T23:49:14.259493+00:00  orphan_ros2_pkill_done
+2026-05-16T23:49:14.650577+00:00  m5_cad_written=/tmp/m5_smoke_box.obj
+2026-05-16T23:49:14.654393+00:00  pure_pursuit_launched_pid=15913
+2026-05-16T23:49:14.657872+00:00  move_group_launched_pid=15914
+2026-05-16T23:49:14.661406+00:00  cell_cam_static_tf_launched_pid=15915
+2026-05-16T23:49:14.664796+00:00  panda_link0_static_tf_launched_pid=15917
+2026-05-16T23:49:14.667490+00:00  franka_ready_joint_states_launched_pid=15920
+2026-05-16T23:49:14.670938+00:00  world_cube_pose_launched_pid=15922
+2026-05-16T23:49:14.673625+00:00  pick_orchestrator_launched_pid=15928
+2026-05-16T23:49:14.677835+00:00  coordinator_launched_pid=15934
+2026-05-16T23:49:14.677947+00:00  sleeping_30s_for_ros2_warmup
+2026-05-16T23:49:44.678663+00:00  ros2_warmup_done
+2026-05-16T23:49:52.529378+00:00  world_reset
+2026-05-16T23:49:57.141401+00:00  world_playing
+2026-05-16T23:49:59.547877+00:00  order_publisher_via_shell_ready
+2026-05-16T23:50:02.701287+00:00  order_published_o1
+2026-05-16T23:54:22.302177+00:00  loop_done_orders_enqueued=1

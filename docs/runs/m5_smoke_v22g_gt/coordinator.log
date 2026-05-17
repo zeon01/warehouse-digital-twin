@@ -1,0 +1,22 @@
+[INFO] [1778974826.210604427] [fleet_coordinator]: fleet_coordinator up — 2 AMRs, pick_cell at (16.00, 15.00)
+[WARN] [1778974833.154736114] [fleet_coordinator]: DEADLOCK detected: {'amr_0', 'amr_1'} (suppressing repeats — known false positive from broken TF lookup)
+[INFO] [1778974905.188495730] [fleet_coordinator]: enqueued order o1 at (4.00, 8.00)
+[INFO] [1778974957.875831380] [fleet_coordinator]: amr_0 arrived at shelf for order o1
+[INFO] [1778975072.721709991] [fleet_coordinator]: amr_0 arrived at pick cell for order o1 — starting pick
+[INFO] [1778975073.060163704] [fleet_coordinator]: order o1 COMPLETED
+Traceback (most recent call last):
+  File "/work/ros2_ws/install/fleet_coordinator/lib/fleet_coordinator/fleet_coordinator_node", line 33, in <module>
+    sys.exit(load_entry_point('fleet-coordinator==0.0.1', 'console_scripts', 'fleet_coordinator_node')())
+  File "/work/ros2_ws/install/fleet_coordinator/lib/python3.10/site-packages/fleet_coordinator/node.py", line 310, in main
+    rclpy.spin(FleetCoordinator())
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+    executor.spin_once()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 653, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:130

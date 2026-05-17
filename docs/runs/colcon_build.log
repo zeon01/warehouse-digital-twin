@@ -1,0 +1,16 @@
+Starting >>> wdt_franka_description
+Starting >>> fleet_coordinator
+Starting >>> warehouse_bringup
+Starting >>> wdt_carter_description
+Starting >>> wdt_nav2_bringup
+Starting >>> wdt_pure_pursuit
+Finished <<< wdt_franka_description [1.07s]
+Starting >>> wdt_manipulation_bringup
+Finished <<< wdt_pure_pursuit [1.32s]
+Finished <<< fleet_coordinator [1.35s]
+Finished <<< wdt_carter_description [1.41s]
+Finished <<< warehouse_bringup [1.46s]
+Finished <<< wdt_nav2_bringup [1.47s]
+Finished <<< wdt_manipulation_bringup [0.92s]
+
+Summary: 7 packages finished [2.19s]
