@@ -474,6 +474,23 @@ try:
     for _ in range(30):
         world.step(render=True)
 
+    # Optional overhead video capture: spawn a top-down camera + Replicator
+    # BasicWriter that drops rgb_NNNN.png frames under <out_dir>/frames/.
+    # Gated on scenario.record_video so the smoke (`record_video: false`)
+    # skips the IO cost; steady_state (`record_video: true`) records.
+    # Step every Nth render tick to throttle wall-fps; 6 ≈ 2 wall-fps at
+    # the typical 12 wall-fps render rate.
+    video_writer = None
+    video_step_every = 6
+    if scenario.record_video:
+        from sim.overhead_capture import spawn_overhead_capture, step_writer  # noqa: E402
+
+        try:
+            video_writer = spawn_overhead_capture(out_dir=str(out_dir))
+            mark("overhead_capture_spawned")
+        except Exception as exc:  # pragma: no cover — non-fatal
+            print(f"[run_scenario] overhead capture failed to spawn: {exc}")
+
     # Drive the sim for scenario.duration_s of sim time at 30 Hz; inject
     # orders at their arrival_t into the recorder (the coordinator picks
     # them up via its /orders/enqueue subscription once that publisher is
@@ -522,9 +539,19 @@ try:
         # render=True regardless of scenario.record_video — Carter's
         # diff_drive OG subscriber fires only on render ticks (gotcha
         # #4 in feedback-nav2-isaac-sim-gotchas). With render=False the
-        # AMR ignores all cmd_vel and never moves. Frame capture for
-        # MP4 is gated on scenario.record_video elsewhere (recorder).
+        # AMR ignores all cmd_vel and never moves.
         world.step(render=True)
+        # Throttled overhead frame capture (only when scenario.record_video).
+        # rep.orchestrator.step() triggers the BasicWriter to flush one
+        # rgb_NNNN.png to <out_dir>/frames/. Once the run completes,
+        # metrics.video.assemble_mp4(out_dir/"frames", out_dir/"run.mp4")
+        # stitches the frames into an MP4 via ffmpeg.
+        if video_writer is not None and (int(t / dt) % video_step_every == 0):
+            try:
+                step_writer()
+            except Exception as exc:  # pragma: no cover
+                print(f"[run_scenario] step_writer failed: {exc}")
+                video_writer = None
         t += dt
 
     mark(f"loop_done_orders_enqueued={next_order_idx}")
@@ -557,6 +584,23 @@ try:
                 )
 
     recorder.flush()
+
+    # Assemble the overhead video, if frames were captured. Errors are
+    # non-fatal — the metrics.json + events.log are the canonical run
+    # output; video is portfolio polish.
+    if video_writer is not None:
+        try:
+            from metrics.video import assemble_mp4  # noqa: E402
+
+            frame_dir = out_dir / "frames"
+            mp4_path = out_dir / "run.mp4"
+            if any(frame_dir.glob("rgb_*.png")):
+                assemble_mp4(frame_dir, mp4_path, fps=10)
+                mark(f"video_assembled={mp4_path}")
+            else:
+                print("[run_scenario] no frames captured; skipping MP4 assembly")
+        except Exception as exc:  # pragma: no cover
+            print(f"[run_scenario] video assembly failed: {exc}")
 
     # Shut down ROS2 subprocesses in reverse-launch order. `start_new_session=True`
     # put each child in its own process group, so we must killpg the GROUP not just

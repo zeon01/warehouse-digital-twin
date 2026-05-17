@@ -202,15 +202,42 @@ class PurePursuitDriver(Node):
 
 
 def main() -> None:
+    from rclpy.executors import ExternalShutdownException
+
     rclpy.init()
     node = PurePursuitDriver()
     executor = MultiThreadedExecutor()
     executor.add_node(node)
     try:
-        executor.spin()
+        while rclpy.ok():
+            try:
+                executor.spin()
+                break  # spin returned cleanly — shutdown signaled
+            except KeyError as exc:
+                # rclpy ActionServer race on goal-timeout cleanup
+                # (rclpy/action/server.py:357 looks up
+                # self._result_futures[goal_uuid] after the future was
+                # already removed by the abort path). Verified deterministic
+                # under M7 steady_state load when pp_driver hits
+                # goal_timeout_s and tries to publish the ABORTED result.
+                # The goal is already terminal; resuming the executor is
+                # safe and keeps the driver alive for the next goal.
+                node.get_logger().warn(
+                    f"executor.spin raised KeyError on goal-result cleanup "
+                    f"(rclpy ActionServer race, goal_uuid={exc!r}); resuming"
+                )
+                continue
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
     finally:
-        node.destroy_node()
-        rclpy.shutdown()
+        try:
+            node.destroy_node()
+        except Exception:
+            pass
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
